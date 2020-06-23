@@ -26,7 +26,11 @@ class dataSim():
             self.m_key = keyData[0]
             self.m_data = keyData[1]
 
-    def getData(self, timestamp, period):
+    def getData(self, timestamp, period, type):
+        if type == "stock":
+            return self.getDataStock(timestamp, period)
+
+    def getDataStock(self, timestamp, period):
         #timestamp should be last data recieved, start of data will be next timestamp
         afterData = None
         if timestamp is None:
@@ -60,4 +64,4 @@ class dataSim():
             return afterData[startIndex:index]
 
     async def asyncGetData(self, timestamp, period):
-        return self.getData(timestamp, period)
+        return self.getData(timestamp, period, "stock")

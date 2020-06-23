@@ -15,7 +15,9 @@ class feed():
 
         self.m_lastTimestamp = None
         self.m_newData = None
+        self.m_newCalcData = None
         self.m_data = None
+        self.m_calcData = None
         self.m_end = False
 
     def updateHelper(self, rawData):
@@ -24,7 +26,7 @@ class feed():
         else:
             logging.warning("RAW DATA CONVERSION TO PANDAS NOT IMPLEMENTED YET")
 
-        if self.m_newData is not None and len(self.m_newData.index):
+        if self.m_newData is not None and len(self.m_newData.index) > 0:
             self.m_lastTimestamp = self.m_newData.index[-1]
             if self.m_data is None:
                 self.m_data = self.m_newData
@@ -36,6 +38,7 @@ class feed():
     async def asyncUpdate(self):
         rawData = await self.m_getDataFunc(self.m_lastTimestamp, self.m_period)
         self.updateHelper(rawData)
+        self.m_newCalcData = pd.DataFrame(index=self.m_newData.index)
         return self.m_newData
 
 
@@ -51,3 +54,17 @@ class feed():
 
     def getNewData(self):
         return self.m_newData
+
+    def appendCalcData(self):
+        if self.m_calcData is None:
+            self.m_calcData = self.m_newCalcData
+        else:
+            self.m_calcData = self.m_calcData.append(self.m_newCalcData, sort = True)
+
+    def addNewCalcCols(self, cols):
+        for key, value in cols.items():
+            try:
+                self.m_newCalcData[key] = value
+            except ValueError as err:
+                logging.warning("addNewCalcCols")
+                logging.warning(err)

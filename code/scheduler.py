@@ -3,11 +3,7 @@ import time
 import threading
 from trigger import trigger
 
-#TODO: Fix time drift
-#TODO: Could there be a better implementation for _schedulerRunNonBlocking
-
-#TODO: BIGGEST UPGRADE WOULD BE SWITCHING THIS TO USE asyncio
-#problem with using asyncio comes with sub blocks for events, how to solve this
+#NOW USING ASYNC SHECUDLER, THIS IS LEFT HERE JUST IN CASE
 class scheduler():
     def __init__(self, actions, feed):
         self.m_sched = sched.scheduler(time.time, time.sleep)

@@ -1,4 +1,5 @@
 import asyncio
+import logging
 """
 class asyncScheduler():
     def __init__(self, actions, feed):
@@ -49,8 +50,9 @@ class asyncScheduler():
 
     async def asyncUpdate(self):
         while True:
-            if self.m_feed.m_end is True:
+            if self.m_feed.m_end:
                 self.stop()
+                break
             newData = await self.m_feed.asyncUpdate()
             self.m_actionPool.doActions(newData)
 
@@ -61,7 +63,8 @@ class asyncScheduler():
         try:
             loop.run_until_complete(self.m_task)   
         except asyncio.CancelledError:
-            pass
+            if not self.m_feed.m_end:
+                logging.warning("async cncelled error")
 
     def stop(self):
         self.m_task.cancel()

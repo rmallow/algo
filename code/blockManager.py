@@ -13,15 +13,15 @@ def loadObj(name ):
 
 def _loadBlockAndDataSource(blockConfig):
     dataSource = _loadDataSource(blockConfig['dataSource'])
-    block = _loadBlock(blockConfig, dataSource.getData, top = True)
+    block = _loadBlock(blockConfig, dataSource.getData)
     return block, dataSource
 
 
 def _loadBlock(blockConfig, dataFunc, top = False):
     name = blockConfig['name']
     feed = _loadFeed(blockConfig['feed'], dataFunc)
-    subBlocks, actionList = _loadActionList(blockConfig['actionList'])
-    return block(actionList, feed, name=name, subBlocks=subBlocks, top=top)
+    actionList = _loadActionList(blockConfig['actionList'])
+    return block(actionList, feed, name=name)
 
 def _loadDataSource(dataSourceConfig):
     dataSourceType = dataSourceConfig['type']
@@ -34,29 +34,20 @@ def _loadDataSource(dataSourceConfig):
         return None #change after implementing stream
 
 def _loadActionList(actionListConfig):
-    subBlocks = []
     actionList = []
     for key, actionConfig in actionListConfig.items():
         action = None
         actionType = actionConfig['actionType']
         name = actionConfig['name']
         calcFunc = actionConfig['calcFunc']
-        timer = actionConfig['timer']
-        onFeedChange = actionConfig['onFeedChange']
-        priority = actionConfig['priority']
-        args = actionConfig['args']
+        period = actionConfig['period']
         if actionType == 'trigger':
             #implement message router here
-            action = trigger(name=name, calcFunc=calcFunc, timer=timer,
-            onFeedChange=onFeedChange, args=args)
+            action = trigger(name=name, calcFunc=calcFunc, period=period)
         elif actionType == 'event':
-            action = event(name=name, calcFunc=calcFunc, timer=timer,
-            onFeedChange=onFeedChange, args=args)
-            subBlock = _loadBlock(actionConfig['block'], action.getData)
-            subBlocks.append(subBlock)
-            action.m_childBlock = subBlock
+            action = event(name=name, calcFunc=calcFunc, period = period)
         actionList.append(action)
-    return subBlocks, actionList
+    return actionList
 
 def _loadFeed(feedConfig, dataFunc):
     period = feedConfig['period']
@@ -71,12 +62,10 @@ class blockManager():
 
     def loadBlocks(self):
         print("---- Block Manager Loading Blocks ----")
-        #for key in self.m_groups:
         for key, config in self.m_assetBlockConfig.items():
             block, dataSource = _loadBlockAndDataSource(config)
             self.m_blockList.append(block)
             self.m_dataMangerList.append(dataSource)
-            #get data manager of top level blcok and append to data managers list
-
+        print("---- Block Manager Done Loading ----")
 
 
