@@ -1,0 +1,23 @@
+block:
+    name: AAPL
+    dataSource:
+        type: dataSim
+        key: ../../data/m1test/AAPL.USUSD_Candlestick_1_M_BID_01.04.2020-03.04.2020.csv
+        fileType: csv
+    feed:
+        period: 60
+        continuous: False
+    actionList:
+        action1:
+            name: lowSearch
+            actionType: trigger
+            calcFunc: REPLACEME
+            period: 1
+            messageRouter: REPALCEME2
+        action2:
+            name: RSI
+            actionType: event
+            calcFunc:
+                location: eventFuncs
+                name: testFunc
+            period: 1
