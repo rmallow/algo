@@ -5,7 +5,10 @@ from trigger import trigger
 import pickle
 from feed import feed
 from dataSim import dataSim
+import importlib
 
+def _loadCalcFunc(calcFuncConfig):
+    return getattr(importlib.import_module(calcFuncConfig['location']),calcFuncConfig['name'])
 
 def loadObj(name ):
     with open('obj/' + name + '.pkl', 'rb') as f:
@@ -39,7 +42,7 @@ def _loadActionList(actionListConfig):
         action = None
         actionType = actionConfig['actionType']
         name = actionConfig['name']
-        calcFunc = actionConfig['calcFunc']
+        calcFunc = _loadCalcFunc(actionConfig['calcFunc'])
         period = actionConfig['period']
         if actionType == 'trigger':
             #implement message router here
