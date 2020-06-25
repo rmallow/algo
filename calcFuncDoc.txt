@@ -1,0 +1,9 @@
+TO ADD:
+Simple math ones that will for sure be needed
+SMA - simple moving average
+EMA - exponential moving average
+
+
+RSI
+MACD (ask me about this one if i don't add clarification here)
+MFI
