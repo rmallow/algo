@@ -5,5 +5,5 @@ class handler():
         self.m_messageRouter = messageRouter
 
     def getMessage(self):
-        x = 2
+        pass
         

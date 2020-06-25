@@ -6,5 +6,4 @@ class messageRouter():
         self.m_messageSubscriptions = {}
 
     def broadcast(self):
-        x = 2
-        #do something with Queue here
+        pass

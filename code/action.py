@@ -12,4 +12,4 @@ class action():
         self.m_calcFunc = calcFunc
 
     def update(self, feed):
-        x=2
+        pass
