@@ -14,10 +14,12 @@ class feed():
         self.m_continuous = continuous #if continuous is true, feed will update periods before full period time has elapsed
 
         self.m_lastTimestamp = None
+
         self.m_newData = None
         self.m_newCalcData = None
         self.m_data = None
         self.m_calcData = None
+        
         self.m_end = False
 
     def updateHelper(self, rawData):
