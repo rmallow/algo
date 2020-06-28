@@ -1,4 +1,4 @@
 from feed import feed
 
-def testFunc(feed):
-    return {"test4":12345}
+def testFunc(feed, **kwargs):
+    return {"test4":12345, "periodTest": kwargs['period']}

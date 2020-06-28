@@ -7,7 +7,5 @@ class trigger(action):
         self.m_messageRouter = None
 
     def update(self, feed):
-        super().update(feed)
-        if self.m_calcFunc is not None:
-            messages = self.m_calcFunc(feed)
-            self.m_messageRouter.broadcast(messages)
+        messages = super().update(feed)
+        self.m_messageRouter.broadcast(messages)

@@ -7,9 +7,7 @@ class action():
         self.m_name = name
 
         #member variables not assigned at initiation
-        self.m_data = None        #might not be necessary
-        self.m_lastTimestamp = None
         self.m_calcFunc = calcFunc
 
-    def update(self, feed):
-        pass
+    def update(self, feed, **kwargs):
+        return self.m_calcFunc(feed, period = self.m_period, kwargs=kwargs)

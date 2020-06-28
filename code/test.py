@@ -10,10 +10,10 @@ import os
 import sys
 import importlib
 
-def testCalcFunc(feed):
+def testCalcFunc(feed, **kwargs):
     return {"test1":123}
 
-def testCalcFunc2(feed):
+def testCalcFunc2(feed, **kwargs):
     testCol = feed.m_newCalcData['test1']
     array1 = []
     array2 = []
@@ -25,7 +25,7 @@ def testCalcFunc2(feed):
     
     return {"test2":array1,"test3":array2}
 
-def testCalcFunc3(feed):
+def testCalcFunc3(feed, **kwargs):
     open = feed.m_newData['Open']
     close = feed.m_newData['Close']
     array = []
@@ -44,8 +44,10 @@ def main():
     actionList.append(event(period=1, name="testEvent2", calcFunc=testCalcFunc2))
     actionList.append(event(period=1, name="testEvent3", calcFunc=testCalcFunc3))
     #actionList.append(event(period=1, name="rsi", calcFunc=testRSI))
-    func = getattr(importlib.import_module("eventFuncs"),"testFunc")
-    actionList.append(event(period=1, name="rsi", calcFunc=func))
+
+    func = getattr(importlib.import_module("eventFuncs"), "testFunc")
+    
+    actionList.append(event(period=60, name="rsi", calcFunc=func))
     dS = dataSim(os.path.abspath(os.getcwd() + "/../../data/m1test/AAPL.USUSD_Candlestick_1_M_BID_01.04.2020-03.04.2020.csv"), 'csv')
     testFeed = feed(dS.asyncGetData)
     testBlock = block(actionList, testFeed)
