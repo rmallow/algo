@@ -16,7 +16,7 @@ def loadObj(name ):
 
 def _loadBlockAndDataSource(blockConfig):
     dataSource = _loadDataSource(blockConfig['dataSource'])
-    block = _loadBlock(blockConfig, dataSource.getData)
+    block = _loadBlock(blockConfig, dataSource.asyncGetData)
     return block, dataSource
 
 
@@ -71,4 +71,6 @@ class blockManager():
             self.m_dataMangerList.append(dataSource)
         print("---- Block Manager Done Loading ----")
 
-
+    def start(self):
+        for block in self.m_blockList:
+            block.start()
