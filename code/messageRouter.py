@@ -26,7 +26,8 @@ class messageRouter():
         while not self.m_end:
             try:
                 message = self.m_messageQueue.get()
-                if message is not None:
-                    self.broadcast(message)
             except queue.Empty:
                 pass
+            else:
+                if message is not None:
+                    self.broadcast(message)
