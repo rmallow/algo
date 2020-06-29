@@ -1,5 +1,7 @@
 import multiprocessing as mp
 import queue
+import message
+import handler
 
 
 """
@@ -12,6 +14,7 @@ class messageRouter():
         self.m_end = False
         self.m_messageQueue = mp.Queue()
         self.m_messageSubscriptions = {}
+        self.m_handlerUpdateDict = {}
 
     #send to message subscriptions
     def broadcast(self, message):
@@ -22,6 +25,9 @@ class messageRouter():
     def send(self, message):
         self.m_messageQueue.put(message)
 
+    def processCommand(self, message):
+        pass
+
     def start(self):
         while not self.m_end:
             try:
@@ -30,4 +36,8 @@ class messageRouter():
                 pass
             else:
                 if message is not None:
-                    self.broadcast(message)
+                    #determine if message is a command
+                    if message.m_type is "command":
+                        self.processCommand(message)
+                    else:
+                        self.broadcast(message)
