@@ -2,9 +2,6 @@ import os
 import pandas as pd
 import numpy as np
 
-def testPrint():
-	print("Bitch")
-
 #specify a specific extension to filter for
 def getFilesFromDir(path, ext = None):
 	(_, _, filenames) = next(os.walk(path))
