@@ -11,7 +11,9 @@ block:
         action1:
             name: lowSearch
             actionType: trigger
-            calcFunc: REPLACEME
+            calcFunc:
+                location: eventFuncs
+                name: testFunc
             period: 1
             messageRouter: REPALCEME2
         action2:
