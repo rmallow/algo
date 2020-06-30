@@ -1,7 +1,7 @@
 import feed
 
 class action():
-    def __init__(self, actionType, period = 1, name = "defaultActionName", calcFunc = None, cols = cols):
+    def __init__(self, actionType, period = 1, name = "defaultActionName", calcFunc = None, cols = None):
         self.m_actionType = actionType
         self.m_period = period
         self.m_name = name
