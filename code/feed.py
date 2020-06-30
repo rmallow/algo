@@ -8,6 +8,9 @@ import logging
 #feed is meant to be an inbetween from raw data to processed data
 
 class feed():
+
+    INSUF_DATA = 'insufData'
+
     def __init__(self, dataFunc, period = 1, continuous = False):
         self.m_getDataFunc = dataFunc
         self.m_period = period	#if period is none, then ticks, otherwise period num in seconds
