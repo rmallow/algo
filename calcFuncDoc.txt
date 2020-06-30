@@ -7,3 +7,8 @@ EMA - exponential moving average
 RSI
 MACD (ask me about this one if i don't add clarification here)
 MFI
+
+func: smaFunc
+description: Returns the Simple Moving Average (SMA) using a passed in period
+output:
+    sma: array
