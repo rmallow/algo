@@ -23,7 +23,7 @@ class messageRouter():
         for handler in handlerList:
             handler.send(message)
 
-    def send(self, message):
+    def receive(self, message):
         self.m_messageQueue.put(message)
 
     #this will handle how the message router responds to various commands
@@ -71,8 +71,8 @@ class messageRouter():
         pass
 
     CMD_DICT = {
-        101: cmdStart,
-        102: cmdEnd,
-        103: cmdAbort,
-        104: cmdResume
+        message.COMMAND_START: cmdStart,
+        message.COMMAND_END: cmdEnd,
+        message.COMMAND_END: cmdAbort,
+        message.COMMAND_RESUME: cmdResume
     }

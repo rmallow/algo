@@ -8,4 +8,5 @@ class trigger(action):
 
     def update(self, feed):
         messages = super().update(feed)
-        self.m_messageRouter.broadcast(messages)
+        for message in messages:
+            self.m_messageRouter.recieve(messages)

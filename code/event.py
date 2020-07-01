@@ -6,4 +6,4 @@ class event(action):
 
     def update(self, feed):
         cols = super().update(feed)
-        feed.addNewCalcCols(cols)
+        return cols
