@@ -1,0 +1,18 @@
+handler1:
+    name: firstHandler
+    subscriptions:
+        - TestMessage
+        - AnotherTestMessage
+        - AndAThirdJustToBeSafeMessage
+    calcFunc:
+        location: handlerFuncs
+        name: testFunc1
+handler2:
+    name: secondHandler
+    subscriptions:
+        - TestMessage
+        - AnotherTestMessage
+        - UniqueMessage
+    calcFunc:
+        location: handlerFuncs
+        name: testFunc1
