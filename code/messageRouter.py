@@ -10,8 +10,6 @@ import handlerManager
 This class works as an intermediate between the blocks and the handlers
 The message router accepts new messages from triggers and sends
 those messages out to all handlers that are subscribed to that message
-
-after initialization, handler manager must be set
 """
 class messageRouter():
     def __init__(self, handlerManager):
@@ -65,7 +63,7 @@ class messageRouter():
         if updateSet is not None:
             #send to handlerManager queue
             val = (message.m_sourceCode, updateSet)
-
+            self.m_handlerManger.receive(val)
         else:
             logging.warning("end cmd on not found code:")
             logging.warning(str(message.m_sourceCode))
