@@ -27,16 +27,17 @@ class actionPool():
         
         self.m_feed.appendCalcData()
 
-        self.m_messageRouter.receive(msg.message(msg.COMMAND_TYPE, msg.COMMAND_START,
-        sourceCode=self.m_code))
+        if len(self.m_triggers) > 0:
+            self.m_messageRouter.receive(msg.message(msg.COMMAND_TYPE, msg.COMMAND_START,
+            sourceCode=self.m_code))
 
-        for trigger in self.m_triggers:
-            messages = trigger.update(self.m_feed)
-            for message in messages:
-                message.m_sourceCode = self.m_code
-                self.m_messageRouter.receive(message)
+            for trigger in self.m_triggers:
+                messages = trigger.update(self.m_feed)
+                for message in messages:
+                    message.m_sourceCode = self.m_code
+                    self.m_messageRouter.receive(message)
 
-        self.m_messageRouter.receive(msg.message(msg.COMMAND_TYPE, msg.COMMAND_END,
-        sourceCode=self.m_code))
+            self.m_messageRouter.receive(msg.message(msg.COMMAND_TYPE, msg.COMMAND_END,
+            sourceCode=self.m_code))
         
             

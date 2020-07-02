@@ -3,25 +3,30 @@ import queue
 import message
 import handler
 import logging
+import handlerManager
 
 
 """
 This class works as an intermediate between the blocks and the handlers
 The message router accepts new messages from triggers and sends
 those messages out to all handlers that are subscribed to that message
+
+after initialization, handler manager must be set
 """
 class messageRouter():
-    def __init__(self):
+    def __init__(self, handlerManager):
         self.m_end = False
         self.m_messageQueue = mp.Queue()
-        self.m_messageSubscriptions = {}
         self.m_handlerUpdateDict = {}
+        self.m_handlerManger = handlerManager
 
     #send to message subscriptions
     def broadcast(self, message):
-        handlerList = self.m_messageSubscriptions.get(message.m_name, [])
+        handlerList = self.m_handlerManager.m_messageSubscriptions.get(message.m_name, [])
+        updateSet = self.m_handlerUpdateDict.get(message.m_sourceCode, set())
         for handler in handlerList:
             handler.receive(message)
+            updateSet.add(handler)
 
     def receive(self, message):
         self.m_messageQueue.put(message)
@@ -56,11 +61,11 @@ class messageRouter():
             logging.warning(str(message.m_sourceCode))
 
     def cmdEnd(self, message):
-        updateList = self.m_handlerUpdateDict.pop(message.m_sourceCode,None)
-        if updateList is not None:
+        updateSet = self.m_handlerUpdateDict.pop(message.m_sourceCode,None)
+        if updateSet is not None:
             #send to handlerManager queue
-            val = (message.m_sourceCode, updateList)
-            
+            val = (message.m_sourceCode, updateSet)
+
         else:
             logging.warning("end cmd on not found code:")
             logging.warning(str(message.m_sourceCode))

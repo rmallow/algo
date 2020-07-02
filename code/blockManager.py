@@ -14,17 +14,13 @@ def loadObj(name ):
     with open('obj/' + name + '.pkl', 'rb') as f:
         return pickle.load(f)
 
-def _loadBlockAndDataSource(blockConfig):
+def _loadBlockAndDataSource(blockConfig, messageRouter):
     dataSource = _loadDataSource(blockConfig['dataSource'])
-    block = _loadBlock(blockConfig, dataSource.asyncGetData)
-    return block, dataSource
-
-
-def _loadBlock(blockConfig, dataFunc, top = False):
     name = blockConfig['name']
-    feed = _loadFeed(blockConfig['feed'], dataFunc)
+    feed = _loadFeed(blockConfig['feed'], dataSource.asyncGetData)
     actionList = _loadActionList(blockConfig['actionList'])
-    return block(actionList, feed, name=name)
+    blk = block(actionList, feed, messageRouter, name=name)
+    return blk, dataSource
 
 def _loadDataSource(dataSourceConfig):
     dataSourceType = dataSourceConfig['type']
@@ -58,15 +54,16 @@ def _loadFeed(feedConfig, dataFunc):
     return feed(dataFunc, period=period, continuous=continuous)
 
 class blockManager():
-    def __init__(self,configDict):
+    def __init__(self,configDict, messageRouter):
         self.m_assetBlockConfig = configDict
         self.m_blockList = []
         self.m_dataMangerList = []
+        self.m_messageRouter = messageRouter
 
     def loadBlocks(self):
         print("---- Block Manager Loading Blocks ----")
         for key, config in self.m_assetBlockConfig.items():
-            block, dataSource = _loadBlockAndDataSource(config)
+            block, dataSource = _loadBlockAndDataSource(config, self.m_messageRouter)
             self.m_blockList.append(block)
             self.m_dataMangerList.append(dataSource)
         print("---- Block Manager Done Loading ----")
