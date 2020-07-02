@@ -6,9 +6,9 @@ import pandas
 
 
 class block():
-    def __init__(self, actionList, feed, messageRouter, name ="defaultBlockName"):
+    def __init__(self, actionList, feed, messageRouter, name ="defaultBlockName", code = 123):
         #somehow options for the feed need to be read in here, can be implemented later, for now set manually
-        self.m_code = 123
+        self.m_code = code
         
         self.m_feed = feed
         self.m_messageRouter = messageRouter

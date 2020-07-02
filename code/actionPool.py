@@ -33,6 +33,7 @@ class actionPool():
         for trigger in self.m_triggers:
             messages = trigger.update(self.m_feed)
             for message in messages:
+                message.m_sourceCode = self.m_code
                 self.m_messageRouter.receive(message)
 
         self.m_messageRouter.receive(msg.message(msg.COMMAND_TYPE, msg.COMMAND_END,

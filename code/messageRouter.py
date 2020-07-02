@@ -21,7 +21,7 @@ class messageRouter():
     def broadcast(self, message):
         handlerList = self.m_messageSubscriptions.get(message.m_name, [])
         for handler in handlerList:
-            handler.send(message)
+            handler.receive(message)
 
     def receive(self, message):
         self.m_messageQueue.put(message)
@@ -33,7 +33,7 @@ class messageRouter():
     def start(self):
         while not self.m_end:
             try:
-                message = self.m_messageQueue.get()
+                message = self.m_messageQueue.get(timeout=2)
             except queue.Empty:
                 pass
             else:
@@ -56,10 +56,11 @@ class messageRouter():
             logging.warning(str(message.m_sourceCode))
 
     def cmdEnd(self, message):
-        updateList = self.m_handlerUpdateDict.pop(message.m_sourceCode.None)
+        updateList = self.m_handlerUpdateDict.pop(message.m_sourceCode,None)
         if updateList is not None:
-            for handler in updateList:
-                handler.update()
+            #send to handlerManager queue
+            val = (message.m_sourceCode, updateList)
+            
         else:
             logging.warning("end cmd on not found code:")
             logging.warning(str(message.m_sourceCode))

@@ -1,4 +1,4 @@
-
+import message
 class handler():
     def __init__(self, name, calcFunc):
         self.m_name = name
@@ -9,8 +9,11 @@ class handler():
 
     #called by messageRouter if there is an incoming message
     def update(self, code):
-        pass
+        msgLst = self.m_incomingMessages.pop(code, [])
+        for msg in msgLst:
+            self.m_calcFunc(msg)
 
     def recieve(self, message):
-        pass
-        
+        lst = self.m_incomingMessages.get(message.m_sourceCode, [])
+        lst.append(message)
+        self.m_incomingMessages[message.m_sourceCode] = lst
