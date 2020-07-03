@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 import numpy as np
+from pathlib import Path
+import logging
 
 #specify a specific extension to filter for
 def getFilesFromDir(path, ext = None):
@@ -54,7 +56,11 @@ def combineDirCSV(path, names = None, index = 'Date'):
 		
 
 #only loads one CSV file as key
-def loadSingleCSV(fullPath, names = None, index = 'Date'):
+def loadSingleCSV(path, names=None, index='Date'):
+	print(Path.cwd())
+	print("????????????????????????????????????")
+	logging.warning("why isnt this printing")
+	fullPath = Path.cwd() / path
 	data = loadCSV(fullPath, names, index)	
-	key = os.path.splitext(os.path.split(fullPath)[1])[0]
+	key = os.path.splitext(os.path.split(path)[1])[0]
 	return (key, data)
