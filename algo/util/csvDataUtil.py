@@ -57,9 +57,6 @@ def combineDirCSV(path, names = None, index = 'Date'):
 
 #only loads one CSV file as key
 def loadSingleCSV(path, names=None, index='Date'):
-	print(Path.cwd())
-	print("????????????????????????????????????")
-	logging.warning("why isnt this printing")
 	fullPath = Path.cwd() / path
 	data = loadCSV(fullPath, names, index)	
 	key = os.path.splitext(os.path.split(path)[1])[0]

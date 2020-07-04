@@ -1,15 +1,15 @@
-from trigger import trigger
-from event import event
-from block import block
-from blockManager import blockManager
-from dataSim import dataSim
-from feed import feed
+from algo.trigger import trigger
+from algo.event import event
+from algo.block import block
+from algo.blockManager import blockManager
+from algo.dataSim import dataSim
+from algo.feed import feed
 import threading
 import time
 import os
 import sys
 import importlib
-import message
+import algo.message
 
 def testCalcFunc(feed, **kwargs):
     return {"test1":123}
@@ -50,7 +50,7 @@ def main():
     
     actionList.append(event(period=300, name="sma", calcFunc=func))
 
-    dS = dataSim(os.path.abspath(os.getcwd() + "/../../data/m1test/AAPL.USUSD_Candlestick_1_M_BID_01.04.2020-03.04.2020.csv"), 'csv')
+    dS = dataSim(os.path.abspath(os.getcwd() + "/data/m1test/AAPL.USUSD_Candlestick_1_M_BID_01.04.2020-03.04.2020.csv"), 'csv')
     testFeed = feed(dS.asyncGetData)
     testBlock = block(actionList, testFeed, None)
     testBlock.m_feed.m_period = 60
@@ -63,5 +63,6 @@ def main():
     print(testBlock.m_feed.m_data['Volume'].sum())
 
     print(message.COMMAND_TYPE)
+
 if __name__ == '__main__':
     main()

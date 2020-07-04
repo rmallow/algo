@@ -1,4 +1,4 @@
-from handler import handler
+from algo.handler import handler
 import multiprocessing as mp
 import importlib
 import queue

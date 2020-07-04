@@ -7,8 +7,9 @@ COMMAND_ABORT = 103
 COMMAND_RESUME = 104
 
 class message():
-    def __init__(self, messageType, message, sourceName = None, sourceCode = None):
+    def __init__(self, messageType, message, name = None, sourceName = None, sourceCode = None):
         self.m_type = messageType
         self.m_message = message
+        self.m_name = name
         self.m_sourceName = sourceName
         self.m_sourceCode = sourceCode

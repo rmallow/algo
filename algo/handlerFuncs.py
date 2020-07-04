@@ -6,7 +6,7 @@ prob needs its own data store and a func
 could be a calculator class that stores the data and calculates
 """
 
-import message
+import algo.message
 
 def testFunc1(message):
     print(message.m_message)

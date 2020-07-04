@@ -1,22 +1,39 @@
-from messageRouter import messageRouter
-from blockManager import blockManager
-from handlerManager import handlerManager
+from algo.messageRouter import messageRouter
+from algo.blockManager import blockManager
+from algo.handlerManager import handlerManager
 
-import configLoader
+import algo.configLoader as configLoader
 
 import multiprocessing as mp
+from pathlib import Path
 
-def main():
-    
-    configDict = configLoader.getConfigDictFromFile("../config/testHandlerConfig.yml")
+def start():
+
+    path = Path("/Users/rmallow/Documents/stonks/algo/config/testHandlerConfig.yml")
+    configDict = configLoader.getConfigDictFromFile(path)
     hM = handlerManager(configDict)
     hM.loadHandlers()
 
     mR = messageRouter(hM)
 
-    configDict = configLoader.getConfigDictFromFile("../config/testBlockConfig.yml")
-    bM = blockManager(configDict, messageRouter)
+    path = Path("/Users/rmallow/Documents/stonks/algo/config/testBlockConfig.yml")
+    configDict = configLoader.getConfigDictFromFile(path)
+    bM = blockManager(configDict, mR)
     bM.loadBlocks()
 
+    p1 = mp.Process(target=hM.start)
+    p1.start()
+
+    p2 = mp.Process(target = mR.start)
+    p2.start()
+
+    p3 = mp.Process(target=bM.start)
+    p3.start()
+
+    p1.join()
+    p2.join()
+    p3.join()
+    
+
 if __name__ == '__main__':
-    main()
+    start()

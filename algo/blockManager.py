@@ -1,10 +1,10 @@
 import multiprocessing
-from block import block
-from event import event
-from trigger import trigger
+from algo.block import block
+from algo.event import event
+from algo.trigger import trigger
 import pickle
-from feed import feed
-from dataSim import dataSim
+from algo.feed import feed
+from algo.dataSim import dataSim
 import importlib
 
 def _loadCalcFunc(calcFuncConfig):

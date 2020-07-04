@@ -1,9 +1,7 @@
 import sys
 import os
 
-sys.path.append("..")
-
-import util.csvDataUtil as cdu
+import algo.util.csvDataUtil as cdu
 
 
 #use this to load data and send to feeds for backtesting/simulation

@@ -1,9 +1,9 @@
 import multiprocessing as mp
 import queue
-import message
-import handler
+import algo.message as msg
+import algo.handler
 import logging
-import handlerManager
+import algo.handlerManager
 
 
 """
@@ -16,7 +16,7 @@ class messageRouter():
         self.m_end = False
         self.m_messageQueue = mp.Queue()
         self.m_handlerUpdateDict = {}
-        self.m_handlerManger = handlerManager
+        self.m_handlerManager = handlerManager
 
     #send to message subscriptions
     def broadcast(self, message):
@@ -29,10 +29,7 @@ class messageRouter():
     def receive(self, message):
         self.m_messageQueue.put(message)
 
-    #this will handle how the message router responds to various commands
-    def processCommand(self, message):
-        self.CMD_DICT.get(message.m_message,cmdNotFound)(self,message)
-        
+       
     def start(self):
         while not self.m_end:
             try:
@@ -42,7 +39,8 @@ class messageRouter():
             else:
                 if message is not None:
                     #determine if message is a command
-                    if message.m_type is "command":
+                    if message.m_type == msg.COMMAND_TYPE:
+
                         self.processCommand(message)
                     else:
                         self.broadcast(message)
@@ -53,7 +51,7 @@ class messageRouter():
 
     def cmdStart(self, message):
         if message.m_sourceCode not in self.m_handlerUpdateDict:
-            self.m_handlerUpdateDict = []
+            self.m_handlerUpdateDict[message.m_sourceCode] = set()
         else:
             logging.warning("start cmd on existing update list, code:")
             logging.warning(str(message.m_sourceCode))
@@ -63,7 +61,7 @@ class messageRouter():
         if updateSet is not None:
             #send to handlerManager queue
             val = (message.m_sourceCode, updateSet)
-            self.m_handlerManger.receive(val)
+            self.m_handlerManager.receive(val)
         else:
             logging.warning("end cmd on not found code:")
             logging.warning(str(message.m_sourceCode))
@@ -74,9 +72,12 @@ class messageRouter():
     def cmdResume(self, message):
         pass
 
+    def processCommand(self, message):
+        self.CMD_DICT.get(message.m_message,self.cmdNotFound)(self,message)
+
     CMD_DICT = {
-        message.COMMAND_START: cmdStart,
-        message.COMMAND_END: cmdEnd,
-        message.COMMAND_END: cmdAbort,
-        message.COMMAND_RESUME: cmdResume
+        msg.COMMAND_START: cmdStart,
+        msg.COMMAND_END: cmdEnd,
+        msg.COMMAND_ABORT: cmdAbort,
+        msg.COMMAND_RESUME: cmdResume
     }

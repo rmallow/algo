@@ -1,7 +1,7 @@
 import sched
 import time
 import threading
-from trigger import trigger
+from algo.trigger import trigger
 
 #NOW USING ASYNC SHECUDLER, THIS IS LEFT HERE JUST IN CASE
 class scheduler():

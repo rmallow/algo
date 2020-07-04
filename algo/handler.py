@@ -1,4 +1,4 @@
-import message
+import algo.message
 class handler():
     def __init__(self, name, calcFunc):
         self.m_name = name
@@ -11,9 +11,10 @@ class handler():
     def update(self, code):
         msgLst = self.m_incomingMessages.pop(code, [])
         for msg in msgLst:
+            #print(msg.m_message)
             self.m_calcFunc(msg)
 
-    def recieve(self, message):
+    def receive(self, message):
         lst = self.m_incomingMessages.get(message.m_sourceCode, [])
         lst.append(message)
         self.m_incomingMessages[message.m_sourceCode] = lst

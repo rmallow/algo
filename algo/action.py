@@ -1,5 +1,3 @@
-import feed
-
 class action():
     def __init__(self, actionType, period = 1, name = "defaultActionName", calcFunc = None, cols = None):
         self.m_actionType = actionType

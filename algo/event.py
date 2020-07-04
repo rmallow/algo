@@ -1,4 +1,4 @@
-from action import action
+from algo.action import action
 
 class event(action):
     def __init__(self, period = 1, name = "defaultEventName", calcFunc = None, cols = None):

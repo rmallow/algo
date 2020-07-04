@@ -1,10 +1,10 @@
-from feed import feed
+from algo.feed import feed
 
 def testFunc(feed, **kwargs):
     return {"test4":12345, "periodTest": kwargs['period']}
 
-def Average(lst): 
-    return sum(lst) / len(lst) 
+def average(lst): 
+    return sum(lst) / len(lst)
 
 """
 Description: Returns the Simple Moving Average (SMA) using a passed in period
@@ -35,6 +35,6 @@ def smaFunc(feed, **kwargs):
     for n in curCloses[startingIndex:]:
         recentCloses = recentCloses[1:]
         recentCloses.append(n)
-        avg = Average(recentCloses)
+        avg = average(recentCloses)
         array.append(avg)   
     return {"sma": array}

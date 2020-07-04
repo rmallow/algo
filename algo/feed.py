@@ -1,4 +1,3 @@
-import threading
 import pandas as pd
 import asyncio
 import logging
