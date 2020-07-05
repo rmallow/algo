@@ -39,14 +39,14 @@ def testRSI(feed):
     pass
 
 def testTriggerFunc(feed, **kwargs):
-    return message.message(message.TRIGGER_TYPE, "lol")
+    return algo.message.message(algo.message.TRIGGER_TYPE, "lol")
     
-def main():
+def test():
 
     actionList = []
     actionList.append(event(period=1, name="testEvent1", calcFunc=testCalcFunc))
 
-    func = getattr(importlib.import_module("eventFuncs"), "smaFunc")
+    func = getattr(importlib.import_module("algo.eventFuncs"), "smaFunc")
     
     actionList.append(event(period=300, name="sma", calcFunc=func))
 
@@ -62,7 +62,7 @@ def main():
    
     print(testBlock.m_feed.m_data['Volume'].sum())
 
-    print(message.COMMAND_TYPE)
+    print(algo.message.COMMAND_TYPE)
 
 if __name__ == '__main__':
-    main()
+    test()
