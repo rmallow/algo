@@ -2,7 +2,7 @@ block:
     name: AAPL
     dataSource:
         type: dataSim
-        key: ../../data/m1test/AAPL.USUSD_Candlestick_1_M_BID_01.04.2020-03.04.2020.csv
+        key: data/m1test/AAPL.USUSD_Candlestick_1_M_BID_01.04.2020-03.04.2020.csv
         fileType: csv
     feed:
         period: 60
@@ -12,7 +12,7 @@ block:
             name: lowSearch
             actionType: trigger
             calcFunc:
-                location: eventFuncs
+                location: algo.triggerFuncs
                 name: testFunc
             period: 1
             messageRouter: REPALCEME2
@@ -20,6 +20,6 @@ block:
             name: RSI
             actionType: event
             calcFunc:
-                location: eventFuncs
+                location: algo.eventFuncs
                 name: testFunc
             period: 1
