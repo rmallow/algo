@@ -30,10 +30,6 @@ def start():
     p3 = mp.Process(target=bM.start)
     p3.start()
 
+    p3.join()
     p1.join()
     p2.join()
-    p3.join()
-    
-
-if __name__ == '__main__':
-    start()

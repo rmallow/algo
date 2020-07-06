@@ -60,14 +60,15 @@ class messageRouter():
         updateSet = self.m_handlerUpdateDict.pop(message.m_sourceCode,None)
         if updateSet is not None:
             #send to handlerManager queue
-            val = (message.m_sourceCode, updateSet)
-            self.m_handlerManager.receive(val)
+            message = msg.message(msg.TRIGGER_TYPE, updateSet, sourceCode=message.m_sourceCode)
+            self.m_handlerManager.receive(message)
         else:
             logging.warning("end cmd on not found code:")
             logging.warning(str(message.m_sourceCode))
 
     def cmdAbort(self, message):
-        pass
+        self.m_handlerManager.receive(message)
+        self.m_end = True
 
     def cmdResume(self, message):
         pass

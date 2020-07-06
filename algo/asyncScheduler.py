@@ -1,5 +1,8 @@
 import asyncio
 import logging
+import traceback
+import sys
+logging.basicConfig(filename="log/asyncWarning.log")
 
 class asyncScheduler():
     def __init__(self, feed, pool):
@@ -9,11 +12,13 @@ class asyncScheduler():
 
     async def asyncUpdate(self):
         while True:
+            newData = await self.m_feed.asyncUpdate()
             if self.m_feed.m_end:
+                self.m_actionPool.sendAbortCommand()
                 self.stop()
                 break
-            newData = await self.m_feed.asyncUpdate()
-            self.m_actionPool.doActions(newData)
+            elif newData is not None:
+                self.m_actionPool.doActions(newData)
 
     def run(self):
         loop = asyncio.get_event_loop()
@@ -23,7 +28,15 @@ class asyncScheduler():
             loop.run_until_complete(self.m_task)   
         except asyncio.CancelledError:
             if not self.m_feed.m_end:
-                logging.warning("async cncelled error")
+                logging.warning("async cancelled error")
+        except Exception as e:
+            logging.warning(e)
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            logging.warning(traceback.extract_tb(exc_traceback))
+
+            
+            
+
 
     def stop(self):
         self.m_task.cancel()

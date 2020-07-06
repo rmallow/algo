@@ -38,5 +38,9 @@ class actionPool():
 
             message = msg.message(msg.COMMAND_TYPE, msg.COMMAND_END, sourceCode=self.m_code)
             self.m_messageRouter.receive(message)
+
+    def sendAbortCommand(self):
+        message = msg.message(msg.COMMAND_TYPE, msg.COMMAND_ABORT)
+        self.m_messageRouter.receive(message)
         
             

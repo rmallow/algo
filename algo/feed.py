@@ -41,11 +41,15 @@ class feed():
 
     async def asyncUpdate(self):
         rawData = await self.m_getDataFunc(self.m_lastTimestamp, self.m_period)
+        if rawData is None:
+            self.m_end = True
+            return None
         self.updateHelper(rawData)
         self.m_newCalcData = pd.DataFrame(index=self.m_newData.index)
         return self.m_newData
 
 
+    #not updated with most recent standards, do not use
     def update(self):
         rawData = self.m_getDataFunc(self.m_lastTimestamp, self.m_period)
         self.updateHelper(rawData)

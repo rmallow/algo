@@ -1,4 +1,5 @@
 from algo.start import start
+from algo.test import test
 import multiprocessing as mp
 
 def main():

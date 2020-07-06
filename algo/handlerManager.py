@@ -2,6 +2,8 @@ from algo.handler import handler
 import multiprocessing as mp
 import importlib
 import queue
+import algo.message as msg
+import logging
 
 def _loadCalcFunc(calcFuncConfig):
     return getattr(importlib.import_module(calcFuncConfig['location']),calcFuncConfig['name'])
@@ -47,12 +49,33 @@ class handlerManager():
     def start(self):
         while not self.m_end:
             try:
-                val = self.m_updateQueue.get(timeout=2)
+                message = self.m_updateQueue.get(timeout=2)
             except queue.Empty:
                 pass
             else:
-                code = val[0]
-                updateSet = val[1]
-                if code is not None and updateSet is not None:
-                   for handler in updateSet:
-                       handler.update(code)
+                if message is not None:
+                    #determine if message is a command
+                    #only command that handler manager currently can get is abort, sent at end for cleanup
+                    if message.m_type == msg.COMMAND_TYPE:
+                        self.processCommand(message)
+                    elif message.m_sourceCode is not None and message.m_message is not None:
+                        for handler in message.m_message:
+                            handler.update(message.m_sourceCode)
+
+    def stop(self):
+        self.m_end = True
+
+    def processCommand(self, message):
+        self.CMD_DICT.get(message.m_message,self.cmdNotFound)(self,message)
+
+    def cmdNotFound(self, message):
+        logging.warning("unrecognized command")
+        logging.warning(str(message.m_message))
+
+    def cmdAbort(self, message):
+        self.m_end = True
+
+
+    CMD_DICT = {
+        msg.COMMAND_ABORT: cmdAbort
+    }
