@@ -1,12 +1,39 @@
+Change to be implemented for actions is a require configuration:
+if event a requires a calculation based on event b, a require config can be included with event a
+this would force event b to be included even if it was not listed in the master configuration that was loaded in
+assume that this convetion will be included in the future, it will be added at some point
+
+
 TO ADD:
-Simple math ones that will for sure be needed
+Math:
+
+    *Note: many functions will use sma or ema, maybe have that as a kwarg in future?*
 SMA - simple moving average
 EMA - exponential moving average
+standard deviation:
+    have two different versions one using sma and another using ema
 
 
+
+
+Finance:
 RSI
 MACD (ask me about this one if i don't add clarification here)
 MFI
+On-Balance Volume (OBV)
+average true range
+
+Other:
+max/min of period
+    example:
+    period: 3
+    data: [0, 1, 4, 5, 3, 4]
+    calcMin: [0, 0, 0, 1, 4, 3, 3]
+    calcMax: [0, 1, 4, 5, 5, 5]
+
+times so far stock value has moved 1% or more
+
+
 
 func: smaFunc
 description: Returns the Simple Moving Average (SMA) using a passed in period
