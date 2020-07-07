@@ -34,8 +34,12 @@ max/min of period
 times so far stock value has moved 1% or more
 
 
-
-func: smaFunc
+func: sma
 description: Returns the Simple Moving Average (SMA) using a passed in period
 output:
     sma: array
+
+func: ema
+Description: Returns the Exponential Moving Average (EMA) using a passed in period
+Output:
+    ema: array
