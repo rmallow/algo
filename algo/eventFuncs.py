@@ -11,6 +11,7 @@ Description: Returns the Simple Moving Average (SMA) using a passed in period
 Output:
     sma: array
 """
+
 def sma(feed, **kwargs):
     colValue = ""
     try:
@@ -55,7 +56,13 @@ Output:
     ema: array
 """
 def ema(feed, **kwargs):
-    colValue = kwargs.get('col')  
+    colValue = ""
+    try:
+        kwargs['col']
+    except:
+        colValue = 'Close'
+    else:
+        colValue = kwargs['col']  
 
     smoothingFactor = 0
     try:
