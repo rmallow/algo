@@ -1,16 +1,4 @@
-from feed import feed
-
-INSUF_DATA = 'insufData' 
-"""
-ngl i don't feel like googling how to grab this from feed 
-as feed.INSUF_DATA didn't work and just grabbing it doesnt work so im done and just defining it above
-"""
-
-"""
-also lmk how to run this thing 
-now that ive pulled the changes idk how tf to run it
-
-"""
+import algo.feed as afd
 
 def testFunc(feed, **kwargs):
     return {"test4":12345, "periodTest": kwargs['period']}
@@ -24,7 +12,7 @@ Output:
     sma: array
 """
 def sma(feed, **kwargs):
-    colValue = "";
+    colValue = ""
     try:
         kwargs['col']
     except:
@@ -39,13 +27,13 @@ def sma(feed, **kwargs):
     startingIndex = 0
     #if the old data is too small and the new data is too small
     if((len(feed.m_data) < (neededLength + dataLength)) or dataLength == 0) and not(dataLength > neededLength + 1):
-        return {"sma": INSUF_DATA}
+        return {"sma": afd.INSUF_DATA}
     #if the old data is too small but the new data is large enough
     if(dataLength > neededLength + 1) and (len(feed.m_data) < (neededLength + dataLength)):
         recentData = feed.m_newData[:neededLength]
         startingIndex = neededLength 
         for n in range(neededLength):
-            array.append(INSUF_DATA)
+            array.append(afd.INSUF_DATA)
     else:
         recentData = feed.m_data[: len(feed.m_data) - dataLength] [-neededLength:]
     recentColsData = recentData[colValue]
@@ -67,13 +55,7 @@ Output:
     ema: array
 """
 def ema(feed, **kwargs):
-    colValue = ""
-    try:
-        kwargs['col']
-    except:
-        colValue = 'Close'
-    else:
-        colValue = kwargs['col']  
+    colValue = kwargs.get('col')  
 
     smoothingFactor = 0
     try:
@@ -92,13 +74,13 @@ def ema(feed, **kwargs):
     startingIndex = 0
     #if the old data is too small and the new data is too small
     if((len(feed.m_data) < (neededLength + dataLength)) or dataLength == 0) and not(dataLength > neededLength + 1):
-        return {"ema": INSUF_DATA}
+        return {"ema": afd.INSUF_DATA}
     #if the old data is too small but the new data is large enough
     if(dataLength > neededLength + 1) and (len(feed.m_data) < (neededLength + dataLength)):
         recentData = feed.m_newData[:neededLength]
         startingIndex = neededLength 
         for n in range(neededLength):
-            array.append(INSUF_DATA)
+            array.append(afd.INSUF_DATA)
     else:
         recentData = feed.m_data[: len(feed.m_data) - dataLength] [-neededLength:]
     recentColsData = recentData[colValue]
@@ -109,11 +91,11 @@ def ema(feed, **kwargs):
     try:        
         len(feed.m_calcData)
     except:
-        prevema = INSUF_DATA
+        prevema = afd.INSUF_DATA
     else:
         lastCalcdata = feed.m_calcData.iloc[-1:]
         prevema = lastCalcdata['ema'].item()
-    if(prevema == INSUF_DATA):
+    if(prevema == afd.INSUF_DATA):
         prevema = average(recentCols)
     curCols = feed.m_newData[colValue]
     for n in curCols[startingIndex:]:
