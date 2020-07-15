@@ -9,4 +9,4 @@ could be a calculator class that stores the data and calculates
 import algo.message
 
 def testFunc1(message):
-    print(message.m_message)
+    pass

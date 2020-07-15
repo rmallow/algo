@@ -7,7 +7,7 @@ Output:
     sma-${col}: array
 """
 
-def sma(feed, **kwargs):
+def sma(feed, params):
     
     return {"sma": 0}
 
@@ -16,6 +16,6 @@ Description: Returns the Exponential Moving Average (EMA)
 Output:
     ema-${col}: array
 """
-def ema(feed, **kwargs):
+def ema(feed, params):
     
     return {"ema": 0}
