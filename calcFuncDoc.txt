@@ -35,11 +35,13 @@ times so far stock value has moved 1% or more
 
 
 func: sma
-description: Returns the Simple Moving Average (SMA) using a passed in period
+description: Returns the Simple Moving Average (SMA)
+    col default: Close
 output:
-    sma: array
+    sma-${col}: array
 
 func: ema
-Description: Returns the Exponential Moving Average (EMA) using a passed in period
+Description: Returns the Exponential Moving Average (EMA)
+    col default: Close
 Output:
-    ema: array
+    ema-${col}: array
