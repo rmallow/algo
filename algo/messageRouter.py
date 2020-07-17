@@ -5,7 +5,6 @@ import algo.handler
 import logging
 import algo.handlerManager
 
-
 """
 This class works as an intermediate between the blocks and the handlers
 The message router accepts new messages from triggers and sends

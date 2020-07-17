@@ -2,7 +2,6 @@ import asyncio
 import logging
 import traceback
 import sys
-logging.basicConfig(filename="log/asyncWarning.log")
 
 class asyncScheduler():
     def __init__(self, feed, pool):
