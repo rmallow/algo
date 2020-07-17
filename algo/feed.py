@@ -2,16 +2,18 @@ import pandas as pd
 import asyncio
 import logging
 
-#only store up intraday periods of data
+#store data as necessary based on data source and desired period
 #data in feed should be stored in programming language acessible containers
 #feed is meant to be an inbetween from raw data to processed data
 
 INSUF_DATA = 'insufData'
+COL_NF = 'colNF'
 
 class feed():
 
     def __init__(self, dataFunc, period = 1, continuous = False):
         self.m_getDataFunc = dataFunc
+        #this period measures actual time, versus action period is just in units
         self.m_period = period	#if period is none, then ticks, otherwise period num in seconds
         self.m_continuous = continuous #if continuous is true, feed will update periods before full period time has elapsed
 
