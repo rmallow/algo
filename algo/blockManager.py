@@ -40,11 +40,13 @@ def _loadActionList(actionListConfig):
         name = actionConfig['name']
         calcFunc = _loadCalcFunc(actionConfig['calcFunc'])
         period = actionConfig['period']
+        params = {}
+        if 'params' in actionConfig:
+            params = actionConfig['params']
         if actionType == 'trigger':
-            #implement message router here
-            action = trigger(name=name, calcFunc=calcFunc, period=period)
+            action = trigger(name=name, calcFunc=calcFunc, period=period, params = params)
         elif actionType == 'event':
-            action = event(name=name, calcFunc=calcFunc, period = period)
+            action = event(name=name, calcFunc=calcFunc, period = period, params = params)
         actionList.append(action)
     return actionList
 
@@ -71,3 +73,6 @@ class blockManager():
     def start(self):
         for block in self.m_blockList:
             block.start()
+            print("data")
+            print(block.m_feed.m_data)
+            print(block.m_feed.m_calcData)
