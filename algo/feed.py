@@ -78,3 +78,22 @@ class feed():
             except ValueError as err:
                 logging.warning("addNewCalcCols")
                 logging.warning(err)
+
+    def addPartialCol(self, cols):
+        df1 = pd.DataFrame(cols)
+        try:
+            self.m_newCalcData = pd.concat([self.m_newCalcData, df1], axis=1)
+        except ValueError as err:
+            logging.warning("addPartialCols")
+            logging.warning(err)
+
+        
+    def addToPartialCol(self, cols):
+        for key, value in col.items():
+            if key in self.m_newCalcData:
+                start = self.m_newCalcData[key].last_valid_index()+1
+                stop = start + len(value) - 1
+                self.m_newCalcData.loc[start:stop, key] = value
+            else:
+                logging.warning("addAfterNaN - col not found")
+                logging.warning(key)
