@@ -3,24 +3,13 @@ import logging
 import algo.action as act
 
 
-def findCol(feed, col):
-    if col in feed.m_data.columns:
-        return feed.m_data[col]
-    elif feed.m_calcData is not None and col in feed.m_calcData.columns:
-        if col in feed.m_newCalcData.columns:
-            return feed.m_calcData[col].append(feed.m_newCalcData[col])
-        else:
-            return feed.m_calcData[col]
-    else:
-        return None
 
-def addINF(feed, period, calcColName):
-    sub = 0
-    #only put in as many insuf data as needed
-    if not(feed.m_calcData is None or calcColName not in feed.m_calcData.columns):
-        sub = len(feed.m_calcData.index)
-    return [afd.INSUF_DATA] * (period - 1 - sub)
-    
+"""
+input for calcFuncs: dataset, params
+do as much error handling as possibble outside of calcFunc
+"""
+
+
 
 """
 Description: Returns the Simple Moving Average (SMA)

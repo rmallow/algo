@@ -73,11 +73,14 @@ class feed():
 
     def addNewCalcCols(self, cols):
         for key, value in cols.items():
-            try:
-                self.m_newCalcData[key] = value
-            except ValueError as err:
-                logging.warning("addNewCalcCols")
-                logging.warning(err)
+            if key in self.m_newCalcData:
+                self.addToPartialCol({key: value})
+            else:
+                try:
+                    self.m_newCalcData[key] = value
+                except ValueError as err:
+                    logging.warning("addNewCalcCols")
+                    logging.warning(err)
 
     def addPartialCol(self, cols):
         df1 = pd.DataFrame(cols)
@@ -90,7 +93,7 @@ class feed():
         
     def addToPartialCol(self, cols):
         for key, value in col.items():
-            if key in self.m_newCalcData:
+            if key in self.m_newCalcData and value is not None:
                 start = self.m_newCalcData[key].last_valid_index()+1
                 stop = start + len(value) - 1
                 self.m_newCalcData.loc[start:stop, key] = value

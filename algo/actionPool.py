@@ -21,8 +21,7 @@ class actionPool():
     def doActions(self, newData):
         for event in self.m_events:
             #get pandas columns, append it then add that to calculated feed
-            cols = event.update(self.m_feed)
-            self.m_feed.addNewCalcCols(cols)
+            event.update(self.m_feed)
         
         self.m_feed.appendCalcData()
 
