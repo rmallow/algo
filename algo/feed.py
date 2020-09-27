@@ -91,8 +91,8 @@ class feed():
             logging.warning(err)
 
         
-    def addToPartialCol(self, cols):
-        for key, value in col.items():
+    def addPartialCols(self, cols):
+        for key, value in cols.items():
             if key in self.m_newCalcData and value is not None:
                 start = self.m_newCalcData[key].last_valid_index()+1
                 stop = start + len(value) - 1

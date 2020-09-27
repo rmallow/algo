@@ -2,6 +2,7 @@ import asyncio
 import logging
 import traceback
 import sys
+from . import algoLogging
 
 class asyncScheduler():
     def __init__(self, feed, pool):
@@ -31,7 +32,8 @@ class asyncScheduler():
         except Exception as e:
             logging.warning(e)
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            logging.warning(traceback.extract_tb(exc_traceback))
+            warning = traceback.extract_tb(exc_traceback)
+            logging.warning(algoLogging.formatTraceback(warning))
 
             
             
