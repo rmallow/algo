@@ -46,7 +46,7 @@ def test():
     actionList = []
     actionList.append(event(period=1, name="testEvent1", calcFunc=testCalcFunc))
 
-    func = getattr(importlib.import_module("algo.eventFuncs"), "smaFunc")
+    func = getattr(importlib.import_module("algo.eventFuncs"), "sma")
     
     actionList.append(event(period=300, name="sma", calcFunc=func))
 

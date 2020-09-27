@@ -18,6 +18,9 @@ block:
         action2:
             name: RSI
             actionType: event
+            dataset:
+                inputCol: close
+                outputCol: rsi-close
             calcFunc:
                 location: algo.eventFuncs
                 name: sma
@@ -25,9 +28,9 @@ block:
         action3:
             name: change
             actionType: event
+            dataset:
+                inputCol1: sma-close
             calcFunc:
                 location: algo.eventFuncs
                 name: change
             period: 1
-            params:
-                col: sma-Close

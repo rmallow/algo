@@ -1,11 +1,14 @@
 import algo.action as act
+import algo.feed as afd
 
 def addINF(feed, period, calcColName):
     sub = 0
     #only put in as many insuf data as needed
     if not(feed.m_calcData is None or calcColName not in feed.m_calcData.columns):
         sub = len(feed.m_calcData.index)
-    return [afd.INSUF_DATA] * (period - 1 - sub)
+    INFListLength = (period - 1 - sub) if (period - 1 - sub) > 0 else 0
+
+    return [afd.INSUF_DATA] * INFListLength
     
 
 class event(act.action):
@@ -15,10 +18,10 @@ class event(act.action):
     def update(self, feed):
         feed.addPartialCols(self.setupCols(feed))
         cols = super().update(feed)
-        feed.addNewCalcColc(cols)
+        feed.addNewCalcCols(cols)
 
     def setupCols(self, feed):
-       return {'test':[]}
+       rowVals = addINF(feed, self.m_period, )
 
 
 """

@@ -5,7 +5,6 @@ import multiprocessing as mp
 def main():
 
     start()
-    
 
 
 if __name__ == '__main__':
