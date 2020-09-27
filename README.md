@@ -1,9 +1,10 @@
 # algo
 By Robert Mallow
 
-Create data simulation and live stream management algorithims with ease.
+A custom data processing system, created with the intent of algorithmic trading.
 
-Future Updates:
- * Adding py-qt gui
- * Improving multiprocessing approach and proper grouping
- * Adding easy integration for machine learning handling
+Uses requiremental:
+https://github.com/rmallow/requiremental
+
+Not currently available for install.
+Not finished.
