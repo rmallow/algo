@@ -4,6 +4,19 @@ import algo.action as act
 
 
 
+"""
+input for calcFuncs: dataset, params
+do as much error handling as possibble outside of calcFunc
+"""
+
+
+
+"""
+Description: Returns the Simple Moving Average (SMA)
+Output:
+    sma-${col}: array
+"""
+
 def sma(feed, params):
     col = params.get(act.col, 'Close')
     calcColName = 'sma-' + col
@@ -32,7 +45,11 @@ def sma(feed, params):
                 
     return {calcColName: array}
 
-
+"""
+Description: Returns the Exponential Moving Average (EMA)
+Output:
+    ema-${col}: array
+"""
 def ema(feed, params):
     
     return {"ema": 0}

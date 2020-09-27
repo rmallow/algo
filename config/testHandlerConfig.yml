@@ -5,7 +5,7 @@ handler1:
         - AnotherTestMessage
         - AndAThirdJustToBeSafeMessage
     calcFunc:
-        location: algo.handlerFuncs
+        location: funcs.handlerFuncs
         name: testFunc1
 handler2:
     name: secondHandler
@@ -14,5 +14,5 @@ handler2:
         - AnotherTestMessage
         - UniqueMessage
     calcFunc:
-        location: algo.handlerFuncs
+        location: funcs.handlerFuncs
         name: testFunc1

@@ -12,7 +12,7 @@ block:
             name: lowSearch
             actionType: trigger
             calcFunc:
-                location: algo.triggerFuncs
+                location: funcs.triggerFuncs
                 name: testFunc
             period: 1
         action2:
@@ -22,7 +22,7 @@ block:
                 inputCol: close
                 outputCol: rsi-close
             calcFunc:
-                location: algo.eventFuncs
+                location: funcs.eventFuncs
                 name: sma
             period: 4
         action3:
@@ -31,6 +31,6 @@ block:
             dataset:
                 inputCol1: sma-close
             calcFunc:
-                location: algo.eventFuncs
+                location: funcs.eventFuncs
                 name: change
             period: 1

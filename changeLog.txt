@@ -1,11 +1,16 @@
-Current Version: 0.01
-Last Version Change: 08/1/20
+Current Version: 0.0.1
+Last Version Change: 09/27/20
 
-0.01    - Basic implementation working, data is pulled in through datasim, sent to a feed and maninpulated by events.
+0.1.0    - Basic implementation working, data is pulled in through datasim, sent to a feed and maninpulated by events.
         - Triggers send messages to a message router which then broadcast messages out to handlers that have subscribed.
         - Handlers use their calc funcs, similar to events and triggers to determine how to handle incoming messages.
 
-0.02    - Utility functions added to events to make the process of creating event funcs easier.
-        - Current utility functionality included in this update:
-            - Handling insufficient data and column not found cases.
-        - REQUIREMENTAL
+0.2.0    - Requiremental was created
+                - this was put into it's own project and packaged on pypi
+                - implemented for sorting actionPool
+        - updating some version control and git stuff
+                - adding __version__.py
+                - adding pre-commit hook to update version
+                - major updates will be included in change log
+                - pushing to github now with ssh
+        - redoing venv due to some issues
