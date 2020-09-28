@@ -10,13 +10,13 @@ class actionPool():
         self.m_events = []
         self.m_triggers = []
         for action in actions:
-            if action.m_actionType == "event":
-                self.m_events.append(action)
-            else:
-                self.m_triggers.append(action)
+            self.addAction(action)
 
     def addAction(self, action):
-        self.m_actions.append(action)
+        if action.m_actionType == "event":
+            self.m_events.append(action)
+        else:
+            self.m_triggers.append(action)
 
     def doActions(self, newData):
         for event in self.m_events:

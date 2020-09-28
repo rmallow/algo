@@ -6,9 +6,19 @@ import pickle
 from algo.feed import feed
 from algo.dataSim import dataSim
 import importlib
+import logging
+import requiremental
 
 def _loadCalcFunc(calcFuncConfig):
-    return getattr(importlib.import_module(calcFuncConfig['location']),calcFuncConfig['name'])
+    module = importlib.import_module(calcFuncConfig['location'])
+    if module is not None:
+        if hasattr(module, calcFuncConfig['name']):
+            return getattr(module, calcFuncConfig['name'])
+        else:
+            logging.warning("attr not found: " + calcFuncConfig['name'] + "at module: " + calcFuncConfig['location'])
+    else:
+        logging.warning("module not found: " + calcFuncConfig['location'])
+    return None
 
 def loadObj(name ):
     with open('obj/' + name + '.pkl', 'rb') as f:
@@ -34,7 +44,7 @@ def _loadDataSource(dataSourceConfig):
 
 def _loadActionList(actionListConfig):
     actionList = []
-    for key, actionConfig in actionListConfig.items():
+    for _, actionConfig in actionListConfig.items():
         action = None
         actionType = actionConfig['actionType']
         name = actionConfig['name']
@@ -64,7 +74,7 @@ class blockManager():
 
     def loadBlocks(self):
         print("---- Block Manager Loading Blocks ----")
-        for key, config in self.m_assetBlockConfig.items():
+        for _, config in self.m_assetBlockConfig.items():
             block, dataSource = _loadBlockAndDataSource(config, self.m_messageRouter)
             self.m_blockList.append(block)
             self.m_dataMangerList.append(dataSource)

@@ -74,15 +74,21 @@ class feed():
     def addNewCalcCols(self, cols):
         for key, value in cols.items():
             if key in self.m_newCalcData:
-                self.addToPartialCol({key: value})
+                self.addAfterNaN({key: value})
             else:
-                try:
-                    self.m_newCalcData[key] = value
-                except ValueError as err:
-                    logging.warning("addNewCalcCols")
-                    logging.warning(err)
+                self.safeAddCol(key, value)
+    
+    def safeAddCol(self, key, value):
+        if len(value) == len(self.m_newCalcData.index):
+            try:
+                self.m_newCalcData[key] = value
+            except ValueError as err:
+                logging.warning("attempted to add col of same length")
+                logging.warning(err)
+        else:
+            self.addPartialCols({key,value})
 
-    def addPartialCol(self, cols):
+    def addPartialCols(self, cols):
         df1 = pd.DataFrame(cols)
         try:
             self.m_newCalcData = pd.concat([self.m_newCalcData, df1], axis=1)
@@ -91,12 +97,22 @@ class feed():
             logging.warning(err)
 
         
-    def addPartialCols(self, cols):
-        for key, value in cols.items():
-            if key in self.m_newCalcData and value is not None:
-                start = self.m_newCalcData[key].last_valid_index()+1
-                stop = start + len(value) - 1
-                self.m_newCalcData.loc[start:stop, key] = value
-            else:
-                logging.warning("addAfterNaN - col not found")
-                logging.warning(key)
+    def addafterNaN(self, cols):
+        try:
+            for key, value in cols.items():
+                if key in self.m_newCalcData and value is not None:
+                    #start and stop are for correctly indexing gow to add to col
+                    start = self.m_newCalcData[key].last_valid_index()
+                    if start:
+                        start += 1
+                    else:
+                        start = 0
+
+                    stop = start + len(value) - 1
+                    self.m_newCalcData.loc[start:stop, key] = value
+                else:
+                    logging.warning("addAfterNaN - col not found")
+                    logging.warning(key)
+        except TypeError:
+            logging.warning("error acessing cols in addAfterNaN")
+            logging.warning(key)

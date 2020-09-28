@@ -31,7 +31,7 @@ class asyncScheduler():
                 logging.warning("async cancelled error")
         except Exception as e:
             logging.warning(e)
-            exc_type, exc_value, exc_traceback = sys.exc_info()
+            _, _, exc_traceback = sys.exc_info()
             warning = traceback.extract_tb(exc_traceback)
             logging.warning(algoLogging.formatTraceback(warning))
 

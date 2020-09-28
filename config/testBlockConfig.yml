@@ -23,7 +23,7 @@ block:
                 outputCol: rsi-close
             calcFunc:
                 location: funcs.eventFuncs
-                name: sma
+                name: testFunc
             period: 4
         action3:
             name: change
@@ -32,5 +32,5 @@ block:
                 inputCol1: sma-close
             calcFunc:
                 location: funcs.eventFuncs
-                name: change
+                name: testFunc
             period: 1
