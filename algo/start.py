@@ -2,7 +2,7 @@ from algo.messageRouter import messageRouter
 from algo.blockManager import blockManager
 from algo.handlerManager import handlerManager
 
-import algo.configLoader as configLoader
+import algo.util.configLoader as configLoader
 
 import multiprocessing as mp
 from pathlib import Path
