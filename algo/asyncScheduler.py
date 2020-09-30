@@ -29,11 +29,6 @@ class asyncScheduler():
         except asyncio.CancelledError:
             if not self.m_feed.m_end:
                 logging.warning("async cancelled error")
-        except Exception as e:
-            logging.warning(e)
-            _, _, exc_traceback = sys.exc_info()
-            warning = traceback.extract_tb(exc_traceback)
-            logging.warning(algoLogging.formatTraceback(warning))
 
             
             

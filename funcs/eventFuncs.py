@@ -2,6 +2,8 @@ import algo.feed as afd
 import logging
 import algo.action as act
 
+import random
+
 
 
 """
@@ -18,4 +20,4 @@ Output:
 """
 
 def testFunc(feed, params):
-    return {'test':0}
+    return random.randint(0,100)

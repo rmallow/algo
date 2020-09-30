@@ -8,6 +8,8 @@ def addINF(feed, period, calcColName):
         sub = len(feed.m_calcData.index)
     INFListLength = (period - 1 - sub) if (period - 1 - sub) > 0 else 0
 
+    if INFListLength > feed.m_newCalcLength:
+        INFListLength = feed.m_newCalcLength
     return [afd.INSUF_DATA] * INFListLength
     
 
@@ -18,13 +20,24 @@ class event(act.action):
     def update(self, feed):
         #first set up col using util functions like INF and Not Found
         setupCols = self.setupCols(feed)
-        feed.addNewCalcCol(setupCols)
+        feed.addNewCalcCols(setupCols)
         
         #do following for remaining amount of times until period
         #   call calcFunc to get calculated data
         #   add to feed, so future calcFunc calls can access it
-        
-        
+        start = 0
+        index = feed.m_newCalcData[self.m_name].last_valid_index()
+        if index:
+            start = feed.m_newCalcData.index.get_loc(index) + 1
+        if start < len(feed.m_newCalcData.index):
+            if feed.m_newCalcData[self.m_name].iloc[-1] == afd.INSUF_DATA:
+                start +=1
+                self.m_parameters['first'] = True
+                feed.addToPartialCols({self.m_name : self.m_calcFunc(feed, self.m_parameters)})
+
+            self.m_parameters['first'] = False
+            for _ in range(start, len(feed.m_newCalcData.index)):
+                feed.addToPartialCols({self.m_name : self.m_calcFunc(feed, self.m_parameters)})
 
     def setupCols(self, feed):
        rowVals = addINF(feed, self.m_period, self.m_name)

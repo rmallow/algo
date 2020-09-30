@@ -1,6 +1,25 @@
 import pandas as pd
 import asyncio
 import logging
+import numpy as np
+import collections
+
+def safeLength(value):
+    """
+    use this for values that could be an unknown type
+    """
+    if isinstance(value, collections.Iterable) and not isinstance(value, str):
+        return len(value)
+    else:
+        return 1
+
+def setFrameColRange(frame, col, start, values):
+    stop = start + safeLength(values) - 1
+    if start == stop:
+        stop += 1
+    frame.iloc[start:stop, frame.columns.get_loc(col)] = values 
+
+
 
 #store data as necessary based on data source and desired period
 #data in feed should be stored in programming language acessible containers
@@ -24,6 +43,7 @@ class feed():
         self.m_data = None
         self.m_calcData = None
         
+        self.m_newCalcLength = 0
         self.m_end = False
 
     def updateHelper(self, rawData):
@@ -48,13 +68,7 @@ class feed():
             return None
         self.updateHelper(rawData)
         self.m_newCalcData = pd.DataFrame(index=self.m_newData.index)
-        return self.m_newData
-
-
-    #not updated with most recent standards, do not use
-    def update(self):
-        rawData = self.m_getDataFunc(self.m_lastTimestamp, self.m_period)
-        self.updateHelper(rawData)
+        self.m_newCalcLength = len(self.m_newCalcData.index)  #conveience
         return self.m_newData
 
     def getDataSince(self, timestamp):
@@ -74,45 +88,35 @@ class feed():
     def addNewCalcCols(self, cols):
         for key, value in cols.items():
             if key in self.m_newCalcData:
-                self.addAfterNaN({key: value})
+                self.addToPartialCols({key: value})
             else:
                 self.safeAddCol(key, value)
     
     def safeAddCol(self, key, value):
-        if len(value) == len(self.m_newCalcData.index):
+        #safeValue = makeDataSafeList(value)
+        if safeLength(value) == len(self.m_newCalcData.index):
             try:
                 self.m_newCalcData[key] = value
             except ValueError as err:
                 logging.warning("attempted to add col of same length")
                 logging.warning(err)
         else:
-            self.addPartialCols({key,value})
+            self.m_newCalcData[key] = np.nan
+            self.addToPartialCols({key:value})
 
-    def addPartialCols(self, cols):
-        df1 = pd.DataFrame(cols)
-        try:
-            self.m_newCalcData = pd.concat([self.m_newCalcData, df1], axis=1)
-        except ValueError as err:
-            logging.warning("addPartialCols")
-            logging.warning(err)
-
-        
-    def addafterNaN(self, cols):
-        try:
-            for key, value in cols.items():
-                if key in self.m_newCalcData and value is not None:
+    def addToPartialCols(self, cols):
+        """
+        used for adding partially either new or to an existing column
+        """
+        for key, value in cols.items():
+            if key:
+                start = 0
+                if key in self.m_newCalcData:
                     #start and stop are for correctly indexing gow to add to col
-                    start = self.m_newCalcData[key].last_valid_index()
-                    if start:
-                        start += 1
-                    else:
-                        start = 0
-
-                    stop = start + len(value) - 1
-                    self.m_newCalcData.loc[start:stop, key] = value
-                else:
-                    logging.warning("addAfterNaN - col not found")
-                    logging.warning(key)
-        except TypeError:
-            logging.warning("error acessing cols in addAfterNaN")
-            logging.warning(key)
+                    index = self.m_newCalcData[key].last_valid_index()
+                    if index:
+                        start = self.m_newCalcData.index.get_loc(index) + 1
+                #if key not in there, will add from 0
+                setFrameColRange(self.m_newCalcData, key, start, value)
+            else:
+                logging.warning("key not exist addToPartialCols")

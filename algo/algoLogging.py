@@ -1,4 +1,6 @@
 import traceback
+import logging
+import sys
 
 def formatTraceback(tracebackWarning):
     formattedWarning = ""
@@ -8,4 +10,10 @@ def formatTraceback(tracebackWarning):
             formattedWarning += tokens[-2] + " -> " + tokens[-1] + " Line Number: " + str(level.lineno) + "\n"    
         else:
             formattedWarning += "unknown traceback level format\n"
-    return formattedWarning
+    return
+    
+def exceptionTraceback(e):
+    logging.warning(e)
+    _, _, exc_traceback = sys.exc_info()
+    warning = traceback.extract_tb(exc_traceback)
+    logging.warning(formatTraceback(warning))

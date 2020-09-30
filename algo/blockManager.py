@@ -83,6 +83,5 @@ class blockManager():
     def start(self):
         for block in self.m_blockList:
             block.start()
-            print("data")
             print(block.m_feed.m_data)
             print(block.m_feed.m_calcData)
