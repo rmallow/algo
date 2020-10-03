@@ -20,7 +20,7 @@ class dataSim():
             self.m_key = keyData[0]
             self.m_data = keyData[1]
         elif self.m_dataType == 'dir':
-            keyData = cdu.combineDir(self.m_key, index="Local time")
+            keyData = cdu.combineDirCSV(self.m_key, index="Local time")
             self.m_key = keyData[0]
             self.m_data = keyData[1]
 
