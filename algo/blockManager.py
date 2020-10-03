@@ -44,10 +44,9 @@ def _loadDataSource(dataSourceConfig):
 
 def _loadActionList(actionListConfig):
     actionList = []
-    for _, actionConfig in actionListConfig.items():
+    for name, actionConfig in actionListConfig.items():
         action = None
         actionType = actionConfig['actionType']
-        name = actionConfig['name']
         calcFunc = _loadCalcFunc(actionConfig['calcFunc'])
         period = actionConfig['period']
         params = {}

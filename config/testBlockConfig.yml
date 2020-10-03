@@ -8,25 +8,21 @@ block:
         period: 60
         continuous: False
     actionList:
-        action1:
-            name: lowSearch
+        lowSearch:
             actionType: trigger
             calcFunc:
                 location: funcs.triggerFuncs
                 name: testFunc
             period: 1
-        action2:
-            name: RSI
+        RSI:
             actionType: event
             dataset:
-                inputCol: close
-                outputCol: rsi-close
+                - close
             calcFunc:
                 location: funcs.eventFuncs
                 name: testFunc
             period: 4
-        action3:
-            name: change
+        change2:
             actionType: event
             dataset:
                 inputCol1: sma-close
