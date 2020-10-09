@@ -24,6 +24,8 @@ class dataSim():
             self.m_key = keyData[0]
             self.m_data = keyData[1]
 
+        self.m_data.columns = [x.lower() for x in self.m_data.columns]
+
     def getData(self, timestamp, period, getType):
         if getType == "stock":
             return self.getDataStock(timestamp, period)

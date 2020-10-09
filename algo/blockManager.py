@@ -50,12 +50,13 @@ def _loadActionList(actionListConfig):
         calcFunc = _loadCalcFunc(actionConfig['calcFunc'])
         period = actionConfig['period']
         params = {}
+        inputCols = actionConfig['inputCols']
         if 'params' in actionConfig:
             params = actionConfig['params']
         if actionType == 'trigger':
-            action = trigger(name=name, calcFunc=calcFunc, period=period, params = params)
+            action = trigger(name=name, calcFunc=calcFunc, period=period, params = params, inputCols = inputCols)
         elif actionType == 'event':
-            action = event(name=name, calcFunc=calcFunc, period = period, params = params)
+            action = event(name=name, calcFunc=calcFunc, period = period, params = params, inputCols = inputCols)
         actionList.append(action)
     return actionList
 

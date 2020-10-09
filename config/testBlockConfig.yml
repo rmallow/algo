@@ -9,6 +9,8 @@ block:
         continuous: False
     actionList:
         lowSearch:
+            inputCols:
+                - close
             actionType: trigger
             calcFunc:
                 location: funcs.triggerFuncs
@@ -16,7 +18,7 @@ block:
             period: 1
         RSI:
             actionType: event
-            dataset:
+            inputCols:
                 - close
             calcFunc:
                 location: funcs.eventFuncs
@@ -24,8 +26,8 @@ block:
             period: 4
         change2:
             actionType: event
-            dataset:
-                inputCol1: sma-close
+            inputCols:
+                - close
             calcFunc:
                 location: funcs.eventFuncs
                 name: testFunc

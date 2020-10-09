@@ -19,5 +19,5 @@ Output:
     sma-${col}: array
 """
 
-def testFunc(feed, params):
-    return random.randint(0,100)
+def testFunc(dataSet, parameters = None):
+    return dataSet['close'].iloc[0] + 1

@@ -14,8 +14,8 @@ def addINF(feed, period, calcColName):
     
 
 class event(act.action):
-    def __init__(self, period=1, name="defaultEventName", calcFunc=None, params={}):
-        super().__init__("event", period=period, name=name, calcFunc=calcFunc, params = params)
+    def __init__(self, period=1, name="defaultEventName", calcFunc=None, params={}, inputCols = []):
+        super().__init__("event", period=period, name=name, calcFunc=calcFunc, params = params, inputCols = inputCols)
 
     def update(self, feed):
         #first set up col using util functions like INF and Not Found
@@ -37,7 +37,8 @@ class event(act.action):
 
             self.m_parameters['first'] = False
             for _ in range(start, len(feed.m_newCalcData.index)):
-                feed.addToPartialCols({self.m_name : self.m_calcFunc(feed, self.m_parameters)})
+                calcFuncVal = super().update(feed)
+                feed.addToPartialCols({self.m_name : calcFuncVal})
 
     def setupCols(self, feed):
        rowVals = addINF(feed, self.m_period, self.m_name)

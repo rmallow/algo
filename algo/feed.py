@@ -55,6 +55,8 @@ class feed():
         if self.m_newData is not None and len(self.m_newData.index) > 0:
             self.m_lastTimestamp = self.m_newData.index[-1]
             if self.m_data is None:
+                #first time setup here
+                #self.m_newData.columns = [x.lower() for x in self.m_newData.columns]
                 self.m_data = self.m_newData
             else:
                 self.m_data = self.m_data.append(self.m_newData)
@@ -96,12 +98,12 @@ class feed():
         #safeValue = makeDataSafeList(value)
         if safeLength(value) == len(self.m_newCalcData.index):
             try:
-                self.m_newCalcData[key] = value
+                self.m_newCalcData[key.lower()] = value
             except ValueError as err:
                 logging.warning("attempted to add col of same length")
                 logging.warning(err)
         else:
-            self.m_newCalcData[key] = np.nan
+            self.m_newCalcData[key.lower()] = np.nan
             self.addToPartialCols({key:value})
 
     def addToPartialCols(self, cols):
