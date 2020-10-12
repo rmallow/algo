@@ -24,7 +24,7 @@ class handlerManager():
 
     def loadHandlers(self):
         print("---- Handler Manager Loading Blocks ----")
-        for key, config in self.m_handlerConfig.items():
+        for _, config in self.m_handlerConfig.items():
             self.m_handlerList.append(self._loadHandler(config))
         print("---- Handler Manager Done Loading ----")
 
