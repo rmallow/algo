@@ -33,7 +33,8 @@ class event(act.action):
             if feed.m_newCalcData[self.m_name].iloc[-1] == afd.INSUF_DATA:
                 start +=1
                 self.m_parameters['first'] = True
-                feed.addToPartialCols({self.m_name : self.m_calcFunc(feed, self.m_parameters)})
+                calcFuncVal = super().update(feed)
+                feed.addToPartialCols({self.m_name : calcFuncVal})
 
             self.m_parameters['first'] = False
             for _ in range(start, len(feed.m_newCalcData.index)):

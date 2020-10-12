@@ -1,5 +1,7 @@
 block:
     name: AAPL
+    libraries:
+        - funcs/eventFuncs.py
     dataSource:
         type: dataSim
         key: data/m1test/AAPL.USUSD_Candlestick_1_M_BID_01.04.2020-03.04.2020.csv
@@ -8,27 +10,28 @@ block:
         period: 60
         continuous: False
     actionList:
-        lowSearch:
+        crossover:
             inputCols:
-                - close
+                - ema7
+                - ema14
             actionType: trigger
             calcFunc:
                 location: funcs.triggerFuncs
-                name: testFunc
+                name: crossover
             period: 1
-        RSI:
+        ema7:
             actionType: event
             inputCols:
                 - close
             calcFunc:
                 location: funcs.eventFuncs
-                name: testFunc
-            period: 4
-        change2:
+                name: ema
+            period: 7
+        ema14:
             actionType: event
             inputCols:
                 - close
             calcFunc:
                 location: funcs.eventFuncs
-                name: testFunc
-            period: 1
+                name: ema
+            period: 14

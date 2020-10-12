@@ -4,15 +4,19 @@ col = 'col'
 period = 'period'
 
 def findCol(feed, col):
-    if col in feed.m_data.columns:
+    if feed.m_data is not None and col in feed.m_data.columns:
         return feed.m_data[col]
     elif feed.m_calcData is not None and col in feed.m_calcData.columns:
-        if col in feed.m_newCalcData.columns:
+        if feed.m_newCalcData is not None and col in feed.m_newCalcData.columns:
             return feed.m_calcData[col].append(feed.m_newCalcData[col])
         else:
             return feed.m_calcData[col]
     else:
         return None
+
+def getParameter(parameters, key, default):
+    if parameters is not None:
+        return parameters.get(key, default)
 
 #period refers to number of units, not time
 class action():
@@ -32,9 +36,11 @@ class action():
         return self.m_calcFunc(self.m_dataSet, parameters=self.m_parameters)
         
     def updateDataSet(self, feed):
-        if self.m_dataSet is None:
-            start = -1 * self.m_period
-            self.m_dataSet = pd.DataFrame(index=feed.m_data.index[start: len(feed.m_data.index)])
+        start = -1 * self.m_period
+        self.m_dataSet = pd.DataFrame(index=feed.m_data.index[start: len(feed.m_data.index)])
         for col in self.m_inputCols:
             self.m_dataSet[col] = findCol(feed, col)
+
+    def getCalcFunc(self):
+        return self.m_calcFunc
         

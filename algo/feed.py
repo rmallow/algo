@@ -85,7 +85,9 @@ class feed():
         if self.m_calcData is None:
             self.m_calcData = self.m_newCalcData
         else:
-            self.m_calcData = self.m_calcData.append(self.m_newCalcData, sort = True)
+            self.m_calcData = self.m_calcData.append(self.m_newCalcData, sort=True)
+        #this is necessary otherwise indexing gets weird for triggers
+        self.m_newCalcData = None
 
     def addNewCalcCols(self, cols):
         for key, value in cols.items():

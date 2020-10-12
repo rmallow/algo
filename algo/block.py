@@ -6,13 +6,13 @@ import pandas
 
 
 class block():
-    def __init__(self, actionList, feed, messageRouter, name ="defaultBlockName", code = 123):
+    def __init__(self, actionList, feed, messageRouter, libraries, parseSettings = None, name ="defaultBlockName", code = 123):
         #somehow options for the feed need to be read in here, can be implemented later, for now set manually
         self.m_code = code
         
         self.m_feed = feed
         self.m_messageRouter = messageRouter
-        self.m_pool = actionPool(actionList, feed, messageRouter, self.m_code)
+        self.m_pool = actionPool(actionList, feed, messageRouter, self.m_code, libraries, parseSettings)
         self.m_scheduler = asyncScheduler(feed, self.m_pool)
 
     def start(self):

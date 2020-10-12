@@ -29,7 +29,8 @@ def _loadBlockAndDataSource(blockConfig, messageRouter):
     name = blockConfig['name']
     feed = _loadFeed(blockConfig['feed'], dataSource.asyncGetData)
     actionList = _loadActionList(blockConfig['actionList'])
-    blk = block(actionList, feed, messageRouter, name=name)
+    libraries = blockConfig['libraries']
+    blk = block(actionList, feed, messageRouter, libraries, name=name)
     return blk, dataSource
 
 def _loadDataSource(dataSourceConfig):
