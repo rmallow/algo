@@ -1,4 +1,3 @@
-import algo.feed as afd
 import logging
 import algo.action as act
 
@@ -8,7 +7,6 @@ import random
 
 """
 input for calcFuncs: dataset, params
-do as much error handling as possibble outside of calcFunc
 """
 
 

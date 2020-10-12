@@ -52,14 +52,15 @@ class actionPool():
 
             for trigger in self.m_triggers:
                 messages = trigger.update(self.m_feed)
-                #check if message iterable is received, otherwise assume one message
-                if messages is isinstance(messages, Iterable):
-                    for message in messages:
-                        message.m_sourceCode = self.m_code
-                        self.m_messageRouter.receive(message)
-                else:
-                    messages.m_sourceCode = self.m_code
-                    self.m_messageRouter.receive(messages)
+                if messages is not None:
+                    #check if message iterable is received, otherwise check if one message
+                    if isinstance(messages, Iterable):
+                        for message in messages:
+                            message.m_sourceCode = self.m_code
+                            self.m_messageRouter.receive(message)
+                    elif isinstance(messages, msg.message):
+                        messages.m_sourceCode = self.m_code
+                        self.m_messageRouter.receive(messages)
 
             endCmd = msg.message(msg.COMMAND_TYPE, msg.COMMAND_END, sourceCode=self.m_code)
             self.m_messageRouter.receive(endCmd)
