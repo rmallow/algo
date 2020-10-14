@@ -1,3 +1,4 @@
+import algo.feed as afd
 from algo.action import action
 
 class trigger(action):
@@ -5,5 +6,9 @@ class trigger(action):
         super().__init__("trigger", period=period, name=name, calcFunc=calcFunc, params = params, inputCols=inputCols)
 
     def update(self, feed):
-        messages = super().update(feed)
+        super().updateDataSet(feed)
+        for inputCol in self.m_inputCols:
+            if afd.INSUF_DATA in self.m_dataSet[inputCol].values:
+                return None
+        messages = self.m_calcFunc(self.m_dataSet, parameters=self.m_parameters)
         return messages

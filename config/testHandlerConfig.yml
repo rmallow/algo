@@ -1,18 +1,7 @@
 handler1:
     name: firstHandler
     subscriptions:
-        - TestMessage
-        - AnotherTestMessage
-        - AndAThirdJustToBeSafeMessage
-    calcFunc:
-        location: funcs.handlerFuncs
-        name: testFunc1
-handler2:
-    name: secondHandler
-    subscriptions:
-        - TestMessage
-        - AnotherTestMessage
-        - UniqueMessage
+        - crossover
     calcFunc:
         location: funcs.handlerFuncs
         name: testFunc1

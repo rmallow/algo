@@ -24,6 +24,8 @@ class messageRouter():
         for handler in handlerList:
             handler.receive(message)
             updateSet.add(handler)
+        
+        self.m_handlerUpdateDict[message.m_sourceCode] = updateSet
 
     def receive(self, message):
         self.m_messageQueue.put(message)
