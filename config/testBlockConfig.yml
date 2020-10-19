@@ -13,7 +13,7 @@ block:
         crossover:
             inputCols:
                 - ema7
-                - ema28
+                - sma28
             actionType: trigger
             calcFunc:
                 location: funcs.triggerFuncs
@@ -27,11 +27,11 @@ block:
                 location: funcs.eventFuncs
                 name: ema
             period: 7
-        ema28:
+        sma28:
             actionType: event
             inputCols:
                 - close
             calcFunc:
                 location: funcs.eventFuncs
-                name: ema
+                name: sma
             period: 28

@@ -1,4 +1,6 @@
 import algo.message
+import multiprocessing as mp
+
 class handler():
     def __init__(self, name, calcFunc):
         self.m_name = name
@@ -12,7 +14,6 @@ class handler():
     def update(self, code):
         msgLst = self.m_incomingMessages.pop(code, [])
         for msg in msgLst:
-            print(self.m_count)
             self.m_count +=1
             self.m_calcFunc(msg)
 

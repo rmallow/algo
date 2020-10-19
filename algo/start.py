@@ -24,12 +24,12 @@ def start():
     p1 = mp.Process(target=hM.start)
     p1.start()
 
-    p2 = mp.Process(target = mR.start)
-    p2.start()
+    #p2 = mp.Process(target = mR.start)
+    #p2.start()
 
     p3 = mp.Process(target=bM.start)
     p3.start()
 
     p3.join()
     p1.join()
-    p2.join()
+    #p2.join()

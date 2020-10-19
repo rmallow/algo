@@ -1,20 +1,8 @@
 import logging
 import algo.action as act
 
-import random
-
-
-
 """
 input for calcFuncs: dataset, params
-"""
-
-
-
-"""
-Description: Returns the Simple Moving Average (SMA)
-Output:
-    sma-${col}: array
 """
 
 def testFunc(dataSet, parameters = None):
@@ -30,3 +18,6 @@ def ema(dataSet, parameters=None):
         else:
             ema = row[0] * (smooth / (period + 1)) + ema * (1 - (smooth / (period + 1)))
     return ema
+
+def sma(dataSet, parameters=None):
+    return dataSet.iloc[0].mean()

@@ -30,6 +30,7 @@ class event(act.action):
         if index:
             start = feed.m_newCalcData.index.get_loc(index) + 1
         if start < len(feed.m_newCalcData.index):
+            #checking whats the first calculated data needs to be fixed
             if feed.m_newCalcData[self.m_name].iloc[-1] == afd.INSUF_DATA:
                 start +=1
                 self.m_parameters['first'] = True
