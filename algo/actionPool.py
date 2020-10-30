@@ -3,6 +3,7 @@ from collections.abc import Iterable
 import algo.action
 import algo.message as msg
 from algo.asyncScheduler import asyncScheduler
+from algo.messageKey import messageKey
 
 from requiremental import library
 from requiremental import parser
@@ -47,7 +48,8 @@ class actionPool():
         self.m_feed.appendCalcData()
 
         if len(self.m_triggers) > 0:
-            startCmd = msg.message(msg.COMMAND_TYPE, msg.COMMAND_START, sourceCode=self.m_code)
+            startKey = messageKey(self.m_code, self.m_feed.m_newData.index[0])
+            startCmd = msg.message(msg.COMMAND_TYPE, msg.COMMAND_START, key = startKey)
             self.m_messageRouter.receive(startCmd)
 
             for trigger in self.m_triggers:
@@ -61,8 +63,9 @@ class actionPool():
                     elif isinstance(messages, msg.message):
                         messages.m_sourceCode = self.m_code
                         self.m_messageRouter.receive(messages)
-
-            endCmd = msg.message(msg.COMMAND_TYPE, msg.COMMAND_END, sourceCode=self.m_code)
+            
+            endKey = messageKey(self.m_code,self.m_feed.m_newData.index[-1])
+            endCmd = msg.message(msg.COMMAND_TYPE, msg.COMMAND_END, key = endKey)
             self.m_messageRouter.receive(endCmd)
 
     def sendAbortCommand(self):
