@@ -1,6 +1,6 @@
 from algo.messageRouter import messageRouter
 from algo.blockManager import blockManager
-from algo.handlerManager import handlerManager
+from algo.handlerManagerAsync import handlerManager
 
 import algo.util.configLoader as configLoader
 
@@ -14,22 +14,9 @@ def start():
     hM = handlerManager(configDict)
     hM.loadHandlers()
 
-    mR = messageRouter(hM)
+    mR = messageRouter(hM.m_messageSubscriptions)
 
     path = Path("/Users/rmallow/Documents/stonks/algo/config/testBlockConfig.yml")
     configDict = configLoader.getConfigDictFromFile(path)
     bM = blockManager(configDict, mR)
     bM.loadBlocks()
-
-    p1 = mp.Process(target=hM.start)
-    p1.start()
-
-    #p2 = mp.Process(target = mR.start)
-    #p2.start()
-
-    p3 = mp.Process(target=bM.start)
-    p3.start()
-
-    p3.join()
-    p1.join()
-    #p2.join()

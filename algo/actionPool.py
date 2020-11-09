@@ -1,5 +1,3 @@
-from collections.abc import Iterable
-
 import algo.action
 import algo.message as msg
 from algo.asyncScheduler import asyncScheduler
@@ -8,6 +6,9 @@ from algo.messageKey import messageKey
 from requiremental import library
 from requiremental import parser
 from requiremental import libGroup
+
+from collections.abc import Iterable
+
 
 class actionPool():
     def __init__(self, actions, feed, messageRouter, code, libraries, parseSettings = None):

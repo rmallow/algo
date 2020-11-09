@@ -6,6 +6,9 @@ class messageKey():
     def __eq__(self, other):
         return (self.m_sourceCode == other.m_sourceCode and self.m_time == other.m_time)
 
+    def __hash__(self):
+        return hash((self.m_sourceCode, self.m_time))
+
     def compareTime(self, other):
         retVal = None
         if self.m_sourceCode == other.m_sourceCode:

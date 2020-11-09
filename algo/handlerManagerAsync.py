@@ -1,9 +1,10 @@
-from algo.handler import handler
+from algo.handlerAsync import handler
 import multiprocessing as mp
 import importlib
 import queue
 import algo.message as msg
 import logging
+from algo.asyncScheduler import asyncScheduler
 
 def _loadCalcFunc(calcFuncConfig):
     return getattr(importlib.import_module(calcFuncConfig['location']),calcFuncConfig['name'])
@@ -16,14 +17,20 @@ gets update lists and corresponding source codes for updates from message Router
 class handlerManager():
     def __init__(self, configDict):
         self.m_handlerConfig = configDict
-        self.m_handlerList = []
         self.m_messageSubscriptions = {}
         self.m_end = False
 
+        self.m_handlers = []
+        self.m_scheduler = asyncScheduler()
+
     def loadHandlers(self):
         print("---- Handler Manager Loading Blocks ----")
+
         for _, config in self.m_handlerConfig.items():
-            self.m_handlerList.append(self._loadHandler(config))
+            h = self._loadHandler(config)
+            self.m_scheduler.addTask(h.start())
+            self.m_handlers.append(h)
+        
         print("---- Handler Manager Done Loading ----")
 
     def _addSubscriptions(self, subscriptions, val):
@@ -40,3 +47,11 @@ class handlerManager():
         val = handler(name, calcFunc)
         self._addSubscriptions(subscriptions, val)
         return val
+
+    def end(self):
+        self.m_handlers = None
+        self.m_scheduler.end()
+        self.m_scheduler = None
+
+    def start(self):
+        self.m_scheduler.start()

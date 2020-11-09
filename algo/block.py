@@ -1,6 +1,6 @@
 from algo.feed import feed
 from algo.actionPool import actionPool
-from algo.asyncScheduler import asyncScheduler
+
 import pandas
 
 
@@ -13,11 +13,10 @@ class block():
         self.m_feed = feed
         self.m_messageRouter = messageRouter
         self.m_pool = actionPool(actionList, feed, messageRouter, self.m_code, libraries, parseSettings)
-        self.m_scheduler = asyncScheduler(feed, self.m_pool)
 
     def start(self):
-        self.m_scheduler.run()
+        pass
 
     def clear(self):
         self.m_feed.clear()
-        self.m_scheduler.stop()
+        pass
