@@ -42,6 +42,8 @@ class actionPool():
             self.m_triggers.append(action)
 
     def doActions(self, newData):
+        if newData.empty:
+            return
         for event in self.m_events:
             #get pandas columns, append it then add that to calculated feed
             event.update(self.m_feed)

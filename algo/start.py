@@ -31,11 +31,11 @@ def start():
 
     #get objects that have start() awaitables for scheduler
 
-    pScheduler = mp.Process(target = mainMessageRouter.initAndStart)
+    pRouter = mp.Process(target = mainMessageRouter.initAndStart)
     pMainBlockManager = mp.Process(target = mainBlockManager.start)
 
-    pScheduler.start()
+    pRouter.start()
     pMainBlockManager.start()
     
-    pScheduler.join()
+    pRouter.join()
     pMainBlockManager.join()

@@ -35,6 +35,8 @@ class feed():
         #this period measures actual time, versus action period is just in units
         self.m_period = period	#if period is none, then ticks, otherwise period num in seconds
         self.m_continuous = continuous #if continuous is true, feed will update periods before full period time has elapsed
+        
+        self.m_closeOnEmpty = True
 
         self.m_lastTimestamp = None
 
@@ -65,7 +67,7 @@ class feed():
 
     def update(self):
         rawData = self.m_getDataFunc(self.m_lastTimestamp, self.m_period)
-        if rawData is None:
+        if rawData is None or (rawData.empty and self.m_closeOnEmpty):
             self.m_end = True
             return None
         self.updateHelper(rawData)
