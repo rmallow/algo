@@ -93,5 +93,5 @@ class dataSim():
         else:
             return afterData[:index]
 
-    async def asyncGetData(self, timestamp, period):
+    def getDataFeed(self, timestamp, period):
         return self.getData(timestamp, period, "stock")

@@ -31,7 +31,7 @@ def loadObj(name ):
 def _loadBlockAndDataSource(blockConfig, messageRouter):
     dataSource = _loadDataSource(blockConfig['dataSource'])
     name = blockConfig['name']
-    feed = _loadFeed(blockConfig['feed'], dataSource.asyncGetData)
+    feed = _loadFeed(blockConfig['feed'], dataSource.getDataFeed)
     actionList = _loadActionList(blockConfig['actionList'])
     libraries = blockConfig['libraries']
     blk = block(actionList, feed, messageRouter, libraries, name=name)

@@ -49,22 +49,62 @@ class actionPool():
         self.m_feed.appendCalcData()
 
         if len(self.m_triggers) > 0:
+
+            #tell message router tha triggers are going to start sending messages
             startKey = messageKey(self.m_code, self.m_feed.m_newData.index[0])
             startCmd = msg.message(msg.COMMAND_TYPE, msg.COMMAND_START, key = startKey)
             self.m_messageRouter.receive(startCmd)
 
+
+
+            #
+            #   various checks done on how to handle values/messages returned from trigger funcs
+            #
+            sentMessageList = []
             for trigger in self.m_triggers:
-                messages = trigger.update(self.m_feed)
-                if messages is not None:
-                    #check if message iterable is received, otherwise check if one message
-                    if isinstance(messages, Iterable):
-                        for message in messages:
-                            message.m_sourceCode = self.m_code
-                            self.m_messageRouter.receive(message)
-                    elif isinstance(messages, msg.message):
-                        messages.m_sourceCode = self.m_code
-                        self.m_messageRouter.receive(messages)
+                rawTriggerValue = trigger.update(self.m_feed)
+                if rawTriggerValue is not None:
+                    if isinstance(rawTriggerValue, str):
+                        sentMessage = msg.message(msg.NORMAL_TYPE, rawTriggerValue, key = startKey, name = trigger.m_name)
+                        sentMessageList.append(sentMessage)
+                    elif isinstance(rawTriggerValue, Iterable):
+                        for rawMessage in rawTriggerValue:
+                            sentMessage = None
+                            if isinstance(rawMessage, msg.message):
+                                #rawMessage are already message class messages
+                                sentMessage = rawMessage  
+                                if sentMessage.m_key is None:
+                                    sentMessage.m_key = startKey
+                                sentMessage.m_name = trigger.m_name  
+                            else:
+                                sentMessage = msg.message(msg.NORMAL_TYPE, rawMessage, key = startKey, name = trigger.m_name)
+                            
+                            if sentMessage.isPriority():    
+                                self.m_messageRouter.receive(sentMessage)
+                            else:
+                                sentMessageList.append(sentMessage)
+                    elif isinstance(rawTriggerValue, msg.message):
+                        #rawMessage are already message class messages
+                        sentMessage = rawTriggerValue
+                        if sentMessage.m_key is None:
+                                    sentMessage.m_key = startKey
+                        sentMessage.m_name = trigger.m_name  
+                        if sentMessage.isPriority():    
+                            self.m_messageRouter.receive(sentMessage)
+                        else:
+                            sentMessageList.append(sentMessage)
             
+            #send all the non priority messages
+            self.m_messageRouter.receive(sentMessageList)
+            #
+            #   End of trigger func updating and sending to message router
+            #
+            
+
+            #tell message router tha triggers are going to done sending messages
+            #handlers should now be told to process this block of messages
+            
+
             endKey = messageKey(self.m_code,self.m_feed.m_newData.index[-1])
             endCmd = msg.message(msg.COMMAND_TYPE, msg.COMMAND_END, key = endKey)
             self.m_messageRouter.receive(endCmd)

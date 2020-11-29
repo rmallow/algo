@@ -5,3 +5,10 @@ handler1:
     calcFunc:
         location: funcs.handlerFuncs
         name: testFunc1
+handler2:
+    name: handler2
+    subscriptions:
+        - testTrigger
+    calcFunc:
+        location: funcs.handlerFuncs
+        name: testFunc2

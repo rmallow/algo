@@ -1,55 +1,21 @@
 import algo.message
-from algo.commandProcessor import commandProcessor
 
-import aioprocessing
 import asyncio
-from queue import Empty
-import multiprocessing as mp
-
 
 """
 handler class, takes message from message router and outputs
-
-
 """
-class handler(commandProcessor):
+class handler():
     def __init__(self, name, calcFunc):
         self.m_name = name
         self.m_calcFunc = calcFunc
-        self.m_data = None
-
-        self.m_buffer = {}
-        self.m_messageQueue = aioprocessing.AioQueue()
-        self.m_commandQueue = aioprocessing.AioQueue()
-
-    def receiveMessage(self, message):
-        # pylint: disable=no-member
-        self.m_messageQueue.put(message)
-
-    def coroReceiveMessage(self, message):
-        # pylint: disable=no-member
-        self.m_messageQueue.coro_put(message)
-
-    def receiveCommand(self, command):
-        # pylint: disable=no-member
-        self.m_commandQueue.put(command)
-
-    def coroReceiveCommand(self, command):
-        # pylint: disable=no-member
-        self.m_commandQueue.coro_put(command)
-
-    def cmdEnd(self, command):
+        self.m_personalData = None
+        self.m_handlerData = None
+        
+    async def updatePriority(self, message):
+        #this func will handle priority messages that this handler is subscribed to
         pass
 
-    async def start(self):
-        while True:
-            try:
-                # pylint: disable=no-member
-                command = await self.m_commandQueue.coro_get(timeout=.25)
-            except Empty:
-                pass
-            else:
-                if command is None:
-                    continue
-                else:
-                    self.processCommand(command)
+    async def update(self, key):
+        #pass in key to look in handler date for what it needs
+        pass

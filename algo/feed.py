@@ -63,8 +63,8 @@ class feed():
         else:
             self.m_end = True
 
-    async def asyncUpdate(self):
-        rawData = await self.m_getDataFunc(self.m_lastTimestamp, self.m_period)
+    def update(self):
+        rawData = self.m_getDataFunc(self.m_lastTimestamp, self.m_period)
         if rawData is None:
             self.m_end = True
             return None

@@ -15,7 +15,9 @@ class block():
         self.m_pool = actionPool(actionList, feed, messageRouter, self.m_code, libraries, parseSettings)
 
     def start(self):
-        pass
+        while True:
+            newData = self.m_feed.update()
+            self.m_pool.doActions(newData)
 
     def clear(self):
         self.m_feed.clear()

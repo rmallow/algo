@@ -1,10 +1,11 @@
 from algo.handlerAsync import handler
+from algo.asyncScheduler import asyncScheduler
+import algo.message as msg
+
 import multiprocessing as mp
 import importlib
 import queue
-import algo.message as msg
 import logging
-from algo.asyncScheduler import asyncScheduler
 
 def _loadCalcFunc(calcFuncConfig):
     return getattr(importlib.import_module(calcFuncConfig['location']),calcFuncConfig['name'])
@@ -21,20 +22,28 @@ class handlerManager():
         self.m_end = False
 
         self.m_handlers = []
-        self.m_scheduler = asyncScheduler()
+        self.m_scheduler = None
 
-    def loadHandlers(self):
+    def initAndStart(self, handlerData):
+        self.m_scheduler = asyncScheduler()
+        for h in self.m_handlers:
+            
+            self.m_scheduler.addTask(h.start())
+        self.start()
+
+    def loadHandlers(self, sharedData):
         print("---- Handler Manager Loading Blocks ----")
 
         for _, config in self.m_handlerConfig.items():
             h = self._loadHandler(config)
-            self.m_scheduler.addTask(h.start())
+            h.m_handlerData = sharedData
             self.m_handlers.append(h)
         
         print("---- Handler Manager Done Loading ----")
 
     def _addSubscriptions(self, subscriptions, val):
         for subscription in subscriptions:
+            subscription = subscription.lower()
             lst = self.m_messageSubscriptions.get(subscription, [])
             lst.append(val)
             self.m_messageSubscriptions[subscription] = lst
@@ -48,10 +57,5 @@ class handlerManager():
         self._addSubscriptions(subscriptions, val)
         return val
 
-    def end(self):
+    def clear(self):
         self.m_handlers = None
-        self.m_scheduler.end()
-        self.m_scheduler = None
-
-    def start(self):
-        self.m_scheduler.start()
