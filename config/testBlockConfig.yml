@@ -10,14 +10,6 @@ block:
         period: 60
         continuous: False
     actionList:
-        testTrigger:
-            inputCols:
-                - ema7
-            actionType: trigger
-            calcFunc:
-                location: funcs.triggerFuncs
-                name: testFunc
-            period: 1
         crossover:
             inputCols:
                 - ema7

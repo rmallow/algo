@@ -11,6 +11,7 @@ import pickle
 import importlib
 import logging
 import multiprocessing
+import datetime
 
 
 def _loadCalcFunc(calcFuncConfig):
@@ -87,6 +88,9 @@ class blockManager():
 
     def start(self):
         for block in self.m_blockList:
+            startTime = datetime.datetime.now()
             block.start()
+            print("--- Time Elapsed ---")
+            print(datetime.datetime.now() - startTime)
             print(block.m_feed.m_data)
             print(block.m_feed.m_calcData)

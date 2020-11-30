@@ -66,10 +66,7 @@ class actionPool():
             for trigger in self.m_triggers:
                 rawTriggerValue = trigger.update(self.m_feed)
                 if rawTriggerValue is not None:
-                    if isinstance(rawTriggerValue, str):
-                        sentMessage = msg.message(msg.NORMAL_TYPE, rawTriggerValue, key = startKey, name = trigger.m_name)
-                        sentMessageList.append(sentMessage)
-                    elif isinstance(rawTriggerValue, Iterable):
+                    if isinstance(rawTriggerValue, Iterable) and not isinstance(rawTriggerValue, str):
                         for rawMessage in rawTriggerValue:
                             sentMessage = None
                             if isinstance(rawMessage, msg.message):
@@ -79,6 +76,8 @@ class actionPool():
                                     sentMessage.m_key = startKey
                                 sentMessage.m_name = trigger.m_name  
                             else:
+                                if rawMessage is None:
+                                    continue
                                 sentMessage = msg.message(msg.NORMAL_TYPE, rawMessage, key = startKey, name = trigger.m_name)
                             
                             if sentMessage.isPriority():    
@@ -95,6 +94,9 @@ class actionPool():
                             self.m_messageRouter.receive(sentMessage)
                         else:
                             sentMessageList.append(sentMessage)
+                    else:
+                        sentMessage = msg.message(msg.NORMAL_TYPE, rawTriggerValue, key = startKey, name = trigger.m_name)
+                        sentMessageList.append(sentMessage)
             
             #send all the non priority messages
             self.m_messageRouter.receive(sentMessageList)

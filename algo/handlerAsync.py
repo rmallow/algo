@@ -11,6 +11,7 @@ class handler():
         self.m_calcFunc = calcFunc
         self.m_personalData = None
         self.m_handlerData = None
+        self.m_count = 0
         
     async def updatePriority(self, message):
         #this func will handle priority messages that this handler is subscribed to
@@ -18,4 +19,4 @@ class handler():
 
     async def update(self, key):
         #pass in key to look in handler date for what it needs
-        pass
+        print(key.m_time)
