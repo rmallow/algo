@@ -4,6 +4,7 @@ import os
 import algo.util.csvDataUtil as cdu
 
 
+
 #use this to load data and send to feeds for backtesting/simulation
 
 class dataSim():
@@ -23,6 +24,8 @@ class dataSim():
             keyData = cdu.combineDirCSV(self.m_key, index="Local time")
             self.m_key = keyData[0]
             self.m_data = keyData[1]
+        elif self.m_dataType == 'url':
+            pass
 
         self.m_data.columns = [x.lower() for x in self.m_data.columns]
 
