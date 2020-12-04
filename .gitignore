@@ -8,6 +8,7 @@ notes
 data
 log
 deprecated
+*.code-workspace
 
 # Distribution / packaging
 .Python
