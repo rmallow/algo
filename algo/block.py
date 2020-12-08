@@ -1,5 +1,5 @@
-from algo.feed import feed
-from algo.actionPool import actionPool
+from .feed import feed
+from .actionPool import actionPool
 
 import pandas
 

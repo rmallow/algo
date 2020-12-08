@@ -40,8 +40,8 @@ class commandProcessor():
         self.m_cmdDict.get(message.m_message,commandProcessor.cmdNotFound)(self,message)
 
 CMD_DICT = {
-    msg.COMMAND_START: commandProcessor.cmdStart,
-    msg.COMMAND_END: commandProcessor.cmdEnd,
-    msg.COMMAND_ABORT: commandProcessor.cmdAbort,
-    msg.COMMAND_RESUME: commandProcessor.cmdResume
+    msg.CommandType.START: commandProcessor.cmdStart,
+    msg.CommandType.END: commandProcessor.cmdEnd,
+    msg.CommandType.ABORT: commandProcessor.cmdAbort,
+    msg.CommandType.RESUME: commandProcessor.cmdResume
 }

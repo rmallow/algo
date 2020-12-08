@@ -1,10 +1,10 @@
-import algo.message
-import algo.messageKey
-import algo.handlerAsync
-import algo.message as msg
-from algo.commandProcessor      import commandProcessor
-from algo.handlerData           import handlerData
-from algo.asyncScheduler        import asyncScheduler
+from . import message
+from . import messageKey
+from . import handlerAsync
+from . import message as msg
+from .commandProcessor      import commandProcessor
+from .handlerData           import handlerData
+from .asyncScheduler        import asyncScheduler
 
 import aioprocessing
 import multiprocessing as mp

@@ -1,4 +1,4 @@
-import algo.message
+from . import message
 
 """
 mostly a wrapper for a two layered dict to make things 

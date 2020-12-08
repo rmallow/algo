@@ -1,7 +1,7 @@
-import algo.action
-import algo.message as msg
-from algo.asyncScheduler import asyncScheduler
-from algo.messageKey import messageKey
+from . import action
+from . import message as msg
+from .asyncScheduler import asyncScheduler
+from .messageKey import messageKey
 
 from requiremental import library
 from requiremental import parser
@@ -54,7 +54,7 @@ class actionPool():
 
             #tell message router tha triggers are going to start sending messages
             startKey = messageKey(self.m_code, self.m_feed.m_newData.index[0])
-            startCmd = msg.message(msg.COMMAND_TYPE, msg.COMMAND_START, key = startKey)
+            startCmd = msg.message(msg.MessageType.COMMAND, msg.CommandType.START, key = startKey)
             self.m_messageRouter.receive(startCmd)
 
 
@@ -78,7 +78,7 @@ class actionPool():
                             else:
                                 if rawMessage is None:
                                     continue
-                                sentMessage = msg.message(msg.NORMAL_TYPE, rawMessage, key = startKey, name = trigger.m_name)
+                                sentMessage = msg.message(msg.MessageType.NORMAL, rawMessage, key = startKey, name = trigger.m_name)
                             
                             if sentMessage.isPriority():    
                                 self.m_messageRouter.receive(sentMessage)
@@ -95,7 +95,7 @@ class actionPool():
                         else:
                             sentMessageList.append(sentMessage)
                     else:
-                        sentMessage = msg.message(msg.NORMAL_TYPE, rawTriggerValue, key = startKey, name = trigger.m_name)
+                        sentMessage = msg.message(msg.MessageType.NORMAL, rawTriggerValue, key = startKey, name = trigger.m_name)
                         sentMessageList.append(sentMessage)
             
             #send all the non priority messages
@@ -110,11 +110,11 @@ class actionPool():
             
 
             endKey = messageKey(self.m_code,self.m_feed.m_newData.index[-1])
-            endCmd = msg.message(msg.COMMAND_TYPE, msg.COMMAND_END, key = endKey)
+            endCmd = msg.message(msg.MessageType.COMMAND, msg.CommandType.END, key = endKey)
             self.m_messageRouter.receive(endCmd)
 
     def sendAbortCommand(self):
-        message = msg.message(msg.COMMAND_TYPE, msg.COMMAND_ABORT)
+        message = msg.message(msg.MessageType.COMMAND, msg.CommandType.ABORT)
         self.m_messageRouter.receive(message)
         
             

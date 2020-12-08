@@ -1,7 +1,7 @@
 import sys
 import os
 
-import algo.util.csvDataUtil as cdu
+from .util import csvDataUtil as cdu
 
 
 

@@ -3,9 +3,10 @@ block:
     libraries:
         - funcs/eventFuncs.py
     dataSource:
-        type: dataSim
-        key: data/m1test/AAPL.USUSD_Candlestick_1_M_BID_01.04.2020-03.04.2020.csv
-        fileType: csv
+        type: stream
+        key: xyz
+        dataType: real_time
+        url: https://financialmodelingprep.com/api/v3/quote/JPYUSD?apikey=988acec08b291b04291918235100cd16
     feed:
         period: 60
         continuous: False
@@ -22,7 +23,7 @@ block:
         ema7:
             actionType: event
             inputCols:
-                - close
+                - price
             calcFunc:
                 location: funcs.eventFuncs
                 name: ema
@@ -30,7 +31,7 @@ block:
         sma28:
             actionType: event
             inputCols:
-                - close
+                - price
             calcFunc:
                 location: funcs.eventFuncs
                 name: sma

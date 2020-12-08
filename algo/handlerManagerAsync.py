@@ -1,6 +1,6 @@
-from algo.handlerAsync import handler
-from algo.asyncScheduler import asyncScheduler
-import algo.message as msg
+from .handlerAsync import handler
+from .asyncScheduler import asyncScheduler
+from .message import message as msg
 
 import multiprocessing as mp
 import importlib
@@ -29,7 +29,6 @@ class handlerManager():
         for h in self.m_handlers:
             
             self.m_scheduler.addTask(h.start())
-        self.start()
 
     def loadHandlers(self, sharedData):
         print("---- Handler Manager Loading Blocks ----")

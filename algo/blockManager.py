@@ -1,9 +1,10 @@
-from algo.asyncScheduler import asyncScheduler
-from algo.block import block
-from algo.event import event
-from algo.trigger import trigger
-from algo.feed import feed
-from algo.dataSim import dataSim
+from .asyncScheduler import asyncScheduler
+from .block import block
+from .event import event
+from .trigger import trigger
+from .feed import feed
+from .dataSim import dataSim
+from .dataStream import dataStream
 
 import requiremental
 
@@ -45,8 +46,9 @@ def _loadDataSource(dataSourceConfig):
         fileType = dataSourceConfig['fileType']
         return dataSim(key, fileType)
     elif dataSourceType == 'stream':
-        #return stream(key)
-        return None #change after implementing stream
+        dataType = dataSourceConfig['dataType']
+        url = dataSourceConfig['url']
+        return dataStream(key, dataType, url)
 
 def _loadActionList(actionListConfig):
     actionList = []

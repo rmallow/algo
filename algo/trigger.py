@@ -1,5 +1,5 @@
-import algo.feed as afd
-from algo.action import action
+from . import feed as afd
+from .action import action
 
 class trigger(action):
     def __init__(self, period=1, name = "defaultTriggerName", calcFunc = None, params = {}, inputCols = []):

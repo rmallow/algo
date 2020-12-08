@@ -1,14 +1,17 @@
 import algo.messageKey
 
+from enum import Enum
 
-COMMAND_TYPE = 1
-NORMAL_TYPE = 2
-PRIORITY_TYPE = 3
+class MessageType(Enum):
+    COMMAND = 1
+    NORMAL = 2
+    PRIORITY = 3
 
-COMMAND_START = 101
-COMMAND_END = 102
-COMMAND_ABORT = 103
-COMMAND_RESUME = 104
+class CommandType(Enum):
+    START = 1
+    END = 2
+    ABORT = 3
+    RESUME = 4
 
 class message():
     def __init__(self, messageType, message, name = None, sourceName = None, key = None):
@@ -22,11 +25,11 @@ class message():
         return self.m_key.m_sourceCode is not None and self.m_key.m_time is not None
 
     def isPriority(self):
-        return self.m_type == PRIORITY_TYPE
+        return self.m_type == MessageType.PRIORITY
 
     def isCommand(self):
-        return self.m_type == COMMAND_TYPE
+        return self.m_type == MessageType.COMMAND
 
     def isNormal(self):
-        return self.m_type == NORMAL_TYPE
+        return self.m_type == MessageType.NORMAL
         

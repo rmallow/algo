@@ -1,5 +1,5 @@
-import algo.action as act
-import algo.feed as afd
+from . import action as act
+from . import feed as afd
 
 def addINF(feed, period, calcColName):
     sub = 0

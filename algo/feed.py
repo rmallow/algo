@@ -14,7 +14,8 @@ def safeLength(value):
         return 1
 
 def setFrameColRange(frame, col, start, values):
-    stop = start + safeLength(values) - 1
+    #REMOVED -1 FROM THE END OF THIS??
+    stop = start + safeLength(values)
     if start == stop:
         stop += 1
     frame.iloc[start:stop, frame.columns.get_loc(col)] = values 
