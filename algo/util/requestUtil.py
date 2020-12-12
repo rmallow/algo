@@ -28,7 +28,7 @@ def getPandasFromUrl(url, indexName=None, columnFilter=None, removeColumns = Non
         #not going to drop all columns so make sure they're not the same length
         if len(dropColList) > 0 and len(dropColList) != len(colList):
             bFiltered = True
-            df = df.drop(dropColList)
+            df = df.drop(dropColList, axis = 1)
 
     #remove columns from removeColumns if we didn't already filter
     if not bFiltered and removeColumns:
@@ -38,7 +38,7 @@ def getPandasFromUrl(url, indexName=None, columnFilter=None, removeColumns = Non
                 dropColList.append(col)
         
         if len(dropColList) > 0:
-            df = df.drop(dropColList)
+            df = df.drop(dropColList, axis = 1)
 
     return df
 

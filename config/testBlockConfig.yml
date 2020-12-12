@@ -7,6 +7,11 @@ block:
         key: xyz
         dataType: real_time
         url: https://financialmodelingprep.com/api/v3/quote/JPYUSD?apikey=988acec08b291b04291918235100cd16
+        index: timestamp
+        columnFilter:
+            - price
+            - change
+        period: 1
     feed:
         period: 60
         continuous: False
@@ -14,7 +19,7 @@ block:
         crossover:
             inputCols:
                 - ema7
-                - sma28
+                - sma7
             actionType: trigger
             calcFunc:
                 location: funcs.triggerFuncs
@@ -28,11 +33,11 @@ block:
                 location: funcs.eventFuncs
                 name: ema
             period: 7
-        sma28:
+        sma7:
             actionType: event
             inputCols:
                 - price
             calcFunc:
                 location: funcs.eventFuncs
                 name: sma
-            period: 28
+            period: 7

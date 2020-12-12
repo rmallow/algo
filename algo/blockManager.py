@@ -48,7 +48,10 @@ def _loadDataSource(dataSourceConfig):
     elif dataSourceType == 'stream':
         dataType = dataSourceConfig['dataType']
         url = dataSourceConfig['url']
-        return dataStream(key, dataType, url)
+        index = dataSourceConfig['index']
+        colFilter = dataSourceConfig['columnFilter']
+        period = dataSourceConfig['period']
+        return dataStream(key, dataType, url, index, colFilter, period )
 
 def _loadActionList(actionListConfig):
     actionList = []

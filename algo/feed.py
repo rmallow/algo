@@ -3,6 +3,7 @@ import asyncio
 import logging
 import numpy as np
 import collections
+import time
 
 def safeLength(value):
     """
@@ -18,7 +19,10 @@ def setFrameColRange(frame, col, start, values):
     stop = start + safeLength(values)
     if start == stop:
         stop += 1
-    frame.iloc[start:stop, frame.columns.get_loc(col)] = values 
+    try:
+        frame.iloc[start:stop, frame.columns.get_loc(col)] = values
+    except ValueError as e:
+        pass
 
 
 
@@ -49,6 +53,8 @@ class feed():
         self.m_newCalcLength = 0
         self.m_end = False
 
+        self.m_startTime = time.time()
+
     def updateHelper(self, rawData):
         if isinstance(rawData, pd.DataFrame):
             self.m_newData = rawData
@@ -74,6 +80,11 @@ class feed():
         self.updateHelper(rawData)
         self.m_newCalcData = pd.DataFrame(index=self.m_newData.index)
         self.m_newCalcLength = len(self.m_newCalcData.index)  #conveience
+
+        if self.m_startTime < time.time() - 10:
+            print(self.m_data.head(20))
+            print(self.m_calcData.head(20))
+            self.m_startTime = time.time()
         return self.m_newData
 
     def getDataSince(self, timestamp):
@@ -109,7 +120,8 @@ class feed():
                 logging.warning(err)
         else:
             self.m_newCalcData[key.lower()] = np.nan
-            self.addToPartialCols({key:value})
+            if safeLength(value) > 0:
+                self.addToPartialCols({key:value})
 
     def addToPartialCols(self, cols):
         """

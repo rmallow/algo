@@ -1,4 +1,5 @@
 import pandas as pd
+import logging
 
 col = 'col'
 period = 'period'
@@ -37,9 +38,14 @@ class action():
         
     def updateDataSet(self, feed):
         start = -1 * self.m_period
-        self.m_dataSet = pd.DataFrame(index=feed.m_data.index[start: len(feed.m_data.index)])
+        index = feed.m_data.index[start: len(feed.m_data.index)]
+        self.m_dataSet = pd.DataFrame(index=index)
         for col in self.m_inputCols:
-            self.m_dataSet[col] = findCol(feed, col)
+            try:
+                self.m_dataSet[col] = findCol(feed, col)
+            except ValueError as e:
+                logging.warning(e)
+                logging.warning(col + str(index))
 
     def getCalcFunc(self):
         return self.m_calcFunc
