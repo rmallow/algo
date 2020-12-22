@@ -80,11 +80,11 @@ class feed():
         self.updateHelper(rawData)
         self.m_newCalcData = pd.DataFrame(index=self.m_newData.index)
         self.m_newCalcLength = len(self.m_newCalcData.index)  #conveience
-
-        if self.m_startTime < time.time() - 10:
-            print(self.m_data.head(20))
-            print(self.m_calcData.head(20))
-            self.m_startTime = time.time()
+        if False:
+            if self.m_startTime < time.time() - 10:
+                print(self.m_data.head(20))
+                print(self.m_calcData.head(20))
+                self.m_startTime = time.time()
         return self.m_newData
 
     def getDataSince(self, timestamp):

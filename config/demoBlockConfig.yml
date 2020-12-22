@@ -1,0 +1,53 @@
+block:
+    name: AAPL
+    libraries:
+        - funcs/eventFuncs.py
+    dataSource:
+        type: dataSim
+        key: data/m1test/AAPL.USUSD_Candlestick_1_M_BID_01.04.2020-03.04.2020.csv
+        fileType: csv
+    feed:
+        period: 60
+        continuous: False
+    actionList:
+        closeChange:
+            inputCols:
+                - close
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: change
+            period: 2
+        closeUp:
+            inputCols:
+                - closeChange
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: up
+            period: 1
+        crossover:
+            inputCols:
+                - ema7
+                - sma7
+            actionType: trigger
+            calcFunc:
+                location: funcs.triggerFuncs
+                name: crossover
+            period: 2
+        ema7:
+            actionType: event
+            inputCols:
+                - close
+            calcFunc:
+                location: funcs.eventFuncs
+                name: ema
+            period: 7
+        sma7:
+            actionType: event
+            inputCols:
+                - close
+            calcFunc:
+                location: funcs.eventFuncs
+                name: sma
+            period: 7

@@ -20,7 +20,9 @@ class handlerData():
 
             self.m_dataSet[key.m_sourceCode][key.m_time].append(message)
 
-
+    """
+    insert one message or list of messages
+    """
     def insert(self, rawMessage):
         try:
             for msg in rawMessage:
