@@ -26,7 +26,6 @@ def change(dataSet, parameters=None):
     return dataSet.iloc[-1][0] - dataSet.iloc[0][0]
     
 def up(dataSet, parameters=None):
-    print(dataSet.head())
     if dataSet.iloc[0][0] > 0:
         return dataSet.iloc[0][0]
     else:

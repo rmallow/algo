@@ -5,6 +5,15 @@ col = 'col'
 period = 'period'
 
 def findCol(feed, col):
+    """
+    finds the specified col from feed
+    if col in data, return that, won't be in calc or new calc
+    if col in calc check if it's also in new calc:
+        return combined if also in new clac
+        else return just calc col
+    if col in new calc return that
+    else return none
+    """
     if feed.m_data is not None and col in feed.m_data.columns:
         return feed.m_data[col]
     elif feed.m_calcData is not None and col in feed.m_calcData.columns:
@@ -12,6 +21,17 @@ def findCol(feed, col):
             return feed.m_calcData[col].append(feed.m_newCalcData[col])
         else:
             return feed.m_calcData[col]
+    elif feed.m_newCalcData is not None and col in feed.m_newCalcData.columns:
+        return feed.m_newCalcData[col]
+    else:
+        return None
+
+def findNewCalcCol(feed, col):
+    """
+    find only in new Calc data
+    """
+    if feed.m_newCalcData is not None and col in feed.m_newCalcData.columns:
+        return feed.m_newCalcData[col]
     else:
         return None
 

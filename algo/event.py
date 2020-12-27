@@ -1,18 +1,6 @@
 from . import action as act
 from . import feed as afd
 
-def addINF(feed, period, calcColName):
-    sub = 0
-    #only put in as many insuf data as needed
-    if not(feed.m_calcData is None or calcColName not in feed.m_calcData.columns):
-        sub = len(feed.m_calcData.index)
-    INFListLength = (period - 1 - sub) if (period - 1 - sub) > 0 else 0
-
-    if INFListLength > feed.m_newCalcLength:
-        INFListLength = feed.m_newCalcLength
-    return [afd.INSUF_DATA] * INFListLength
-    
-
 class event(act.action):
     def __init__(self, period=1, name="defaultEventName", calcFunc=None, params={}, inputCols = []):
         super().__init__("event", period=period, name=name, calcFunc=calcFunc, params = params, inputCols = inputCols)
@@ -40,8 +28,55 @@ class event(act.action):
             self.m_parameters['first'] = False
             for _ in range(start, len(feed.m_newCalcData.index)):
                 calcFuncVal = super().update(feed)
-                feed.addToPartialCols({self.m_name : calcFuncVal})
+                feed.addToPartialCols({self.m_name: calcFuncVal})
+                
+    def addINF(self, feed):
+        """
+        only put in as many insuf data as needed
+        overall i feel like this function could use  good bit of reworking
+        it feels like it currently handles things pretty inefficiently
+
+        could probably add some flags so that we don't have to perform some inputs over and over
+        """
+        #this will check for the input cols and see if they have any insufficient data constants
+        #it will find the last inf constant in any input col
+        #insuf data at this point only applies to calc data, so skip a col if it's in data
+        lastINFIndex = -1
+        for col in self.m_inputCols:
+            if col not in feed.m_data.columns:
+                inputColDf = act.findNewCalcCol(feed, col)
+                #kinda hacky but used isin and list instead of == to supress annoying numpy warning
+                index = inputColDf.where(inputColDf.isin([afd.INSUF_DATA])).last_valid_index()
+                if index:
+                    intIndex = inputColDf.index.get_loc(index)
+                    if lastINFIndex < intIndex:
+                        lastINFIndex = intIndex
+                
+                        #there won't be enough data to calculate so we just exit here to avoid unecessary computations
+                        if lastINFIndex > feed.m_newCalcLength - self.m_period:
+                            return [afd.INSUF_DATA] * feed.m_newCalcLength
+        
+        #if we've made it here and lastINFIndex is not 0 then the starting point is just
+        #period - 1 as INF was determined by the inputCols
+        #if the columns can get other issues like errors and such filled in then this function will
+        #need to be reworked
+        INFListLength = 0
+        if lastINFIndex > -1:
+            #the actual math would be lastINFIndex + 1 + self.m_period - 1 but for obvious reasons i've slimmed that down
+            #this is because of indexing stuff for lastIndex that it gets the add and period - 1 is stuff seen below
+            INFListLength = lastINFIndex + self.m_period
+        
+        #check amount of data already calculated
+        else:
+            sub = 0
+            if feed.m_calcData is not None and self.m_name in feed.m_calcData.columns:
+                sub = len(feed.m_calcData.index)
+            INFListLength = (self.m_period - 1 - sub) if (self.m_period - 1 - sub) > 0 else 0
+
+        if INFListLength > feed.m_newCalcLength:
+            INFListLength = feed.m_newCalcLength
+        return [afd.INSUF_DATA] * INFListLength
 
     def setupCols(self, feed):
-       rowVals = addINF(feed, self.m_period, self.m_name)
+       rowVals = self.addINF(feed)
        return {self.m_name: rowVals}

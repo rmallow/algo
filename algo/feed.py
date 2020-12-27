@@ -125,7 +125,8 @@ class feed():
 
     def addToPartialCols(self, cols):
         """
-        used for adding partially either new or to an existing column
+        used for adding partially 
+        either new or to an existing column
         """
         for key, value in cols.items():
             if key:

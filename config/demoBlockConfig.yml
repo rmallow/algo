@@ -26,28 +26,11 @@ block:
                 location: funcs.eventFuncs
                 name: up
             period: 1
-        crossover:
+        closeDown:
             inputCols:
-                - ema7
-                - sma7
-            actionType: trigger
-            calcFunc:
-                location: funcs.triggerFuncs
-                name: crossover
-            period: 2
-        ema7:
+                - closeChange
             actionType: event
-            inputCols:
-                - close
             calcFunc:
                 location: funcs.eventFuncs
-                name: ema
-            period: 7
-        sma7:
-            actionType: event
-            inputCols:
-                - close
-            calcFunc:
-                location: funcs.eventFuncs
-                name: sma
-            period: 7
+                name: down
+            period: 1
