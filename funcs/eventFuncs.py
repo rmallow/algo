@@ -33,6 +33,12 @@ def up(dataSet, parameters=None):
 
 def down(dataSet, parameters=None):
     if dataSet.iloc[-1][0] < 0:
-        return dataSet.iloc[-1][0]
+        return dataSet.iloc[-1][0] * -1
     else:
         return 0
+
+def divide(dataSet, parameters=None):
+    return dataSet.iloc[0][0] / dataSet.iloc[0][1]
+
+def rsi(dataSet, parameters=None):
+    return (100 - ( 100 / (1 + dataSet.iloc[0][0])))

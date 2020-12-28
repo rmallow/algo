@@ -34,3 +34,36 @@ block:
                 location: funcs.eventFuncs
                 name: down
             period: 1
+        emaUp:
+            inputCols:
+                - closeUp
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: ema
+            period: 28
+        emaDown:
+            inputCols:
+                - closeDown
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: ema
+            period: 28 
+        rs:
+            inputCols:
+                - emaUp
+                - emaDown
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: divide
+            period: 1
+        rsi:
+            inputCols:
+                - rs
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: rsi
+            period: 1

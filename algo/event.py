@@ -42,9 +42,15 @@ class event(act.action):
         #it will find the last inf constant in any input col
         #insuf data at this point only applies to calc data, so skip a col if it's in data
         lastINFIndex = -1
+
+        rangeIndexStart = self.m_period * -1
+        
         for col in self.m_inputCols:
             if col not in feed.m_data.columns:
-                inputColDf = act.findNewCalcCol(feed, col)
+                #find the column and get just the parts we care about
+                inputColDf = act.findCol(feed, col)
+                rangeIndexEnd = len(inputColDf.index)
+                inputColDf = inputColDf.iloc[rangeIndexStart:rangeIndexEnd]
                 #kinda hacky but used isin and list instead of == to supress annoying numpy warning
                 index = inputColDf.where(inputColDf.isin([afd.INSUF_DATA])).last_valid_index()
                 if index:
