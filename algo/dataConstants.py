@@ -5,5 +5,8 @@ DATA CONSTATNTS
 """
 
 class DataTypeEnum(algoEnum):
-    HISTORICAL = 1
-    REAL_TIME = 2
+    HISTORICAL_REQUEST = 1
+    REAL_TIME_REQUEST = 2
+    CSV = 3
+    DIR = 4
+    URL = 5

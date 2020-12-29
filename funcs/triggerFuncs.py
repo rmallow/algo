@@ -11,3 +11,11 @@ def crossover(dataSet, parameters):
         return dataSet.index[0]
     else:
         return None
+
+def under(dataSet, parameters=None):
+    if dataSet.iloc[0, 0] < parameters['factor']:
+        return True
+
+def over(dataSet, parameters=None):
+    if dataSet.iloc[0, 0] > parameters['factor']:
+        return True

@@ -1,31 +1,34 @@
-import sys
-import os
+from .dataBase import dataBase
+from .dataConstants import DataTypeEnum
 
 from .util import csvDataUtil as cdu
+from .util import requestUtil as ru
 
+import sys
+import os
 
 
 #use this to load data and send to feeds for backtesting/simulation
 
-class dataSim():
-    def __init__(self, key, dataType):
-        self.m_key = key
-        self.m_dataType = dataType
+class dataSim(dataBase):
+    def __init__(self, key, dataType, indexName = None, period = None, columnFilter = None):
+        super().__init__(key, dataType, indexName, period, columnFilter)
+
         self.m_data = None
         self.m_newDay = False
         self.loadData()
     
     def loadData(self):
-        if self.m_dataType == 'csv':
+        if self.m_dataType == DataTypeEnum.CSV:
             keyData = cdu.loadSingleCSV(self.m_key, index="Local time")
             self.m_key = keyData[0]
             self.m_data = keyData[1]
-        elif self.m_dataType == 'dir':
+        elif self.m_dataType == DataTypeEnum.DIR:
             keyData = cdu.combineDirCSV(self.m_key, index="Local time")
             self.m_key = keyData[0]
             self.m_data = keyData[1]
-        elif self.m_dataType == 'url':
-            pass
+        elif self.m_dataType == DataTypeEnum.URL:
+            self.m_data = ru.getPandasFromUrl(self.m_key, indexName = self.m_indexName, columnFilter=self.m_columnFilter)
 
         self.m_data.columns = [x.lower() for x in self.m_data.columns]
 

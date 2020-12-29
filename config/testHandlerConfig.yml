@@ -1,14 +1,7 @@
 handler1:
-    name: firstHandler
+    name: buyHandler
     subscriptions:
-        - crossover
-    calcFunc:
-        location: funcs.handlerFuncs
-        name: testFunc1
-handler2:
-    name: handler2
-    subscriptions:
-        - testTrigger
+        - rsi-buy
     calcFunc:
         location: funcs.handlerFuncs
         name: testFunc2

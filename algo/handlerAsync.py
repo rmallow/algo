@@ -18,6 +18,4 @@ class handler():
         pass
 
     async def update(self, key):
-        #pass in key to look in handler date for what it needs
-        #print(key.m_time)
-        pass
+        print(key.m_time)

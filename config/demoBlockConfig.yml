@@ -67,3 +67,23 @@ block:
                 location: funcs.eventFuncs
                 name: rsi
             period: 1
+        rsi-buy:
+            inputCols:
+                - rsi
+            actionType: trigger
+            calcFunc:
+                location: funcs.triggerFuncs
+                name: under
+            period: 1
+            params:
+                factor: 20
+        rsi-sell:
+            inputCols:
+                - rsi
+            actionType: trigger
+            calcFunc:
+                location: funcs.triggerFuncs
+                name: over
+            period: 1
+            params:
+                factor: 80

@@ -1,3 +1,4 @@
+from .dataBase import dataBase
 from .dataConstants import DataTypeEnum
 
 from .util import requestUtil as ru
@@ -5,18 +6,11 @@ from .util import requestUtil as ru
 import logging
 import time
 
-class dataStream():
-    def __init__(self, key, dataType, url, indexName = None, columnFilter = None, period = None):
-        self.m_key = key
-        try:
-            self.m_dataType = DataTypeEnum[dataType]
-        except ValueError:
-            logging.warning("Failed setting data type")
-            logging.warning(self.m_dataType)
+class dataStream(dataBase):
+    def __init__(self, key, dataType, url, indexName = None, period = None, columnFilter = None):
+        super().__init__(key, dataType, indexName, period, columnFilter)
+        
         self.m_url = url
-        self.m_indexName = indexName
-        self.m_columnFilter = columnFilter
-        self.m_period = period
         self.m_time = None
 
     def getData(self, timestamp, period):
@@ -26,9 +20,9 @@ class dataStream():
                     break
 
         returnVal = None
-        if self.m_dataType == DataTypeEnum.HISTORICAL:
+        if self.m_dataType == DataTypeEnum.HISTORICAL_REQUEST:
             pass
-        elif self.m_dataType == DataTypeEnum.REAL_TIME:
+        elif self.m_dataType == DataTypeEnum.REAL_TIME_REQUEST:
             returnVal = self.getDataReal(timestamp, period)
 
         self.m_time = time.time()
