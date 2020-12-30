@@ -1,9 +1,6 @@
 import pandas as pd
 import logging
 
-col = 'col'
-period = 'period'
-
 def findCol(feed, col):
     """
     finds the specified col from feed

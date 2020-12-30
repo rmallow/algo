@@ -10,3 +10,6 @@ class DataTypeEnum(algoEnum):
     CSV = 3
     DIR = 4
     URL = 5
+
+INSUF_DATA = 'insufData'
+COL_NF = 'colNF'

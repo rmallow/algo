@@ -38,7 +38,10 @@ def down(dataSet, parameters=None):
         return 0
 
 def divide(dataSet, parameters=None):
-    return dataSet.iloc[0][0] / dataSet.iloc[0][1]
+    try:
+        return dataSet.iloc[0][0] / dataSet.iloc[0][1]
+    except ZeroDivisionError:
+        return 0
 
 def rsi(dataSet, parameters=None):
     return (100 - ( 100 / (1 + dataSet.iloc[0][0])))

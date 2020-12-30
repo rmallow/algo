@@ -1,5 +1,6 @@
 from . import action as act
 from . import feed as afd
+from . import constants as con
 
 class event(act.action):
     def __init__(self, period=1, name="defaultEventName", calcFunc=None, params={}, inputCols = []):
@@ -19,7 +20,7 @@ class event(act.action):
             start = feed.m_newCalcData.index.get_loc(index) + 1
         if start < len(feed.m_newCalcData.index):
             #checking whats the first calculated data needs to be fixed
-            if feed.m_newCalcData[self.m_name].iloc[-1] == afd.INSUF_DATA:
+            if feed.m_newCalcData[self.m_name].iloc[-1] == con.INSUF_DATA:
                 start +=1
                 self.m_parameters['first'] = True
                 calcFuncVal = super().update(feed)
@@ -52,7 +53,7 @@ class event(act.action):
                 rangeIndexEnd = len(inputColDf.index)
                 inputColDf = inputColDf.iloc[rangeIndexStart:rangeIndexEnd]
                 #kinda hacky but used isin and list instead of == to supress annoying numpy warning
-                index = inputColDf.where(inputColDf.isin([afd.INSUF_DATA])).last_valid_index()
+                index = inputColDf.where(inputColDf.isin([con.INSUF_DATA])).last_valid_index()
                 if index:
                     intIndex = inputColDf.index.get_loc(index)
                     if lastINFIndex < intIndex:
@@ -60,7 +61,7 @@ class event(act.action):
                 
                         #there won't be enough data to calculate so we just exit here to avoid unecessary computations
                         if lastINFIndex > feed.m_newCalcLength - self.m_period:
-                            return [afd.INSUF_DATA] * feed.m_newCalcLength
+                            return [con.INSUF_DATA] * feed.m_newCalcLength
         
         #if we've made it here and lastINFIndex is not 0 then the starting point is just
         #period - 1 as INF was determined by the inputCols
@@ -81,7 +82,7 @@ class event(act.action):
 
         if INFListLength > feed.m_newCalcLength:
             INFListLength = feed.m_newCalcLength
-        return [afd.INSUF_DATA] * INFListLength
+        return [con.INSUF_DATA] * INFListLength
 
     def setupCols(self, feed):
        rowVals = self.addINF(feed)

@@ -4,9 +4,8 @@ block:
         - funcs/eventFuncs.py
     dataSource:
         type: stream
-        key: xyz
-        dataType: real_time
-        url: https://financialmodelingprep.com/api/v3/quote/JPYUSD?apikey=988acec08b291b04291918235100cd16
+        dataType: real_time_request
+        key: https://financialmodelingprep.com/api/v3/quote/JPYUSD?apikey=988acec08b291b04291918235100cd16
         index: timestamp
         columnFilter:
             - price
