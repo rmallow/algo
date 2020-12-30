@@ -1,5 +1,5 @@
 from .dataBase import dataBase
-from .dataConstants import DataTypeEnum
+from .constants import DataTypeEnum
 
 from .util import requestUtil as ru
 
@@ -7,10 +7,9 @@ import logging
 import time
 
 class dataStream(dataBase):
-    def __init__(self, key, dataType, url, indexName = None, period = None, columnFilter = None):
+    def __init__(self, key, dataType, indexName = None, period = None, columnFilter = None):
         super().__init__(key, dataType, indexName, period, columnFilter)
         
-        self.m_url = url
         self.m_time = None
 
     def getData(self, timestamp, period):
@@ -29,7 +28,7 @@ class dataStream(dataBase):
         return returnVal
 
     def getDataReal(self, timestamp, period):
-        return ru.getPandasFromUrl(self.m_url, indexName = self.m_indexName, columnFilter=self.m_columnFilter)
+        return ru.getPandasFromUrl(self.m_key, indexName = self.m_indexName, columnFilter=self.m_columnFilter)
 
     def getDataFeed(self, timestamp, period):
         return self.getData(timestamp, period)

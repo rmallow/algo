@@ -42,16 +42,15 @@ def _loadBlockAndDataSource(blockConfig, messageRouter):
 def _loadDataSource(dataSourceConfig):
     dataSourceType = dataSourceConfig['type']
     key = dataSourceConfig['key']
+    dataType = dataSourceConfig['dataType']
+    index = dataSourceConfig['index']
+    colFilter = dataSourceConfig['columnFilter']
+    period = dataSourceConfig['period']
     if dataSourceType == 'dataSim':
-        fileType = dataSourceConfig['fileType']
-        return dataSim(key, fileType)
+        return dataSim(key, dataType, index, period, colFilter)
     elif dataSourceType == 'stream':
-        dataType = dataSourceConfig['dataType']
-        url = dataSourceConfig['url']
-        index = dataSourceConfig['index']
-        colFilter = dataSourceConfig['columnFilter']
-        period = dataSourceConfig['period']
-        return dataStream(key, dataType, url, index, colFilter, period )
+        
+        return dataStream(key, dataType, index, period, colFilter)
 
 def _loadActionList(actionListConfig):
     actionList = []

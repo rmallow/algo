@@ -1,5 +1,5 @@
 from .dataBase import dataBase
-from .dataConstants import DataTypeEnum
+from .constants import DataTypeEnum
 
 from .util import csvDataUtil as cdu
 from .util import requestUtil as ru
@@ -31,6 +31,9 @@ class dataSim(dataBase):
             self.m_data = ru.getPandasFromUrl(self.m_key, indexName = self.m_indexName, columnFilter=self.m_columnFilter)
 
         self.m_data.columns = [x.lower() for x in self.m_data.columns]
+        if self.m_data.index[0] > self.m_data.index[1]:
+            self.m_data  = self.m_data[::-1]
+        #self.m_data.index = self.m_data.index.tz_localize('UTC').tz_convert('US/Central')
 
     def getData(self, timestamp, period, getType):
         if getType == "stock":
@@ -47,22 +50,25 @@ class dataSim(dataBase):
         else:
             timestamp = self.m_data.loc[timestamp:].index[1]
         afterData = self.m_data.loc[timestamp:]
-        #for now we are just going to assume data is correctly indexed
+        
         timesAfter = afterData.index
-        timesAfter.tz_convert('US/Central')
-        timestamp.tz_convert('US/Central')
+
         index = -1
         startIndex = -1
         for idx, time in enumerate(timesAfter):
             index = idx
             #times are in CST, might wanna make sure timestamp is CST just in case
-            if time.hour < 8 or (time.hour == 8 and time.minute < 31):
+            if time.hour < 9 or (time.hour == 9 and time.minute < 31):
                 startIndex += 1
                 timestamp = time
                 continue
-            elif time.day != timestamp.day or time.hour >= 15:
+            elif time.day != timestamp.day or time.hour >= 16:
                 self.m_newDay = True
-                break
+                #if there is no data from last day to pass then continue, otherwise clear
+                if index <= 0 or startIndex == index:
+                    continue
+                else:
+                    break
             elif (time - timestamp).total_seconds() >= period:
                 break
 

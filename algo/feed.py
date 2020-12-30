@@ -57,6 +57,8 @@ class feed():
 
     def updateHelper(self, rawData):
         if isinstance(rawData, pd.DataFrame):
+            if self.m_lastTimestamp and rawData.index[0].day != self.m_lastTimestamp.day:
+                self.clear()
             self.m_newData = rawData
         else:
             logging.warning("RAW DATA CONVERSION TO PANDAS NOT IMPLEMENTED YET")
@@ -80,11 +82,6 @@ class feed():
         self.updateHelper(rawData)
         self.m_newCalcData = pd.DataFrame(index=self.m_newData.index)
         self.m_newCalcLength = len(self.m_newCalcData.index)  #conveience
-        if False:
-            if self.m_startTime < time.time() - 10:
-                print(self.m_data.head(20))
-                print(self.m_calcData.head(20))
-                self.m_startTime = time.time()
         return self.m_newData
 
     def getDataSince(self, timestamp):
@@ -140,3 +137,9 @@ class feed():
                 setFrameColRange(self.m_newCalcData, key, start, value)
             else:
                 logging.warning("key not exist addToPartialCols")
+
+    def clear(self):
+        self.m_data = None
+        self.m_newData = None
+        self.m_calcData = None
+        self.m_newCalcData = None
