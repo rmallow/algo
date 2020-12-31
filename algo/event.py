@@ -20,6 +20,7 @@ class event(act.action):
             start = feed.m_newCalcData.index.get_loc(index) + 1
         if start < len(feed.m_newCalcData.index):
             #checking whats the first calculated data needs to be fixed
+            #first parameter can be used by functions to only do some computations on first attempt
             if feed.m_newCalcData[self.m_name].iloc[-1] == con.INSUF_DATA:
                 start +=1
                 self.m_parameters['first'] = True
@@ -38,10 +39,11 @@ class event(act.action):
         it feels like it currently handles things pretty inefficiently
 
         could probably add some flags so that we don't have to perform some inputs over and over
+        
+        this will check for the input cols and see if they have any insufficient data constants
+        it will find the last inf constant in any input col
+        insuf data at this point only applies to calc data, so skip a col if it's in data
         """
-        #this will check for the input cols and see if they have any insufficient data constants
-        #it will find the last inf constant in any input col
-        #insuf data at this point only applies to calc data, so skip a col if it's in data
         lastINFIndex = -1
 
         rangeIndexStart = self.m_period * -1

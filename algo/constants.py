@@ -1,7 +1,9 @@
 from .util.algoEnum import algoEnum
 
 """
-DATA CONSTATNTS
+----------------------------
+DATA GETTER CLASS CONSTATNTS
+----------------------------
 """
 
 class DataTypeEnum(algoEnum):
@@ -10,6 +12,15 @@ class DataTypeEnum(algoEnum):
     CSV = 3
     DIR = 4
     URL = 5
+
+OUTSIDE_CONSTRAINT = 'Outside'
+
+
+"""
+----------------------------
+FEED SPECIAL VALUE CONSTANTS
+----------------------------
+"""
 
 INSUF_DATA = 'insufData'
 COL_NF = 'colNF'

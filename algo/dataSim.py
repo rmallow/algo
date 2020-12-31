@@ -11,12 +11,10 @@ import os
 #use this to load data and send to feeds for backtesting/simulation
 
 class dataSim(dataBase):
-    def __init__(self, key, dataType, indexName = None, period = None, columnFilter = None):
-        super().__init__(key, dataType, indexName, period, columnFilter)
+    def __init__(self, key, dataType, indexName = None, period = None, columnFilter = None, upperConstraint = None, lowerConstraint = None):
+        super().__init__(key, dataType, indexName, period, columnFilter, upperConstraint, lowerConstraint)
 
         self.m_data = None
-        self.m_newDay = False
-        self.loadData()
     
     def loadData(self):
         if self.m_dataType == DataTypeEnum.CSV:
