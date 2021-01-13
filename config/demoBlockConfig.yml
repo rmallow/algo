@@ -4,13 +4,17 @@ block:
         - funcs/eventFuncs.py
     dataSource:
         type: dataSim
-        key: https://financialmodelingprep.com/api/v3/historical-chart/1min/AAPL?apikey=988acec08b291b04291918235100cd16
-        dataType: url
-        index: date
+        key: data/m1test/AAPL.USUSD_Candlestick_1_M_BID_01.04.2020-03.04.2020.csv 
+        dataType: csv
+        index: Local time
         columnFilter:
             - close
             - volume
         period: 1
+        constraint:
+            lower: '8:30'
+            upper: '14:59'
+        dayFirst: True
     feed:
         period: 60
         continuous: False

@@ -1,5 +1,6 @@
 from .dataBase import dataBase
 from .constants import DataTypeEnum
+from .constants import OUTSIDE_CONSTRAINT
 
 from .util import csvDataUtil as cdu
 from .util import requestUtil as ru
@@ -11,14 +12,18 @@ import os
 #use this to load data and send to feeds for backtesting/simulation
 
 class dataSim(dataBase):
-    def __init__(self, key, dataType, indexName = None, period = None, columnFilter = None, upperConstraint = None, lowerConstraint = None):
-        super().__init__(key, dataType, indexName, period, columnFilter, upperConstraint, lowerConstraint)
-
+    def __init__(self, key, dataType, indexName = "Local Time", period = 1, columnFilter = None, lowerConstraint = None, upperConstraint = None, dayFirst = False):
         self.m_data = None
+        self.m_lastIndex = None
+
+        super().__init__(key, dataType, indexName, period, columnFilter, lowerConstraint, upperConstraint, dayFirst)
+
+        
+        
     
     def loadData(self):
         if self.m_dataType == DataTypeEnum.CSV:
-            keyData = cdu.loadSingleCSV(self.m_key, index="Local time")
+            keyData = cdu.loadSingleCSV(self.m_key, index=self.m_indexName, dayFirst = self.m_dayFirst)
             self.m_key = keyData[0]
             self.m_data = keyData[1]
         elif self.m_dataType == DataTypeEnum.DIR:
@@ -32,69 +37,36 @@ class dataSim(dataBase):
         if self.m_data.index[0] > self.m_data.index[1]:
             self.m_data  = self.m_data[::-1]
         #self.m_data.index = self.m_data.index.tz_localize('UTC').tz_convert('US/Central')
+        if self.hasConstraints():
+            self.m_data =self.m_data.between_time(self.m_lowerConstraint, self.m_upperConstraint)
 
-    def getData(self, timestamp, period, getType):
-        if getType == "stock":
-            return self.getDataStock(timestamp, period)
-        elif getType == "continuous":
-            return self.getDataContinuous(timestamp,period)
-
-
-    def getDataStock(self, timestamp, period):
-        #timestamp should be last data recieved, start of data will be next timestamp
+    def getData(self, period):
         afterData = None
-        if timestamp is None:
-            timestamp = self.m_data.index[0]
-        else:
-            timestamp = self.m_data.loc[timestamp:].index[1]
-        afterData = self.m_data.loc[timestamp:]
-        
-        timesAfter = afterData.index
-
-        index = -1
-        startIndex = -1
-        for idx, time in enumerate(timesAfter):
-            index = idx
-            #times are in CST, might wanna make sure timestamp is CST just in case
-            if time.hour < 9 or (time.hour == 9 and time.minute < 31):
-                startIndex += 1
-                timestamp = time
-                continue
-            elif time.day != timestamp.day or time.hour >= 16:
-                self.m_newDay = True
-                #if there is no data from last day to pass then continue, otherwise clear
-                if index <= 0 or startIndex == index:
-                    continue
-                else:
-                    break
-            elif (time - timestamp).total_seconds() >= period:
-                break
-
-        if index == -1:
-            #no new values to return
+        if self.m_lastIndex is None:
+            self.m_lastIndex = self.m_data.index[0]
+        elif self.m_lastIndex == self.m_data.tail(1).index:
             return None
         else:
-            startIndex = 0 if startIndex < 0 else startIndex
-            #combine data to fit period
-            return afterData[startIndex:index]
+            #if just sent a new cycle message then reset new cycle var
+            if self.m_newCycle:
+                self.m_newCycle = False
+            elif self.hasConstraints():
+                #if constraints are set check to make sure were in current cycle, if not send reset OUTSIDE_CONSTRAINT
+                #if eventually do something other than times, this will need to be changed
+                if self.m_lastIndex.day != self.m_data.loc[self.m_lastIndex :].index[1].day:
+                    self.m_newCycle = True
+                    return OUTSIDE_CONSTRAINT
 
-    """
-    this func is pretty much a copy of getdata stock without checking for new day or market hours
-    at some point some of the code can be clumped together but for now this works
-    """
-    def getDataContinuous(self, timestamp, period):
-        afterData = None
-        if timestamp is None:
-            timestamp = self.m_data.index[0]
-        else:
-            timestamp = self.m_data.loc[timestamp:].index[1]
-        afterData = self.m_data.loc[timestamp:]
+            #if made it here, set lastIndex to next index        
+            self.m_lastIndex = self.m_data.loc[self.m_lastIndex:].index[1]
 
+        afterData = self.m_data.loc[self.m_lastIndex:]
+        
         timesAfter = afterData.index
         index = -1
         for idx, time in enumerate(timesAfter):
             index = idx
-            if (time - timestamp).total_seconds() >= period:
+            if (time - self.m_lastIndex).total_seconds() >= period:
                 break
 
         if index == -1:
@@ -102,6 +74,3 @@ class dataSim(dataBase):
             return None
         else:
             return afterData[:index]
-
-    def getDataFeed(self, timestamp, period):
-        return self.getData(timestamp, period, "stock")

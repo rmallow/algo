@@ -9,7 +9,7 @@ Base class for data importers, holds member variables that all should use and ot
 """
 
 class dataBase(abc.ABC):
-    def __init__(self, key, dataType, indexName, period, columnFilter, upperConstraint, lowerConstraint):
+    def __init__(self, key, dataType, indexName, period, columnFilter, lowerConstraint, upperConstraint, dayFirst):
         self.m_key = key
         try:
             self.m_dataType = DataTypeEnum[dataType]
@@ -23,8 +23,13 @@ class dataBase(abc.ABC):
         self.m_upperConstraint = upperConstraint
         self.m_lowerConstraint = lowerConstraint
 
+        self.m_dayFirst = dayFirst
+
         self.m_newCycle = False
         self.loadData()
+
+    def hasConstraints(self):
+        return self.m_lowerConstraint is not None and self.m_upperConstraint is not None
 
     """
     @breif: checks data index based on upper lower constraints
@@ -38,7 +43,7 @@ class dataBase(abc.ABC):
         #as this could be called every get Data wan't to log the except
         try:
             if data.index[0] < self.m_lowerConstraint or \
-                data.index[-1] > self.m_lowerConstraint:
+                data.index[-1] > self.m_upperConstraint:
                 return OUTSIDE_CONSTRAINT
             else:
                 return None
@@ -53,7 +58,7 @@ class dataBase(abc.ABC):
     @param: period      -   period of time to which get data
     """
     @abc.abstractmethod
-    def getData(self, timestamp, period):
+    def getData(self, period):
         return
 
     """

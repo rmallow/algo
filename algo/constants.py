@@ -18,7 +18,7 @@ OUTSIDE_CONSTRAINT = 'Outside'
 
 """
 ----------------------------
-FEED SPECIAL VALUE CONSTANTS
+FEED CONSTANTS
 ----------------------------
 """
 

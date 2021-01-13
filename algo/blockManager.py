@@ -33,7 +33,7 @@ def loadObj(name ):
 def _loadBlockAndDataSource(blockConfig, messageRouter):
     dataSource = _loadDataSource(blockConfig['dataSource'])
     name = blockConfig['name']
-    feed = _loadFeed(blockConfig['feed'], dataSource.getDataFeed)
+    feed = _loadFeed(blockConfig['feed'], dataSource.getData)
     actionList = _loadActionList(blockConfig['actionList'])
     libraries = blockConfig['libraries']
     blk = block(actionList, feed, messageRouter, libraries, name=name)
@@ -46,11 +46,16 @@ def _loadDataSource(dataSourceConfig):
     index = dataSourceConfig['index']
     colFilter = dataSourceConfig['columnFilter']
     period = dataSourceConfig['period']
+    upperConstraint = None
+    lowerConstraint = None
+    if 'constraint' in dataSourceConfig:
+        lowerConstraint = dataSourceConfig['constraint']['lower']
+        upperConstraint = dataSourceConfig['constraint']['upper']
+    dayFirst = dataSourceConfig['dayFirst']
     if dataSourceType == 'dataSim':
-        return dataSim(key, dataType, index, period, colFilter)
+        return dataSim(key, dataType, index, period, colFilter, lowerConstraint, upperConstraint, dayFirst)
     elif dataSourceType == 'stream':
-        
-        return dataStream(key, dataType, index, period, colFilter)
+        return dataStream(key, dataType, index, period, colFilter, lowerConstraint, upperConstraint, dayFirst)
 
 def _loadActionList(actionListConfig):
     actionList = []

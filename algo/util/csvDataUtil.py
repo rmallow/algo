@@ -13,14 +13,14 @@ def getFilesFromDir(path, ext = None):
 
 	return filenames
 
-def loadCSV(fullPath, names = None, index = 'Date'):
+def loadCSV(fullPath, names = None, index = 'Date', dayFirst = False):
 		data = None
 		if names is not None:
 			data = pd.read_csv(fullPath, header = 0, names = names, parse_dates = True,
-			na_filter= True, index_col = index).dropna()
+			na_filter= True, index_col = index, dayfirst = dayFirst).dropna()
 		else:
 			data = pd.read_csv(fullPath, header = 0, parse_dates = True,
-				na_filter= True, index_col = index).dropna()
+				na_filter= True, index_col = index, dayfirst = dayFirst).dropna()
 		return data
 
 #old version, each CSV loaded as separate dataframe, no appending
@@ -56,8 +56,8 @@ def combineDirCSV(path, names = None, index = 'Date'):
 		
 
 #only loads one CSV file as key
-def loadSingleCSV(path, names=None, index='Date'):
+def loadSingleCSV(path, names=None, index='Date', dayFirst=False):
 	fullPath = Path.cwd() / path
-	data = loadCSV(fullPath, names, index)	
+	data = loadCSV(fullPath, names, index, dayFirst)	
 	key = os.path.splitext(os.path.split(path)[1])[0]
 	return (key, data)

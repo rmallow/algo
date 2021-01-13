@@ -1,3 +1,5 @@
+from . import constants as con
+
 import pandas as pd
 import asyncio
 import logging
@@ -36,16 +38,23 @@ class feed():
         self.m_getDataFunc = dataFunc
         #this period measures actual time, versus action period is just in units
         self.m_period = period	#if period is none, then ticks, otherwise period num in seconds
-        self.m_continuous = continuous #if continuous is true, feed will update periods before full period time has elapsed
+        self.m_continuous = continuous  #if continuous is true, feed will update periods before full period time has elapsed
         
-        self.m_closeOnEmpty = True
+        
+        """
+        Various data holders for feed:
+            data - holds all data in current cycle
+            newData - holds all data in current update
+            calcData - holds all calculated data in current cycle
+            newCalcData - holds all currently calculated date in current update
+                - this dataframe is added to continuously during action pool event updates
+                    therefore might not have all columns/rows as the other dataframes
+        """
 
-        self.m_lastTimestamp = None
-
-        self.m_newData = None
-        self.m_newCalcData = None
         self.m_data = None
+        self.m_newData = None
         self.m_calcData = None
+        self.m_newCalcData = None
         
         self.m_newCalcLength = 0
         self.m_end = False
@@ -53,15 +62,8 @@ class feed():
         self.m_startTime = time.time()
 
     def updateHelper(self, rawData):
-        if isinstance(rawData, pd.DataFrame):
-            if self.m_lastTimestamp and rawData.index[0].day != self.m_lastTimestamp.day:
-                self.clear()
-            self.m_newData = rawData
-        else:
-            logging.warning("RAW DATA CONVERSION TO PANDAS NOT IMPLEMENTED YET")
-
+        self.m_newData = rawData
         if self.m_newData is not None and len(self.m_newData.index) > 0:
-            self.m_lastTimestamp = self.m_newData.index[-1]
             if self.m_data is None:
                 #first time setup here
                 #self.m_newData.columns = [x.lower() for x in self.m_newData.columns]
@@ -72,18 +74,28 @@ class feed():
             self.m_end = True
 
     def update(self):
-        rawData = self.m_getDataFunc(self.m_lastTimestamp, self.m_period)
-        if rawData is None or (rawData.empty and self.m_closeOnEmpty):
+        rawData = self.m_getDataFunc(self.m_period)
+        if rawData is None:
             self.m_end = True
             return None
+        elif not isinstance(rawData, pd.DataFrame):
+            if rawData == con.OUTSIDE_CONSTRAINT:
+                #this value is passed from data sim when we need to refresh feed
+                self.clear()
+                # call update again and return that value
+                return self.update()
+            else:
+                logging.warning("Unexpected type passed to feed from data input, returning None")
+                return None
+        #rawData could still be empty
         self.updateHelper(rawData)
         self.m_newCalcData = pd.DataFrame(index=self.m_newData.index)
         self.m_newCalcLength = len(self.m_newCalcData.index)  #conveience
         return self.m_newData
 
-    def getDataSince(self, timestamp):
+    def getDataSince(self, index):
         if self.m_data is not None:
-            return self.m_data.loc[timestamp:]
+            return self.m_data.loc[index:]
         return None
 
     def getNewData(self):
