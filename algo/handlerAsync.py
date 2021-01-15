@@ -18,4 +18,4 @@ class handler():
         pass
 
     async def update(self, key):
-        print(key.m_time)
+        print(self.m_handlerData.getPeriod(key, 5))

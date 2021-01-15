@@ -1,7 +1,8 @@
 from .feed import feed
 from .actionPool import actionPool
-
-import pandas
+from . import message as msg
+from . import messageKey as msgKey
+from . import constants as con
 
 
 
@@ -18,9 +19,14 @@ class block():
         while not self.m_end:
             newData = self.m_feed.update()
             if newData is not None:
-                self.m_pool.doActions(newData)
+                if newData == con.OUTSIDE_CONSTRAINT:
+                    self.clear()
+                else:
+                    self.m_pool.doActions(newData)
             else:
                 self.m_end = True
 
     def clear(self):
         self.m_feed.clear()
+        message = msg.message(msg.MessageType.COMMAND, msg.CommandType.ABORT)
+        self.m_messageRouter.receive(message)

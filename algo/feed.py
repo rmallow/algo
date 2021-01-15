@@ -80,10 +80,8 @@ class feed():
             return None
         elif not isinstance(rawData, pd.DataFrame):
             if rawData == con.OUTSIDE_CONSTRAINT:
-                #this value is passed from data sim when we need to refresh feed
-                self.clear()
-                # call update again and return that value
-                return self.update()
+                #return constant to block, block will clear feed and tell Message Router to clear
+                return rawData
             else:
                 logging.warning("Unexpected type passed to feed from data input, returning None")
                 return None

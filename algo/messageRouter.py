@@ -85,7 +85,12 @@ class messageRouter(commandProcessor):
                         logging.warning("unexpected value in message router")
                         logging.warning(str(message))
 
+    """
+    @brief: called from command processor super class when Start command is received
+        signals the start of messages for this key
 
+    @param: message - command message
+    """
     def cmdStart(self, message):
         if message.m_key not in self.m_handlerUpdateDict:
             self.m_handlerUpdateDict[message.m_key] = set()
@@ -93,13 +98,37 @@ class messageRouter(commandProcessor):
             logging.warning("start cmd on existing update list, code:")
             logging.warning(str(message.m_sourceCode))
 
+    """
+    @brief: called from command processor super class when End command is received
+        signals the end of messages for this key
+
+    @param: message - command message
+    """
     def cmdEnd(self, message):
         updateSet = self.m_handlerUpdateDict.pop(message.m_key,set())
         for handlerToUpdate in updateSet:
             self.m_loop.addTaskArgs(handlerToUpdate.update, message.m_key)
-            
+    
+    """
+    @brief: called from command processor super class when Abort command is received
+
+    @param: message - command message
+    """      
     def cmdAbort(self, message):
         self.m_end = True
 
+    """
+    @brief: called from command processor super class when Resume command is received
+
+    @param: message - command message
+    """
     def cmdResume(self, message):
         self.m_end = False
+
+    """
+    @brief: called from command processor super class when Clear command is received
+
+    @param: message - command message
+    """
+    def cmdClear(self, message):
+        self.m_handlerData.clear(message.m_key)

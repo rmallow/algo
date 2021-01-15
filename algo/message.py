@@ -12,6 +12,7 @@ class CommandType(Enum):
     END = 2
     ABORT = 3
     RESUME = 4
+    CLEAR = 5
 
 class message():
     def __init__(self, messageType, message, name = None, sourceName = None, key = None):
