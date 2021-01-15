@@ -23,15 +23,16 @@ def setFrameColRange(frame, col, start, values):
         stop += 1
     try:
         frame.iloc[start:stop, frame.columns.get_loc(col)] = values
-    except ValueError as e:
+    except ValueError:
         pass
 
 
 
-#store data as necessary based on data source and desired period
-#data in feed should be stored in programming language acessible containers
-#feed is meant to be an inbetween from raw data to processed data
-
+"""
+data storage and processing system for block
+contains multiple containers for data and calc data along with new/all
+appending functions for pandas data
+"""
 class feed():
 
     def __init__(self, dataFunc, period = 1, continuous = False):
@@ -72,6 +73,8 @@ class feed():
                 self.m_data = self.m_data.append(self.m_newData)
         else:
             self.m_end = True
+        self.m_newCalcData = pd.DataFrame(index=self.m_newData.index)
+        self.m_newCalcLength = len(self.m_newCalcData.index)  #conveience
 
     def update(self):
         rawData = self.m_getDataFunc(self.m_period)
@@ -87,8 +90,6 @@ class feed():
                 return None
         #rawData could still be empty
         self.updateHelper(rawData)
-        self.m_newCalcData = pd.DataFrame(index=self.m_newData.index)
-        self.m_newCalcLength = len(self.m_newCalcData.index)  #conveience
         return self.m_newData
 
     def getDataSince(self, index):

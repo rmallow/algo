@@ -97,3 +97,5 @@ class handlerData():
         return dict((k, codeDict[k][1]) for k in keys if k in codeDict)
         
             
+    def clearCode(self, code):
+        self.m_dataSet.pop(code)

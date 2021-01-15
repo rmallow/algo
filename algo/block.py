@@ -4,7 +4,7 @@ from . import message as msg
 from . import messageKey as msgKey
 from . import constants as con
 
-
+import pandas as pd
 
 class block():
     def __init__(self, actionList, feed, messageRouter, libraries, parseSettings = None, name ="defaultBlockName", code = 123):
@@ -19,14 +19,16 @@ class block():
         while not self.m_end:
             newData = self.m_feed.update()
             if newData is not None:
-                if newData == con.OUTSIDE_CONSTRAINT:
-                    self.clear()
-                else:
+                if isinstance(newData, pd.DataFrame):
                     self.m_pool.doActions(newData)
+                elif newData == con.OUTSIDE_CONSTRAINT:
+                    self.clear()                  
             else:
                 self.m_end = True
 
     def clear(self):
         self.m_feed.clear()
-        message = msg.message(msg.MessageType.COMMAND, msg.CommandType.ABORT)
+        #time is set as None as it won't be needed by message router
+        message = msg.message(msg.MessageType.COMMAND, msg.CommandType.CLEAR,
+            key=msgKey.messageKey(self.m_code, None) )
         self.m_messageRouter.receive(message)

@@ -28,6 +28,10 @@ class messageRouter(commandProcessor):
         self.m_handlerUpdateDict = {}
         self.m_handlerData = handlerData
 
+        self.m_blocksToClear = set()
+        
+        self.addCmdFunc(msg.CommandType.CLEAR, messageRouter.cmdClear)
+
         self.m_loop = asyncScheduler()
 
     #send to message subscriptions priority
@@ -88,10 +92,14 @@ class messageRouter(commandProcessor):
     """
     @brief: called from command processor super class when Start command is received
         signals the start of messages for this key
+        clears data for code if it's been marked to clear
 
     @param: message - command message
     """
     def cmdStart(self, message):
+        if message.m_key.m_sourceCode in self.m_blocksToClear:
+            self.m_handlerData.clearCode(message.m_key.m_sourceCode)
+            self.m_blocksToClear.remove(message.m_key.m_sourceCode)
         if message.m_key not in self.m_handlerUpdateDict:
             self.m_handlerUpdateDict[message.m_key] = set()
         else:
@@ -127,8 +135,9 @@ class messageRouter(commandProcessor):
 
     """
     @brief: called from command processor super class when Clear command is received
+        Adds code to set, this code will be cleared when start is called for same code
 
     @param: message - command message
     """
     def cmdClear(self, message):
-        self.m_handlerData.clear(message.m_key)
+        self.m_blocksToClear.add(message.m_key.m_sourceCode)

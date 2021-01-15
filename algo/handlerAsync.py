@@ -1,4 +1,4 @@
-import algo.message
+from . import message
 
 import asyncio
 

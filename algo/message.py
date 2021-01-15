@@ -1,4 +1,4 @@
-import algo.messageKey
+from . import messageKey
 
 from enum import Enum
 
