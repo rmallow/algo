@@ -9,6 +9,17 @@ from requiremental import libGroup
 
 from collections.abc import Iterable
 
+"""
+@brief: container and caller for all actions of a block, communicates with messageRouter
+
+__init__:
+@param: actions     - contains all valid actions of block
+@param: period      - refers to number of units, not time
+@param: name        - name of action
+@param: calcFunc    - passed in function that will be called on the dataSet
+@param: params      - extra parameters that are passed in each time to the calcFunc
+@param: inputCols   - the columns that are used by the action and put into the dataSet
+"""
 
 class actionPool():
     def __init__(self, actions, feed, messageRouter, code, libraries, parseSettings = None):
@@ -18,19 +29,7 @@ class actionPool():
         self.m_events = []
         self.m_triggers = []
         
-        #set up requirementals
-        """
-        parse = parser.parser(settingsPath=parseSettings)
-
-        self.m_library = library.library(parse)
-
-        for libFile in libraries:
-            self.m_library.loadFile(libFile)
-        
-        self.m_libGroup = libGroup.libGroup(library=self.m_libGroup)
-        """
-        #implement usage here, need to fix how requiremental works first
-
+        #TODO: Finish requiremental setup and include here
 
         for action in actions:
             self.addAction(action)
