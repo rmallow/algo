@@ -24,7 +24,7 @@ def start():
     mainMessageRouter = messageRouter(mainHandlerManager.m_messageSubscriptions, sharedData)
 
     #init block manager
-    path = Path("/Users/rmallow/Documents/stonks/algo/config/demoBlockConfig.yml")
+    path = Path("/Users/rmallow/Documents/stonks/algo/config/demoBlockReqConfig.yml")
     configDict = configLoader.getConfigDictFromFile(path)
     mainBlockManager = blockManager(configDict, mainMessageRouter)
     mainBlockManager.loadBlocks()

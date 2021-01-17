@@ -23,7 +23,10 @@ def sma(dataSet, parameters=None):
     return dataSet.iloc[0].mean()
 
 def change(dataSet, parameters=None):
-    return dataSet.iloc[-1][0] - dataSet.iloc[0][0]
+    try:
+       return dataSet.iloc[-1][0] - dataSet.iloc[0][0]
+    except IndexError:
+        x = 2
     
 def up(dataSet, parameters=None):
     if dataSet.iloc[0][0] > 0:

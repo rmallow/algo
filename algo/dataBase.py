@@ -1,6 +1,8 @@
 from .constants import DataTypeEnum
 from .constants import OUTSIDE_CONSTRAINT
 
+from .util import pandasUtil as pu
+
 import abc
 import logging
 
@@ -25,8 +27,34 @@ class dataBase(abc.ABC):
 
         self.m_dayFirst = dayFirst
 
+        self.m_end = False
         self.m_newCycle = False
         self.loadData()
+
+    """
+    @brief: Does modifications to dataFrame based on set values data base
+
+    @param: dataframe - pandas dataframe to perform modiciations
+
+    @return: Returns modified pandas dataframe or None
+    """
+    def dataFrameModifications(self, dataFrame):
+        if dataFrame is not None:
+            dataFrame.columns = [x.lower() for x in dataFrame.columns]
+
+            dataFrame = pu.setIndex(dataFrame, self.m_indexName)
+            #remove columns still to be added
+            dataFrame = pu.filterColumns(dataFrame, columnFilter=self.m_columnFilter)
+
+            if self.hasConstraints():
+                dataFrame = dataFrame.between_time(self.m_lowerConstraint, self.m_upperConstraint)
+                
+            if dataFrame.index[0] > dataFrame.index[1]:
+                dataFrame  = dataFrame[::-1]
+            #dataFrame.index = dataFrame.index.tz_localize('UTC').tz_convert('US/Central')
+        
+
+        return dataFrame
 
     def hasConstraints(self):
         return self.m_lowerConstraint is not None and self.m_upperConstraint is not None
@@ -62,7 +90,7 @@ class dataBase(abc.ABC):
         return
 
     """
-    @brief: abstract method, sets up data getting object as needed, i.e. dataSim loading data into self.m_data
+    @brief: abstract method, sets up data getting object as needed, i.e. dataSim loading data into dataFrame
     """
     @abc.abstractmethod
     def loadData(self):

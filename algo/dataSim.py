@@ -31,14 +31,9 @@ class dataSim(dataBase):
             self.m_key = keyData[0]
             self.m_data = keyData[1]
         elif self.m_dataType == DataTypeEnum.URL:
-            self.m_data = ru.getPandasFromUrl(self.m_key, indexName = self.m_indexName, columnFilter=self.m_columnFilter)
+            self.m_data = ru.getPandasFromUrl(self.m_key)
 
-        self.m_data.columns = [x.lower() for x in self.m_data.columns]
-        if self.m_data.index[0] > self.m_data.index[1]:
-            self.m_data  = self.m_data[::-1]
-        #self.m_data.index = self.m_data.index.tz_localize('UTC').tz_convert('US/Central')
-        if self.hasConstraints():
-            self.m_data =self.m_data.between_time(self.m_lowerConstraint, self.m_upperConstraint)
+        self.m_data = self.dataFrameModifications(self.m_data)
 
     def getData(self, period):
         afterData = None
@@ -72,5 +67,7 @@ class dataSim(dataBase):
         if index == -1:
             #no new values to return
             return None
+        elif index == 0:
+            return self.m_data.loc[self.m_lastIndex:]
         else:
             return afterData[:index]

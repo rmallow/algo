@@ -1,4 +1,3 @@
-import algo.message as msg
 import numpy as np
 
 def testFunc(dataSet, parameters):

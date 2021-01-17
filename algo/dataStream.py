@@ -22,11 +22,14 @@ class dataStream(dataBase):
         if self.m_dataType == DataTypeEnum.REAL_TIME_REQUEST:
             returnVal = self.getDataReal(timestamp, period)
 
+        if returnVal is not None:
+            returnVal = self.dataFrameModifications(returnVal)
+            
         self.m_time = time.time()
         return returnVal
 
     def getDataReal(self, timestamp, period):
-        return ru.getPandasFromUrl(self.m_key, indexName = self.m_indexName, columnFilter=self.m_columnFilter)
+        return ru.getPandasFromUrl(self.m_key)
 
     def loadData(self):
         return

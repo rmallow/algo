@@ -13,7 +13,7 @@ class DataTypeEnum(algoEnum):
     DIR = 4
     URL = 5
 
-OUTSIDE_CONSTRAINT = 'Outside'
+OUTSIDE_CONSTRAINT = 200
 
 
 """

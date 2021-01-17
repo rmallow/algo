@@ -98,4 +98,4 @@ class handlerData():
         
             
     def clearCode(self, code):
-        self.m_dataSet.pop(code)
+        self.m_dataSet.pop(code,None)
