@@ -1,13 +1,4 @@
 # algo
 By Robert Mallow
 
-A custom data processing system, created with the intent of algorithmic trading.
-
-This data processing system is intended to be highly scalable and highly customizable.
-Users can create their own simple functions and use them directly.
-
-Uses requiremental:
-https://github.com/rmallow/requiremental
-
-Not currently available for install.
-Not finished.
+Data processing system architecture. Makes it easy to manipulate live or historical data with very little programming necessary for each change. Algo runs off of configuration files that tell the system how to manipulate the data and what to output. See example configuration files in the config folder.
