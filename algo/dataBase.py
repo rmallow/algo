@@ -18,9 +18,9 @@ class dataBase(abc.ABC):
         except ValueError:
             logging.warning("Failed setting data type")
             logging.warning(self.m_dataType)
-        self.m_indexName = indexName
+        self.m_indexName = indexName.lower()
         self.m_period = period
-        self.m_columnFilter = columnFilter
+        self.m_columnFilter = [col.lower() for col in columnFilter]
 
         self.m_upperConstraint = upperConstraint
         self.m_lowerConstraint = lowerConstraint
@@ -40,6 +40,7 @@ class dataBase(abc.ABC):
     """
     def dataFrameModifications(self, dataFrame):
         if dataFrame is not None:
+            #set columns to lower
             dataFrame.columns = [x.lower() for x in dataFrame.columns]
 
             dataFrame = pu.setIndex(dataFrame, self.m_indexName)
@@ -48,7 +49,7 @@ class dataBase(abc.ABC):
 
             if self.hasConstraints():
                 dataFrame = dataFrame.between_time(self.m_lowerConstraint, self.m_upperConstraint)
-                
+
             if dataFrame.index[0] > dataFrame.index[1]:
                 dataFrame  = dataFrame[::-1]
             #dataFrame.index = dataFrame.index.tz_localize('UTC').tz_convert('US/Central')
