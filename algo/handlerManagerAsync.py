@@ -7,8 +7,16 @@ import importlib
 import queue
 import logging
 
-def _loadCalcFunc(calcFuncConfig):
-    return getattr(importlib.import_module(calcFuncConfig['location']),calcFuncConfig['name'])
+def _loadFunc(funcConfig):
+    module = importlib.import_module(funcConfig['location'])
+    if module is not None:
+        if hasattr(module, funcConfig['name']):
+            return getattr(module, funcConfig['name'])
+        else:
+            logging.warning("attr not found: " + funcConfig['name'] + "at module: " + funcConfig['location'])
+    else:
+        logging.warning("module not found: " + funcConfig['location'])
+    return None
 
 """
 manages all handlers and issues update commands
@@ -49,10 +57,16 @@ class handlerManager():
 
     def _loadHandler(self, config):
         name = config['name']
+        period = config['period']
         subscriptions = config['subscriptions']
-        calcFunc = _loadCalcFunc(config['calcFunc'])
+        params = None
+        if 'params' in config:
+            params = config['params']
+        params['subscriptions'] = subscriptions
+        calcFunc = _loadFunc(config['calcFunc'])
+        outputFunc = _loadFunc(config['outputFunc'])
         
-        val = handler(name, calcFunc)
+        val = handler(name, period, calcFunc, outputFunc, params = params)
         self._addSubscriptions(subscriptions, val)
         return val
 

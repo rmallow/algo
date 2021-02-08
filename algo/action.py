@@ -40,6 +40,7 @@ def findNewCalcCol(feed, col):
 def getParameter(parameters, key, default):
     if parameters is not None:
         return parameters.get(key, default)
+    return None
 
 """
 @brief: base class for actions used by action pool

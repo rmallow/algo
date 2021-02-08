@@ -77,6 +77,20 @@ class handlerData():
         else:
             return default
 
+    """
+    @brief: getter method for getting a period based on key
+
+    @param: key - messageKey data type
+    @param: period - int, period to get by
+
+    @return -   handler data return value, get's code dict by key
+                then returns times without index
+        time1: [data1]
+        time2: [data2]
+        ...
+        time n : [data n]
+        where n is period
+    """
     def getPeriod(self, key, period):
         codeDict = self._getCodeDict(key)
         timeData = self._getTimeData(key)

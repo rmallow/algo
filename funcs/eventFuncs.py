@@ -1,4 +1,6 @@
 import logging
+import sys, os
+sys.path.insert(0, os.path.abspath('..'))
 import algo.action as act
 
 """
