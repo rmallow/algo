@@ -1,11 +1,9 @@
 from .handlerAsync import handler
 from .asyncScheduler import asyncScheduler
-from .message import message as msg
 
-import multiprocessing as mp
 import importlib
-import queue
 import logging
+
 
 def _loadFunc(funcConfig):
     module = importlib.import_module(funcConfig['location'])
@@ -18,11 +16,14 @@ def _loadFunc(funcConfig):
         logging.warning("module not found: " + funcConfig['location'])
     return None
 
+
 """
 manages all handlers and issues update commands
 gets update lists and corresponding source codes for updates from message Router
 
 """
+
+
 class handlerManager():
     def __init__(self, configDict):
         self.m_handlerConfig = configDict
@@ -35,7 +36,7 @@ class handlerManager():
     def initAndStart(self, handlerData):
         self.m_scheduler = asyncScheduler()
         for h in self.m_handlers:
-            
+
             self.m_scheduler.addTask(h.start())
 
     def loadHandlers(self, sharedData):
@@ -45,7 +46,7 @@ class handlerManager():
             h = self._loadHandler(config)
             h.m_handlerData = sharedData
             self.m_handlers.append(h)
-        
+
         print("---- Handler Manager Done Loading ----")
 
     def _addSubscriptions(self, subscriptions, val):
@@ -65,8 +66,8 @@ class handlerManager():
         params['subscriptions'] = subscriptions
         calcFunc = _loadFunc(config['calcFunc'])
         outputFunc = _loadFunc(config['outputFunc'])
-        
-        val = handler(name, period, calcFunc, outputFunc, params = params)
+
+        val = handler(name, period, calcFunc, outputFunc, params=params)
         self._addSubscriptions(subscriptions, val)
         return val
 

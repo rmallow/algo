@@ -14,7 +14,7 @@ class handler():
         self.m_handlerData = None
         self.m_personalData = None
         self.m_params = params
-        
+
     async def updatePriority(self, message):
         # this func will handle priority messages
         pass
