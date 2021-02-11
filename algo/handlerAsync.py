@@ -19,20 +19,20 @@ class handler():
         # this func will handle priority messages
         pass
 
-    """
-    @brief: called to update by message router to update handler
-        when message subscription is hit
-
-    @param: key - messageKey to update parameter on
-
-    calls calcFunc and outputFunc if bool result of calcFunc is true
-    parameters passed into funcs is:
-        handlerData, params, personalData in that order
-
-    TODO: handle passing functions based on arguement names,
-        which means to update wrapper
-    """
     async def update(self, key):
+        """
+        @brief: called to update by message router to update handler
+            when message subscription is hit
+
+        @param: key - messageKey to update parameter on
+
+        calls calcFunc and outputFunc if bool result of calcFunc is true
+        parameters passed into funcs is:
+            handlerData, params, personalData in that order
+
+        TODO: handle passing functions based on arguement names,
+            which means to update wrapper
+        """
         # pass it to wrapper that handles correct number of args for function
         handlerData = self.m_handlerData.getPeriod(self.m_period)
         rawVal = wrap.adjustArgs(self.m_calcFunc, [handlerData, self.m_params, self.m_personalData])

@@ -2,13 +2,14 @@ import asyncio
 import inspect
 import logging
 
+
 class asyncScheduler():
-    def __init__(self, lockBool = False):
+    def __init__(self, lockBool=False):
         self.m_loop = None
         self.m_tasks = []
 
-    #this function is useful for multiprocessing
-    #only pass in objects that have a start() that is awaitable
+    # this function is useful for multiprocessing
+    # only pass in objects that have a start() that is awaitable
     def initAndStart(self, objects):
         self.m_loop = asyncio.new_event_loop()
         try:
@@ -26,11 +27,11 @@ class asyncScheduler():
     def end(self):
         self.m_loop.close()
 
-    def addTask(self, func, name = None):
+    def addTask(self, func, name=None):
         if inspect.iscoroutine(func):
             self.m_tasks.append(self.m_loop.create_task(func))
         else:
             logging.warning("non coroutine function passed")
 
-    def addTaskArgs(self, func, args, name = None):
+    def addTaskArgs(self, func, args, name=None):
         self.m_tasks.append(self.m_loop.create_task(func(args)))

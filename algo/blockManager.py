@@ -1,4 +1,3 @@
-from .asyncScheduler import asyncScheduler
 from .block import block
 from .event import event
 from .trigger import trigger
@@ -6,12 +5,9 @@ from .feed import feed
 from .dataSim import dataSim
 from .dataStream import dataStream
 
-import requiremental
-
 import pickle
 import importlib
 import logging
-import multiprocessing
 import datetime
 
 
@@ -26,9 +22,11 @@ def _loadCalcFunc(calcFuncConfig):
         logging.warning("module not found: " + calcFuncConfig['location'])
     return None
 
-def loadObj(name ):
+
+def loadObj(name):
     with open('obj/' + name + '.pkl', 'rb') as f:
         return pickle.load(f)
+
 
 def _loadBlockAndDataSource(blockConfig, messageRouter):
     dataSource = _loadDataSource(blockConfig['dataSource'])
@@ -38,6 +36,7 @@ def _loadBlockAndDataSource(blockConfig, messageRouter):
     libraries = blockConfig['libraries']
     blk = block(actionList, feed, messageRouter, libraries, name=name)
     return blk, dataSource
+
 
 def _loadDataSource(dataSourceConfig):
     dataSourceType = dataSourceConfig['type']
@@ -57,6 +56,7 @@ def _loadDataSource(dataSourceConfig):
     elif dataSourceType == 'stream':
         return dataStream(key, dataType, index, period, colFilter, lowerConstraint, upperConstraint, dayFirst)
 
+
 def _loadActionList(actionListConfig):
     actionList = []
     for name, actionConfig in actionListConfig.items():
@@ -69,19 +69,21 @@ def _loadActionList(actionListConfig):
         if 'params' in actionConfig:
             params = actionConfig['params']
         if actionType == 'trigger':
-            action = trigger(name=name, calcFunc=calcFunc, period=period, params = params, inputCols = inputCols)
+            action = trigger(name=name, calcFunc=calcFunc, period=period, params=params, inputCols=inputCols)
         elif actionType == 'event':
-            action = event(name=name, calcFunc=calcFunc, period = period, params = params, inputCols = inputCols)
+            action = event(name=name, calcFunc=calcFunc, period=period, params=params, inputCols=inputCols)
         actionList.append(action)
     return actionList
+
 
 def _loadFeed(feedConfig, dataFunc):
     period = feedConfig['period']
     continuous = feedConfig['continuous']
     return feed(dataFunc, period=period, continuous=continuous)
 
+
 class blockManager():
-    def __init__(self,configDict, messageRouter):
+    def __init__(self, configDict, messageRouter):
         self.m_assetBlockConfig = configDict
         self.m_blockList = []
         self.m_dataMangerList = []
@@ -96,10 +98,10 @@ class blockManager():
         print("---- Block Manager Done Loading ----")
 
     def start(self):
-        for block in self.m_blockList:
+        for blockToStart in self.m_blockList:
             startTime = datetime.datetime.now()
-            block.start()
+            blockToStart.start()
             print("--- Time Elapsed ---")
             print(datetime.datetime.now() - startTime)
-            print(block.m_feed.m_data)
-            print(block.m_feed.m_calcData)
+            print(blockToStart.m_feed.m_data)
+            print(blockToStart.m_feed.m_calcData)

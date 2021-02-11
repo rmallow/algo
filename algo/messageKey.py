@@ -13,10 +13,9 @@ class messageKey():
         retVal = None
         if self.m_sourceCode == other.m_sourceCode:
             if self.m_time < other.m_time:
-                retVal =  -1
+                retVal = -1
             elif self.m_time > other.m_time:
-                retVal =  1
+                retVal = 1
             else:
                 retVal = 0
         return retVal
-                

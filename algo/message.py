@@ -1,11 +1,11 @@
-from . import messageKey
-
 from enum import Enum
+
 
 class MessageType(Enum):
     COMMAND = 1
     NORMAL = 2
     PRIORITY = 3
+
 
 class CommandType(Enum):
     START = 1
@@ -14,8 +14,9 @@ class CommandType(Enum):
     RESUME = 4
     CLEAR = 5
 
+
 class message():
-    def __init__(self, messageType, message, name = None, sourceName = None, key = None):
+    def __init__(self, messageType, message, name=None, sourceName=None, key=None):
         self.m_type = messageType
         self.m_message = message
         self.m_name = name
@@ -33,4 +34,3 @@ class message():
 
     def isNormal(self):
         return self.m_type == MessageType.NORMAL
-        

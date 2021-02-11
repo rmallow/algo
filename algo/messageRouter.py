@@ -1,27 +1,23 @@
-from . import message
-from . import messageKey
-from . import handlerAsync
 from . import message as msg
-from .commandProcessor      import commandProcessor
-from .handlerData           import handlerData
-from .asyncScheduler        import asyncScheduler
+from .commandProcessor import commandProcessor
+from .asyncScheduler import asyncScheduler
 
 import aioprocessing
-import multiprocessing as mp
 import queue
 import logging
 from collections.abc import Iterable
 
-"""
-This class works as an intermediate between the blocks and the handlers
-The message router accepts new messages from triggers and sends
-those messages out to all handlers that are subscribed to that message
-"""
+
 class messageRouter(commandProcessor):
+    """
+    This class works as an intermediate between the blocks and the handlers
+    The message router accepts new messages from triggers and sends
+    those messages out to all handlers that are subscribed to that message
+    """
     def __init__(self, messageSubscriptions, handlerData):
-        #initalize command processor
+        # initalize command processor
         super().__init__()
-        
+
         self.m_end = False
         self.m_messageQueue = aioprocessing.AioQueue()
         self.m_messageSubscriptions = messageSubscriptions
@@ -29,19 +25,19 @@ class messageRouter(commandProcessor):
         self.m_handlerData = handlerData
 
         self.m_blocksToClear = set()
-        
+
         self.addCmdFunc(msg.CommandType.CLEAR, messageRouter.cmdClear)
 
         self.m_loop = asyncScheduler()
 
-    #send to message subscriptions priority
+    # send to message subscriptions priority
     def broadcastPriority(self, message):
         self.m_handlerData.insert(message)
         handlerList = self.m_messageSubscriptions.get(message.m_name, [])
         for handlerToUpdate in handlerList:
-            self.m_loop.addTaskArgs(handlerToUpdate.updatePriority, message)    
-    
-    #send to message subscriptions
+            self.m_loop.addTaskArgs(handlerToUpdate.updatePriority, message)
+
+    # send to message subscriptions
     def broadcast(self, message):
         self.m_handlerData.insert(message)
         handlerList = self.m_messageSubscriptions.get(message.m_name, [])
@@ -52,12 +48,12 @@ class messageRouter(commandProcessor):
         # pylint: disable=no-member
         self.m_messageQueue.put(message)
 
-    #calls initAndStart on loop with router as only object
+    # calls initAndStart on loop with router as only object
     def initAndStart(self):
         self.m_loop.initAndStart(self)
 
     async def start(self):
-        #main process loop for message router
+        # main process loop for message router
         while not self.m_end:
             try:
                 # pylint: disable=no-member
@@ -66,14 +62,14 @@ class messageRouter(commandProcessor):
                 continue
             else:
                 if message is not None:
-                    #determine if message is a command
+                    # determine if message is a command
                     if isinstance(message, msg.message):
-                        #just one message, check what type
+                        # just one message, check what type
                         if message.isCommand():
-                            #calls processorCommand func
+                            # calls processorCommand func
                             self.processCommand(message)
                         elif message.isPriority():
-                            #immediately broadcast a priority message
+                            # immediately broadcast a priority message
                             self.broadcastPriority(message)
                         else:
                             logging.warning("unexpected message type:")
@@ -89,14 +85,14 @@ class messageRouter(commandProcessor):
                         logging.warning("unexpected value in message router")
                         logging.warning(str(message))
 
-    """
-    @brief: called from command processor super class when Start command is received
-        signals the start of messages for this key
-        clears data for code if it's been marked to clear
-
-    @param: message - command message
-    """
     def cmdStart(self, message):
+        """
+        @brief: called from command processor super class when Start command is received
+            signals the start of messages for this key
+            clears data for code if it's been marked to clear
+
+        @param: message - command message
+        """
         if message.m_key.m_sourceCode in self.m_blocksToClear:
             self.m_handlerData.clearCode(message.m_key.m_sourceCode)
             self.m_blocksToClear.remove(message.m_key.m_sourceCode)
@@ -106,38 +102,38 @@ class messageRouter(commandProcessor):
             logging.warning("start cmd on existing update list, code:")
             logging.warning(str(message.m_sourceCode))
 
-    """
-    @brief: called from command processor super class when End command is received
-        signals the end of messages for this key
-
-    @param: message - command message
-    """
     def cmdEnd(self, message):
-        updateSet = self.m_handlerUpdateDict.pop(message.m_key,set())
+        """
+        @brief: called from command processor super class when End command is received
+            signals the end of messages for this key
+
+        @param: message - command message
+        """
+        updateSet = self.m_handlerUpdateDict.pop(message.m_key, set())
         for handlerToUpdate in updateSet:
             self.m_loop.addTaskArgs(handlerToUpdate.update, message.m_key)
-    
-    """
-    @brief: called from command processor super class when Abort command is received
 
-    @param: message - command message
-    """      
     def cmdAbort(self, message):
+        """
+        @brief: called from command processor super class when Abort command is received
+
+        @param: message - command message
+        """
         self.m_end = True
 
-    """
-    @brief: called from command processor super class when Resume command is received
-
-    @param: message - command message
-    """
     def cmdResume(self, message):
+        """
+        @brief: called from command processor super class when Resume command is received
+
+        @param: message - command message
+        """
         self.m_end = False
 
-    """
-    @brief: called from command processor super class when Clear command is received
-        Adds code to set, this code will be cleared when start is called for same code
-
-    @param: message - command message
-    """
     def cmdClear(self, message):
+        """
+        @brief: called from command processor super class when Clear command is received
+            Adds code to set, this code will be cleared when start is called for same code
+
+        @param: message - command message
+        """
         self.m_blocksToClear.add(message.m_key.m_sourceCode)

@@ -1,5 +1,3 @@
-from . import message
-
 import logging
 
 """
@@ -19,6 +17,7 @@ code2:
 
 """
 
+
 class handlerData():
     def __init__(self):
         self.m_dataSet = {}
@@ -33,9 +32,9 @@ class handlerData():
             key = message.m_key
             if key.m_sourceCode not in self.m_dataSet:
                 self.m_dataSet[key.m_sourceCode] = {}
-            
+
             if key.m_time not in self.m_dataSet[key.m_sourceCode]:
-                indexAndData = (len(self.m_dataSet[key.m_sourceCode]),[])
+                indexAndData = (len(self.m_dataSet[key.m_sourceCode]), [])
                 self.m_dataSet[key.m_sourceCode][key.m_time] = indexAndData
 
             self.m_dataSet[key.m_sourceCode][key.m_time][1].append(message)
@@ -53,7 +52,7 @@ class handlerData():
     def _getCodeDict(self, key):
         try:
             return self.m_dataSet[key.m_sourceCode]
-        except:
+        except Exception:
             logging.warning("invalid code for handler data access")
             return None
 
@@ -64,34 +63,34 @@ class handlerData():
             return None
 
         try:
-            #the first element is the index of the time, so return the data at second element
+            # the first element is the index of the time, so return the data at second element
             return codeDict[key.m_time]
-        except:
+        except Exception:
             logging.warning("invalid time for handler data access")
             return None
 
-    def get(self, key, default = None):
+    def get(self, key, default=None):
         timeData = self._getTimeData(key)
         if timeData is not None:
             return timeData[1]
         else:
             return default
 
-    """
-    @brief: getter method for getting a period based on key
-
-    @param: key - messageKey data type
-    @param: period - int, period to get by
-
-    @return -   handler data return value, get's code dict by key
-                then returns times without index
-        time1: [data1]
-        time2: [data2]
-        ...
-        time n : [data n]
-        where n is period
-    """
     def getPeriod(self, key, period):
+        """
+        @brief: getter method for getting a period based on key
+
+        @param: key - messageKey data type
+        @param: period - int, period to get by
+
+        @return -   handler data return value, get's code dict by key
+                    then returns times without index
+            time1: [data1]
+            time2: [data2]
+            ...
+            time n : [data n]
+            where n is period
+        """
         codeDict = self._getCodeDict(key)
         timeData = self._getTimeData(key)
 
@@ -107,9 +106,8 @@ class handlerData():
 
         keys = list(codeDict.keys())[timeStartIndex:timeEndIndex]
 
-        #generate new dict and return using these keys, leaving out index
+        # generate new dict and return using these keys, leaving out index
         return dict((k, codeDict[k][1]) for k in keys if k in codeDict)
-        
-            
+
     def clearCode(self, code):
-        self.m_dataSet.pop(code,None)
+        self.m_dataSet.pop(code, None)

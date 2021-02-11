@@ -3,20 +3,19 @@ from .messageKey import messageKey
 
 from collections.abc import Iterable
 
-"""
-@brief: container and caller for all actions of a block, communicates with messageRouter
-
-__init__:
-@param: actions     - contains all valid actions of block
-@param: period      - refers to number of units, not time
-@param: name        - name of action
-@param: calcFunc    - passed in function that will be called on the dataSet
-@param: params      - extra parameters that are passed in each time to the calcFunc
-@param: inputCols   - the columns that are used by the action and put into the dataSet
-"""
-
 
 class actionPool():
+    """
+    @brief: container and caller for all actions of a block, communicates with messageRouter
+
+    __init__:
+    @param: actions     - contains all valid actions of block
+    @param: period      - refers to number of units, not time
+    @param: name        - name of action
+    @param: calcFunc    - passed in function that will be called on the dataSet
+    @param: params      - extra parameters that are passed in each time to the calcFunc
+    @param: inputCols   - the columns that are used by the action and put into the dataSet
+    """
     def __init__(self, actions, feed, messageRouter, code, libraries, parseSettings=None):
         self.m_feed = feed
         self.m_messageRouter = messageRouter
