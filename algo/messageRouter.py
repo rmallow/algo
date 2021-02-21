@@ -3,6 +3,7 @@ from .commandProcessor import commandProcessor
 from .asyncScheduler import asyncScheduler
 
 import aioprocessing
+from multiprocess import Process
 import queue
 import logging
 from collections.abc import Iterable
@@ -19,7 +20,8 @@ class messageRouter(commandProcessor):
         super().__init__()
 
         self.m_end = False
-        self.m_messageQueue = aioprocessing.AioQueue()
+        self.m_manager = aioprocessing.AioManager()
+        self.m_messageQueue = self.m_manager.AioQueue()
         self.m_messageSubscriptions = messageSubscriptions
         self.m_handlerUpdateDict = {}
         self.m_handlerData = handlerData
@@ -29,30 +31,22 @@ class messageRouter(commandProcessor):
         self.addCmdFunc(msg.CommandType.CLEAR, messageRouter.cmdClear)
 
         self.m_loop = asyncScheduler()
+        self.m_process = None
 
-    # send to message subscriptions priority
-    def broadcastPriority(self, message):
-        self.m_handlerData.insert(message)
-        handlerList = self.m_messageSubscriptions.get(message.m_name, [])
-        for handlerToUpdate in handlerList:
-            self.m_loop.addTaskArgs(handlerToUpdate.updatePriority, message)
+    def start(self):
+        self.m_process = Process(target=self.initAndStartLoop, name="Router")
+        self.m_process.start()
 
-    # send to message subscriptions
-    def broadcast(self, message):
-        self.m_handlerData.insert(message)
-        handlerList = self.m_messageSubscriptions.get(message.m_name, [])
-        updateSet = self.m_handlerUpdateDict.get(message.m_key, set())
-        updateSet.update(handlerList)
+    def initAndStartLoop(self):
+        self.m_loop.init()
+        self.m_loop.addTask(self.loop(), name="Router Main Loop")
+        self.m_loop.start()
 
-    def receive(self, message):
-        # pylint: disable=no-member
-        self.m_messageQueue.put(message)
+    def join(self):
+        self.m_process.join()
+        self.m_loop.end()
 
-    # calls initAndStart on loop with router as only object
-    def initAndStart(self):
-        self.m_loop.initAndStart(self)
-
-    async def start(self):
+    async def loop(self):
         # main process loop for message router
         while not self.m_end:
             try:
@@ -84,6 +78,24 @@ class messageRouter(commandProcessor):
                     else:
                         logging.warning("unexpected value in message router")
                         logging.warning(str(message))
+
+    # send to message subscriptions priority
+    def broadcastPriority(self, message):
+        self.m_handlerData.insert(message)
+        handlerList = self.m_messageSubscriptions.get(message.m_name, [])
+        for handlerToUpdate in handlerList:
+            self.m_loop.addTaskArgs(handlerToUpdate.updatePriority, message)
+
+    # send to message subscriptions
+    def broadcast(self, message):
+        self.m_handlerData.insert(message)
+        handlerList = self.m_messageSubscriptions.get(message.m_name, [])
+        updateSet = self.m_handlerUpdateDict.get(message.m_key, set())
+        updateSet.update(handlerList)
+
+    def receive(self, message):
+        # pylint: disable=no-member
+        self.m_messageQueue.put(message)
 
     def cmdStart(self, message):
         """

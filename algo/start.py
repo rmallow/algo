@@ -4,8 +4,6 @@ from .handlerManagerAsync import handlerManager
 from .handlerData import handlerData
 
 from .util import configLoader
-
-import multiprocessing as mp
 from pathlib import Path
 import os
 import sys
@@ -35,9 +33,6 @@ def start():
     dirPath = os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))
     os.chdir(dirPath)
 
-    pRouter = mp.Process(target=mainMessageRouter.initAndStart, name="Router")
-    pMainBlockManager = mp.Process(target=mainBlockManager.start, name="BlockManager")
-    pRouter.start()
-    pMainBlockManager.start()
-    pRouter.join()
-    pMainBlockManager.join()
+    mainBlockManager.start()
+    mainMessageRouter.start()
+    mainMessageRouter.join()

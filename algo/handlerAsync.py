@@ -1,4 +1,5 @@
 from .util import wrappers as wrap
+from collections import OrderedDict
 
 """
 handler class, takes message from message router and outputs
@@ -12,7 +13,7 @@ class handler():
         self.m_outputFunc = outputFunc
         self.m_period = period
         self.m_handlerData = None
-        self.m_personalData = None
+        self.m_personalData = OrderedDict()
         self.m_params = params
 
     async def updatePriority(self, message):
@@ -42,7 +43,7 @@ class handler():
 
         # append personal data
         if personalData is not None:
-            self.m_personalData.append(personalData)
+            self.m_personalData[key] = personalData
 
         # after adjust personal data, call output function
         if boolResult:

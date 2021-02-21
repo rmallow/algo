@@ -8,4 +8,4 @@ handler1:
         name: alwaysTrue
     outputFunc:
         location: funcs.handlerFuncs
-        name: printOutput
+        name: countPersonal

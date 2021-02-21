@@ -1,9 +1,12 @@
 def testFunc1():
     pass
 
+
 def testFunc2(handlerData):
     print(handlerData)
 
+
+# need to refactor this once names is done
 def containsOneOfEach(handlerData, params):
     checkList = []
     if params is not None and 'subscriptions' in params and len(params['subscriptions']) > 0:
@@ -20,10 +23,16 @@ def containsOneOfEach(handlerData, params):
         if not check:
             return False
 
-    return True
+    return (True, "buy")
+
 
 def alwaysTrue():
-    return True
+    return (True, "buy")
+
 
 def printOutput():
     print("I'm an output function")
+
+
+def countPersonal(_, _2, personal):
+    print("Length of personal: " + str(len(personal)))

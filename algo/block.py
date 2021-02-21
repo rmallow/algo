@@ -25,6 +25,7 @@ class block():
                     self.clear()
             else:
                 self.m_end = True
+        return(self.m_feed.m_data, self.m_feed.m_calcData)
 
     def clear(self):
         self.m_feed.clear()

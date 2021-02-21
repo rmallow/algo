@@ -1,5 +1,4 @@
 from .handlerAsync import handler
-from .asyncScheduler import asyncScheduler
 
 import importlib
 import logging
@@ -31,13 +30,6 @@ class handlerManager():
         self.m_end = False
 
         self.m_handlers = []
-        self.m_scheduler = None
-
-    def initAndStart(self, handlerData):
-        self.m_scheduler = asyncScheduler()
-        for h in self.m_handlers:
-
-            self.m_scheduler.addTask(h.start())
 
     def loadHandlers(self, sharedData):
         print("---- Handler Manager Loading Handlers ----")

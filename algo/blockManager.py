@@ -5,10 +5,12 @@ from .feed import feed
 from .dataSim import dataSim
 from .dataStream import dataStream
 
-import pickle
+import dill
 import importlib
 import logging
 import datetime
+from pathos.multiprocessing import ProcessingPool as Pool
+import multiprocessing as mp
 
 
 def _loadCalcFunc(calcFuncConfig):
@@ -21,11 +23,6 @@ def _loadCalcFunc(calcFuncConfig):
     else:
         logging.warning("module not found: " + calcFuncConfig['location'])
     return None
-
-
-def loadObj(name):
-    with open('obj/' + name + '.pkl', 'rb') as f:
-        return pickle.load(f)
 
 
 def _loadBlockAndDataSource(blockConfig, messageRouter):
@@ -98,10 +95,16 @@ class blockManager():
         print("---- Block Manager Done Loading ----")
 
     def start(self):
-        for blockToStart in self.m_blockList:
-            startTime = datetime.datetime.now()
-            blockToStart.start()
-            print("--- Time Elapsed ---")
-            print(datetime.datetime.now() - startTime)
-            print(blockToStart.m_feed.m_data)
-            print(blockToStart.m_feed.m_calcData)
+        startTime = datetime.datetime.now()
+        processCount = len(self.m_blockList)
+        if processCount > mp.cpu_count():
+            processCount = mp.cpu_count()
+        with Pool(nodes=processCount) as pool:
+            for blockResult in pool.uimap(block.start, self.m_blockList):
+                print("--- Time Elapsed ---")
+                print(datetime.datetime.now() - startTime)
+                print(blockResult[0])
+                print(blockResult[1])
+
+    def join(self):
+        pass
