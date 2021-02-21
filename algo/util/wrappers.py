@@ -1,5 +1,6 @@
 from inspect import signature
 
+
 def adjustArgs(func, argList):
     sig = signature(func)
     if len(sig.parameters) == 0:
@@ -9,6 +10,7 @@ def adjustArgs(func, argList):
     else:
         argList = argList + [None]*(len(sig.parameters) - len(argList))
     return func(*argList)
+
 
 def iterableReturnValue(funcResult, returnNum):
     noneToAdd = returnNum - 1
@@ -22,5 +24,5 @@ def iterableReturnValue(funcResult, returnNum):
             funcResult = (funcResult,)
         else:
             return funcResult
-    
+
     return funcResult + (None,) * noneToAdd

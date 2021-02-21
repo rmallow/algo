@@ -3,10 +3,12 @@ from .blockManager import blockManager
 from .handlerManagerAsync import handlerManager
 from .handlerData import handlerData
 
-from .util.configLoader import configLoader
+from .util import configLoader
 
 import multiprocessing as mp
 from pathlib import Path
+import os
+import sys
 
 
 def start():
@@ -28,13 +30,14 @@ def start():
     mainBlockManager = blockManager(configDict, mainMessageRouter)
     mainBlockManager.loadBlocks()
 
-    # get objects that have start() awaitables for scheduler
+    # this will set the current working directory from wherever to the directory this file is in
+    # sys.path.append(os.path.dirname(os.path.abspath(sys.modules[__name__].__file__)))
+    dirPath = os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))
+    os.chdir(dirPath)
 
-    pRouter = mp.Process(target=mainMessageRouter.initAndStart)
-    pMainBlockManager = mp.Process(target=mainBlockManager.start)
-
+    pRouter = mp.Process(target=mainMessageRouter.initAndStart, name="Router")
+    pMainBlockManager = mp.Process(target=mainBlockManager.start, name="BlockManager")
     pRouter.start()
     pMainBlockManager.start()
-
     pRouter.join()
     pMainBlockManager.join()

@@ -1,5 +1,5 @@
 import logging
-
+from collections import OrderedDict
 """
 Stores messages with by keys for handlers to acess quickly
 
@@ -31,7 +31,7 @@ class handlerData():
         if message is not None and message.keyExists():
             key = message.m_key
             if key.m_sourceCode not in self.m_dataSet:
-                self.m_dataSet[key.m_sourceCode] = {}
+                self.m_dataSet[key.m_sourceCode] = OrderedDict()
 
             if key.m_time not in self.m_dataSet[key.m_sourceCode]:
                 indexAndData = (len(self.m_dataSet[key.m_sourceCode]), [])
@@ -76,6 +76,10 @@ class handlerData():
         else:
             return default
 
+    def getNames(self, key, default=None):
+        # TODO
+        pass
+
     def getPeriod(self, key, period):
         """
         @brief: getter method for getting a period based on key
@@ -108,6 +112,9 @@ class handlerData():
 
         # generate new dict and return using these keys, leaving out index
         return dict((k, codeDict[k][1]) for k in keys if k in codeDict)
+
+    def getPeriodNames(self, key, period):
+        pass
 
     def clearCode(self, code):
         self.m_dataSet.pop(code, None)

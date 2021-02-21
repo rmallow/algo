@@ -40,7 +40,7 @@ class handlerManager():
             self.m_scheduler.addTask(h.start())
 
     def loadHandlers(self, sharedData):
-        print("---- Handler Manager Loading Blocks ----")
+        print("---- Handler Manager Loading Handlers ----")
 
         for _, config in self.m_handlerConfig.items():
             h = self._loadHandler(config)
@@ -60,7 +60,7 @@ class handlerManager():
         name = config['name']
         period = config['period']
         subscriptions = config['subscriptions']
-        params = None
+        params = {}
         if 'params' in config:
             params = config['params']
         params['subscriptions'] = subscriptions

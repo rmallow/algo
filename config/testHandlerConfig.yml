@@ -5,7 +5,7 @@ handler1:
     period: 3
     calcFunc:
         location: funcs.handlerFuncs
-        name: containsOneOfEach
+        name: alwaysTrue
     outputFunc:
         location: funcs.handlerFuncs
         name: printOutput

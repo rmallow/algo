@@ -21,8 +21,9 @@ def containsOneOfEach(handlerData, params):
             return False
 
     return True
-            
-        
+
+def alwaysTrue():
+    return True
 
 def printOutput():
     print("I'm an output function")

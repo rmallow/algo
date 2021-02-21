@@ -34,7 +34,7 @@ class handler():
             which means to update wrapper
         """
         # pass it to wrapper that handles correct number of args for function
-        handlerData = self.m_handlerData.getPeriod(self.m_period)
+        handlerData = self.m_handlerData.getPeriod(key, self.m_period)
         rawVal = wrap.adjustArgs(self.m_calcFunc, [handlerData, self.m_params, self.m_personalData])
         # then unpack the results, personalData return could be None
         # first result should always be boolResult
