@@ -28,7 +28,7 @@ def start():
                                       control.m_MPManager.AioQueue())
 
     # init block manager
-    path = Path("/Users/rmallow/Documents/stonks/algo/config/demoBlockCryptoConfig.yml")
+    path = Path("/Users/rmallow/Documents/stonks/algo/config/btcRSI.yml")
     configDict = configLoader.getConfigDictFromFile(path)
     mainBlockManager = blockManager(configDict, mainMessageRouter)
     mainBlockManager.loadBlocks()
@@ -38,11 +38,5 @@ def start():
     dirPath = os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))
     os.chdir(dirPath)
 
-    """
-    mainMessageRouter.start()
-    mainBlockManager.start()
-    mainBlockManager.join()
-    mainMessageRouter.join()
-    """
     control.runManagerAndRouter(mainBlockManager, mainMessageRouter)
     print("All process done, Closing")

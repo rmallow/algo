@@ -40,7 +40,7 @@ class messageRouter(commandProcessor):
         self.m_loop.init()
         self.m_loop.addTask(self.loop(), name="Router Main Loop")
         self.m_loop.start()
-    
+
     """
     def join(self):
         self.m_process.join()

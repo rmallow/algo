@@ -1,0 +1,95 @@
+BTC:
+    name: BTCUSD
+    libraries:
+        - funcs/eventFuncs.py
+    dataSource:
+        type: dataSim
+        key: https://financialmodelingprep.com/api/v3/historical-chart/1min/BTCUSD?apikey=988acec08b291b04291918235100cd16
+        dataType: url
+        index: date
+        columnFilter:
+            - close
+            - volume
+        period: 1
+        dayFirst: False
+    feed:
+        period: 60
+        continuous: False
+    actionList:
+        closeChange:
+            inputCols:
+                - close
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: change
+            period: 2
+        closeUp:
+            inputCols:
+                - closeChange
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: up
+            period: 1
+        closeDown:
+            inputCols:
+                - closeChange
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: down
+            period: 1
+        emaUp:
+            inputCols:
+                - closeUp
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: ema
+            period: 28
+        emaDown:
+            inputCols:
+                - closeDown
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: ema
+            period: 28 
+        rs:
+            inputCols:
+                - emaUp
+                - emaDown
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: divide
+            period: 1
+        rsi:
+            inputCols:
+                - rs
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: rsi
+            period: 1
+        rsi-buy:
+            inputCols:
+                - rsi
+            actionType: trigger
+            calcFunc:
+                location: funcs.triggerFuncs
+                name: under
+            period: 1
+            params:
+                factor: 20
+        rsi-sell:
+            inputCols:
+                - rsi
+            actionType: trigger
+            calcFunc:
+                location: funcs.triggerFuncs
+                name: over
+            period: 1
+            params:
+                factor: 80
