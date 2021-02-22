@@ -34,5 +34,15 @@ def printOutput():
     print("I'm an output function")
 
 
+def buyCodePrint(_, _2, personal):
+    key = list(personal.keys())[-1]
+    print("Buy " + key.m_sourceCode + " at " + str(key.m_time))
+
+
+def sellCodePrint(_, _2, personal):
+    key = list(personal.keys())[-1]
+    print("Sell " + key.m_sourceCode + " at " + str(key.m_time))
+
+
 def countPersonal(_, _2, personal):
     print("Length of personal: " + str(len(personal)))

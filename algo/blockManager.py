@@ -5,12 +5,10 @@ from .feed import feed
 from .dataSim import dataSim
 from .dataStream import dataStream
 
-import dill
 import importlib
 import logging
 import datetime
-from pathos.multiprocessing import ProcessingPool as Pool
-import multiprocessing as mp
+import time
 
 
 def _loadCalcFunc(calcFuncConfig):
@@ -25,13 +23,13 @@ def _loadCalcFunc(calcFuncConfig):
     return None
 
 
-def _loadBlockAndDataSource(blockConfig, messageRouter):
+def _loadBlockAndDataSource(blockConfig, messageRouter, code):
     dataSource = _loadDataSource(blockConfig['dataSource'])
     name = blockConfig['name']
     feed = _loadFeed(blockConfig['feed'], dataSource.getData)
     actionList = _loadActionList(blockConfig['actionList'])
     libraries = blockConfig['libraries']
-    blk = block(actionList, feed, messageRouter, libraries, name=name)
+    blk = block(actionList, feed, messageRouter, libraries, name=name, code=code)
     return blk, dataSource
 
 
@@ -80,31 +78,20 @@ def _loadFeed(feedConfig, dataFunc):
 
 
 class blockManager():
-    def __init__(self, configDict, messageRouter):
+    def __init__(self, configDict, messageRouter, blockOnJoin=True):
         self.m_assetBlockConfig = configDict
         self.m_blockList = []
         self.m_dataMangerList = []
         self.m_messageRouter = messageRouter
+        self.m_results = None
+        self.m_pool = None
+        self.m_blockOnJoin = blockOnJoin
+        self.m_startTime = None
 
     def loadBlocks(self):
         print("---- Block Manager Loading Blocks ----")
-        for _, config in self.m_assetBlockConfig.items():
-            block, dataSource = _loadBlockAndDataSource(config, self.m_messageRouter)
+        for code, config in self.m_assetBlockConfig.items():
+            block, dataSource = _loadBlockAndDataSource(config, self.m_messageRouter, code)
             self.m_blockList.append(block)
             self.m_dataMangerList.append(dataSource)
         print("---- Block Manager Done Loading ----")
-
-    def start(self):
-        startTime = datetime.datetime.now()
-        processCount = len(self.m_blockList)
-        if processCount > mp.cpu_count():
-            processCount = mp.cpu_count()
-        with Pool(nodes=processCount) as pool:
-            for blockResult in pool.uimap(block.start, self.m_blockList):
-                print("--- Time Elapsed ---")
-                print(datetime.datetime.now() - startTime)
-                print(blockResult[0])
-                print(blockResult[1])
-
-    def join(self):
-        pass

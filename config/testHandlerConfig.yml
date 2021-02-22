@@ -1,4 +1,4 @@
-handler1:
+buyHandler:
     name: buyHandler
     subscriptions:
         - rsi-buy
@@ -8,4 +8,15 @@ handler1:
         name: alwaysTrue
     outputFunc:
         location: funcs.handlerFuncs
-        name: countPersonal
+        name: buyCodePrint
+sellHandler:
+    name: sellHandler
+    subscriptions:
+        - rsi-sell
+    period: 3
+    calcFunc:
+        location: funcs.handlerFuncs
+        name: alwaysTrue
+    outputFunc:
+        location: funcs.handlerFuncs
+        name: sellCodePrint

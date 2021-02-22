@@ -2,8 +2,6 @@ from . import message as msg
 from .commandProcessor import commandProcessor
 from .asyncScheduler import asyncScheduler
 
-import aioprocessing
-from multiprocess import Process
 import queue
 import logging
 from collections.abc import Iterable
@@ -15,13 +13,12 @@ class messageRouter(commandProcessor):
     The message router accepts new messages from triggers and sends
     those messages out to all handlers that are subscribed to that message
     """
-    def __init__(self, messageSubscriptions, handlerData):
+    def __init__(self, messageSubscriptions, handlerData, queue):
         # initalize command processor
         super().__init__()
 
         self.m_end = False
-        self.m_manager = aioprocessing.AioManager()
-        self.m_messageQueue = self.m_manager.AioQueue()
+        self.m_messageQueue = queue
         self.m_messageSubscriptions = messageSubscriptions
         self.m_handlerUpdateDict = {}
         self.m_handlerData = handlerData
@@ -33,18 +30,22 @@ class messageRouter(commandProcessor):
         self.m_loop = asyncScheduler()
         self.m_process = None
 
+    """
     def start(self):
         self.m_process = Process(target=self.initAndStartLoop, name="Router")
         self.m_process.start()
+    """
 
     def initAndStartLoop(self):
         self.m_loop.init()
         self.m_loop.addTask(self.loop(), name="Router Main Loop")
         self.m_loop.start()
-
+    
+    """
     def join(self):
         self.m_process.join()
         self.m_loop.end()
+    """
 
     async def loop(self):
         # main process loop for message router
