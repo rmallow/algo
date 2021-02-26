@@ -4,7 +4,6 @@ from .handlerManagerAsync import handlerManager
 from .handlerData import handlerData
 from .controlBoard import controlBoard
 
-import aioprocessing
 from .util import configLoader
 from pathlib import Path
 import os
@@ -15,7 +14,7 @@ def start():
     # init starter variables
     sharedData = handlerData()
 
-    control = controlBoard(manager=aioprocessing.AioManager())
+    control = controlBoard()
 
     # init handler manager
     path = Path("/Users/rmallow/Documents/stonks/algo/config/testHandlerConfig.yml")

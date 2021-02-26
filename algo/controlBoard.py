@@ -1,15 +1,15 @@
 from multiprocess import Process
 from pathos.multiprocessing import ProcessingPool as Pool
-import multiprocessing as mp
-import dill
+import aioprocessing
 import time
-
-from . import messageRouter
 
 
 class controlBoard():
     def __init__(self, manager=None):
-        self.m_MPManager = manager
+        if manager is not None:
+            self.m_MPManager = manager
+        else:
+            self.m_MPManager = aioprocessing.AioManager()
 
     def runManagerAndRouter(self, manager, router):
         processCount = len(manager.m_blockList)
