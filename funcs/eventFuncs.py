@@ -1,19 +1,12 @@
-import sys
-import os
-sys.path.insert(0, os.path.abspath('..'))
-import algo.action as act
-
-"""
-input for calcFuncs: dataset, params
-"""
-
 
 def testFunc(dataSet, parameters=None):
     return dataSet['close'].iloc[0] + 1
 
 
 def ema(dataSet, parameters=None):
-    smooth = act.getParameter(parameters, 'smooth', 2)
+    smooth = 2
+    if 'smooth' in parameters:
+        smooth = parameters['smooth']
     period = len(dataSet.index)
     ema = None
     for _, row in dataSet.iterrows():
