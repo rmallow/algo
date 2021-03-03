@@ -28,9 +28,9 @@
     </spacer>
    </item>
    <item row="0" column="0">
-    <widget class="QPushButton" name="playButton">
+    <widget class="QPushButton" name="startButton">
      <property name="text">
-      <string>Play</string>
+      <string>Start</string>
      </property>
     </widget>
    </item>
