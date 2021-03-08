@@ -1,7 +1,5 @@
 BTC:
     name: BTCUSD
-    libraries:
-        - funcs/eventFuncs.py
     dataSource:
         type: dataSim
         key: https://financialmodelingprep.com/api/v3/historical-chart/1min/BTCUSD?apikey=988acec08b291b04291918235100cd16
@@ -15,6 +13,8 @@ BTC:
     feed:
         period: 60
         continuous: False
+    libraries:
+        - funcs/eventFuncs.py
     actionList:
         closeChange:
             inputCols:

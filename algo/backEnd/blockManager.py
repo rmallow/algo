@@ -10,7 +10,7 @@ from .util import configLoader
 
 class blockManager():
     def __init__(self, messageRouter):
-        self.m_blockList = []
+        self.m_blocks = []
         self.m_dataMangerList = []
         self.m_messageRouter = messageRouter
 
@@ -28,7 +28,7 @@ class blockManager():
         actionList = self._loadActionList(blockConfig['actionList'])
         libraries = blockConfig['libraries']
         blk = block(actionList, feed, self.m_messageRouter, libraries, name=name, code=code)
-        self.m_blockList.append(blk)
+        self.m_blocks.append(blk)
         self.m_dataMangerList.append(dataSource)
 
     def _loadDataSource(self, dataSourceConfig):

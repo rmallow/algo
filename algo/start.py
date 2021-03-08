@@ -7,14 +7,11 @@ import sys
 
 
 def start():
+    # init starter variables
+    main = mainframe()
+    # main.runManagerAndRouter()
+    app = QtWidgets.QApplication([])
 
-    if True:
-        # init starter variables
-        main = mainframe()
-        main.runManagerAndRouter()
-    else:
-        app = QtWidgets.QApplication([])
+    mainWindow(main)
 
-        mainWindow()
-
-        sys.exit(app.exec_())
+    sys.exit(app.exec_())

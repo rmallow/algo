@@ -2,4 +2,4 @@
 Importable settings file
 """
 
-SETTINGS_FILE = "algo/settings.ini"
+SETTINGS_FILE = "/Users/rmallow/Documents/stonks/algo/algo/settings.ini"

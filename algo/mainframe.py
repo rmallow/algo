@@ -28,13 +28,16 @@ class mainframe():
         # Load defaults
         config = configparser.ConfigParser()
         config.read(SETTINGS_FILE)
+        blockConfigFile = ""
+        handlerConfigFile = ""
         if 'Configs' in config:
-            self.blockConfigFile = config.get('Configs', 'Block', fallback="")
-            self.handlerConfigFile = config.get('Configs', 'Handler', fallback="")
+            blockConfigFile = config.get('Configs', 'Block', fallback="")
+            handlerConfigFile = config.get('Configs', 'Handler', fallback="")
 
-        configDict = configLoader.getConfigDictFromFile(self.handlerConfigFile)
         self.m_handlerManager = handlerManager(sharedData)
-        self.m_handlerManager.loadHandlers(configDict)
+        if handlerConfigFile:
+            configDict = configLoader.getConfigDictFromFile(handlerConfigFile)
+            self.m_handlerManager.loadHandlers(configDict)
 
         # init message router
         self.m_messageRouter = messageRouter(self.m_handlerManager.m_messageSubscriptions, sharedData,
@@ -42,8 +45,9 @@ class mainframe():
 
         # init block manager
         self.m_blockManager = blockManager(self.m_messageRouter)
-        configDict = configLoader.getConfigDictFromFile(self.blockConfigFile)
-        self.m_blockManager.loadBlocks(configDict)
+        if blockConfigFile:
+            configDict = configLoader.getConfigDictFromFile(blockConfigFile)
+            self.m_blockManager.loadBlocks(configDict)
 
         # this will set the current working directory from wherever to the directory this file is in
         # sys.path.append(os.path.dirname(os.path.abspath(sys.modules[__name__].__file__)))
@@ -51,13 +55,13 @@ class mainframe():
         os.chdir(dirPath)
 
     def runManagerAndRouter(self):
-        processCount = len(self.m_blockManager.m_blockList)
+        processCount = len(self.m_blockManager.m_blocks)
         pool = Pool(nodes=processCount)
 
         pRouter = Process(target=self.m_messageRouter.initAndStartLoop, name="Router")
         pRouter.start()
 
-        results = pool.amap(lambda block: block.start(), self.m_blockManager.m_blockList)
+        results = pool.amap(lambda block: block.start(), self.m_blockManager.m_blocks)
         while not results.ready():
             time.sleep(2)
 
