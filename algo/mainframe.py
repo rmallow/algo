@@ -7,22 +7,21 @@ from .backEnd.handlerData import handlerData
 from .backEnd.util import configLoader
 
 from multiprocess import Process
-from pathos.multiprocessing import ProcessingPool as Pool
 import aioprocessing
-import time
 import os
 import sys
 import configparser
 
 
 class mainframe():
-    def __init__(self, manager=None):
-        if manager is not None:
-            self.m_MPManager = manager
-        else:
-            self.m_MPManager = aioprocessing.AioManager()
+    def __init__(self):
 
-        sharedData = handlerData()
+        self.m_processDict = {}
+        self.m_routerProcess = None
+        self.m_MPManager = aioprocessing.AioManager()
+        self.m_sharedData = handlerData()
+        self.m_handlerManager = None
+        self.m_blockManager = None
 
         # init handler manager
         # Load defaults
@@ -34,13 +33,13 @@ class mainframe():
             blockConfigFile = config.get('Configs', 'Block', fallback="")
             handlerConfigFile = config.get('Configs', 'Handler', fallback="")
 
-        self.m_handlerManager = handlerManager(sharedData)
+        self.m_handlerManager = handlerManager(self.m_sharedData)
         if handlerConfigFile:
             configDict = configLoader.getConfigDictFromFile(handlerConfigFile)
             self.m_handlerManager.loadHandlers(configDict)
 
         # init message router
-        self.m_messageRouter = messageRouter(self.m_handlerManager.m_messageSubscriptions, sharedData,
+        self.m_messageRouter = messageRouter(self.m_handlerManager.m_messageSubscriptions, self.m_sharedData,
                                              self.m_MPManager.AioQueue())
 
         # init block manager
@@ -54,21 +53,46 @@ class mainframe():
         dirPath = os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))
         os.chdir(dirPath)
 
-    def runManagerAndRouter(self):
-        processCount = len(self.m_blockManager.m_blocks)
-        pool = Pool(nodes=processCount)
+    def startRouter(self):
+        self.m_routerProcess = Process(target=self.m_messageRouter.initAndStartLoop, name="Router")
+        self.m_routerProcess.start()
 
-        pRouter = Process(target=self.m_messageRouter.initAndStartLoop, name="Router")
-        pRouter.start()
+    def runAll(self):
+        if self.m_routerProcess is None:
+            self.startRouter()
 
-        results = pool.amap(lambda block: block.start(), self.m_blockManager.m_blocks)
-        while not results.ready():
-            time.sleep(2)
+        for code, block in self.m_blockManager.m_blocks.items():
+            if code not in self.m_processDict:
+                self.startBlockProcess(code, block)
+            else:
+                print("Error Running Block: " + code)
 
-        if results.ready():
-            for result in results.get():
-                print(result[0])
-                print(result[1])
+    def runBlock(self, code):
+        if self.m_routerProcess is None:
+            self.startRouter()
 
-        pool.close()
-        pRouter.join()
+        if code in self.m_blockManager.m_blocks and code not in self.m_processDict:
+            block = self.m_blockManager.m_blocks[code]
+            self.startBlockProcess(code, block)
+        else:
+            print("Error Running Block: " + code)
+
+    def startBlockProcess(self, code, block):
+        processName = "Block-" + str(code)
+        blockProcess = Process(target=block.start, name=processName)
+        self.m_processDict[code] = blockProcess
+        blockProcess.start()
+
+    def endAll(self):
+        while self.m_processDict:
+            for key, p in self.m_processDict.items():
+                p.join(.5)
+                if p.exitcode is not None:
+                    del self.m_processDict[key]
+        self.m_routerProcess.join()
+
+    def getBlocks(self):
+        return self.m_blockManager.m_blocks
+
+    def getHandlers(self):
+        return self.m_handlerManager.m_handlers

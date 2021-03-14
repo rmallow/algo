@@ -12,6 +12,13 @@ def start():
     # main.runManagerAndRouter()
     app = QtWidgets.QApplication([])
 
-    mainWindow(main)
+    window = mainWindow()
+    window.loadBlocks(main.getBlocks())
+    window.loadHandlers(main.getHandlers())
 
-    sys.exit(app.exec_())
+    window.runAllSignal.connect(main.runAll)
+    window.endAllSignal.connect(main.endAll)
+
+    status = app.exec_()
+
+    sys.exit(status)
