@@ -3,17 +3,20 @@ from . import message as msg
 from . import messageKey as msgKey
 from . import constants as con
 
+from .commandProcessor import commandProcessor
+
 import pandas as pd
 
 
-class block():
-    def __init__(self, actionList, feed, messageRouter, libraries, parseSettings=None, name="defaultBlockName",
+class block(commandProcessor):
+    def __init__(self, actionList, feed, messageRouter, libraries, config, parseSettings=None, name="defaultBlockName",
                  code=123):
         self.m_code = code
         self.m_end = False
         self.m_feed = feed
         self.m_messageRouter = messageRouter
         self.m_pool = actionPool(actionList, feed, messageRouter, self.m_code, libraries, parseSettings)
+        self.m_config = config
 
     def start(self):
         while not self.m_end:

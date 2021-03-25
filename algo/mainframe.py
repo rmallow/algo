@@ -6,19 +6,23 @@ from .backEnd.handlerManagerAsync import handlerManager
 from .backEnd.handlerData import handlerData
 from .backEnd.util import configLoader
 
-from multiprocess import Process
+from multiprocess import Process, Manager
 import aioprocessing
 import os
 import sys
 import configparser
+from PySide6 import QtCore
 
 
-class mainframe():
+class mainframe(QtCore.QObject):
+    dataChanged = QtCore.Signal()
+
     def __init__(self):
-
+        super().__init__(None)
         self.m_processDict = {}
         self.m_routerProcess = None
-        self.m_MPManager = aioprocessing.AioManager()
+        self.m_AioManager = aioprocessing.AioManager()
+        self.m_MpManager = Manager()
         self.m_sharedData = handlerData()
         self.m_handlerManager = None
         self.m_blockManager = None
@@ -34,19 +38,15 @@ class mainframe():
             handlerConfigFile = config.get('Configs', 'Handler', fallback="")
 
         self.m_handlerManager = handlerManager(self.m_sharedData)
-        if handlerConfigFile:
-            configDict = configLoader.getConfigDictFromFile(handlerConfigFile)
-            self.m_handlerManager.loadHandlers(configDict)
+        self.loadHandlerConfig(handlerConfigFile)
 
         # init message router
         self.m_messageRouter = messageRouter(self.m_handlerManager.m_messageSubscriptions, self.m_sharedData,
-                                             self.m_MPManager.AioQueue())
+                                             self.m_AioManager.AioQueue())
 
         # init block manager
         self.m_blockManager = blockManager(self.m_messageRouter)
-        if blockConfigFile:
-            configDict = configLoader.getConfigDictFromFile(blockConfigFile)
-            self.m_blockManager.loadBlocks(configDict)
+        self.loadBlockConfig(blockConfigFile)
 
         # this will set the current working directory from wherever to the directory this file is in
         # sys.path.append(os.path.dirname(os.path.abspath(sys.modules[__name__].__file__)))
@@ -91,8 +91,30 @@ class mainframe():
                     del self.m_processDict[key]
         self.m_routerProcess.join()
 
+    def endBlock(self, code, timeout=None):
+        if code in self.m_processDict:
+            if timeout:
+                self.m_processDict[code].join(timeout)
+            else:
+                self.m_processDict[code].close()
+            del self.m_processDict[code]
+
     def getBlocks(self):
         return self.m_blockManager.m_blocks
 
     def getHandlers(self):
         return self.m_handlerManager.m_handlers
+
+    def loadBlockConfig(self, config):
+        if config:
+            configDict = configLoader.getConfigDictFromFile(config)
+            self.m_blockManager.loadBlocks(configDict)
+
+    def loadHandlerConfig(self, config):
+        if config:
+            configDict = configLoader.getConfigDictFromFile(config)
+            self.m_handlerManager.loadHandlers(configDict)
+
+    def loadConfigs(self, blockConfig, handlerConfig):
+        self.loadBlockConfig(blockConfig)
+        self.loadHandlerConfig(handlerConfig)

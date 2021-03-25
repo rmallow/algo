@@ -17,6 +17,10 @@ class handlerManager():
 
         self.m_handlers = {}
 
+    # wrapper for UI to use
+    def loadItem(self, configDict):
+        self.loadHandlers(configDict)
+
     def loadHandlers(self, configDict):
         print("---- Handler Manager Loading Handlers ----")
         for code, config in configDict.items():
@@ -46,7 +50,7 @@ class handlerManager():
         calcFunc = configLoader.loadFunc(config['calcFunc'])
         outputFunc = configLoader.loadFunc(config['outputFunc'])
 
-        val = handler(code, name, period, calcFunc, outputFunc, params=params)
+        val = handler(code, name, period, calcFunc, outputFunc, config, params=params)
         self._addSubscriptions(subscriptions, val)
         return val
 

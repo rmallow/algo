@@ -28,24 +28,11 @@ class messageRouter(commandProcessor):
         self.addCmdFunc(msg.CommandType.CLEAR, messageRouter.cmdClear)
 
         self.m_loop = asyncScheduler()
-        self.m_process = None
-
-    """
-    def start(self):
-        self.m_process = Process(target=self.initAndStartLoop, name="Router")
-        self.m_process.start()
-    """
 
     def initAndStartLoop(self):
         self.m_loop.init()
         self.m_loop.addTask(self.loop(), name="Router Main Loop")
         self.m_loop.start()
-
-    """
-    def join(self):
-        self.m_process.join()
-        self.m_loop.end()
-    """
 
     async def loop(self):
         # main process loop for message router

@@ -14,6 +14,9 @@ class blockManager():
         self.m_dataMangerList = {}
         self.m_messageRouter = messageRouter
 
+    def loadItem(self, configDict):
+        self.loadBlocks(configDict)
+
     def loadBlocks(self, configDict):
         print("---- Block Manager Loading Blocks ----")
         for code, config in configDict.items():
@@ -27,7 +30,7 @@ class blockManager():
         feed = self._loadFeed(blockConfig['feed'], dataSource.getData)
         actionList = self._loadActionList(blockConfig['actionList'])
         libraries = blockConfig['libraries']
-        blk = block(actionList, feed, self.m_messageRouter, libraries, name=name, code=code)
+        blk = block(actionList, feed, self.m_messageRouter, libraries, blockConfig, name=name, code=code)
         self.m_blocks[code] = blk
         self.m_dataMangerList[code] = dataSource
 

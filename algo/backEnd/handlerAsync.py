@@ -7,7 +7,7 @@ handler class, takes message from message router and outputs
 
 
 class handler():
-    def __init__(self, code, name, period, calcFunc, outputFunc, params=None):
+    def __init__(self, code, name, period, calcFunc, outputFunc, config, params=None):
         self.m_code = code
         self.m_name = name
         self.m_calcFunc = calcFunc
@@ -16,6 +16,7 @@ class handler():
         self.m_handlerData = None
         self.m_personalData = OrderedDict()
         self.m_params = params
+        self.m_config = config
 
     async def updatePriority(self, message):
         # this func will handle priority messages

@@ -30,9 +30,6 @@ class configWindow(QtWidgets.QWidget):
         self.ui.handlerLoadButton.clicked.connect(self.showFileDialog)
         self.ui.otherLoadButton.clicked.connect(self.showFileDialog)
 
-        # blockLoadbutton
-        # handlerLoadButton
-
     @QtCore.Slot()
     def showFileDialog(self):
         button = self.sender()
