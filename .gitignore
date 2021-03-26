@@ -9,6 +9,7 @@ data
 log
 deprecated
 *.code-workspace
+config/
 
 # Distribution / packaging
 .Python
