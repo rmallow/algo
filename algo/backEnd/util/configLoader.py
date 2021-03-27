@@ -48,7 +48,6 @@ class configLoader():
         string = reMatch.group(0)
         if len(string) > 3:
             string = string[2:len(string)-1]
-            print(string)
             if string in self.valueDict:
                 return self.valueDict[string]
         return string
