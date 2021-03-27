@@ -4,9 +4,8 @@ import os
 import pickle
 import yaml
 import configparser
-import sys
-import traceback
 import re
+from ..commonUtil import errorHandling
 
 VALUES_SECTION = 'Values'
 
@@ -61,11 +60,7 @@ class configLoader():
                 yamlReady = re.sub(r"\$\[[^]]*\]", self.matchReplace, fileStrings)
                 return yaml.safe_load(yamlReady)
         except OSError:
-            print("Exception opening file:")
-            print("-"*60)
-            traceback.print_exc(file=sys.stdout)
-            print("-" * 60)
-        
+            errorHandling.printTraceback("Exception loading file: ")
         return {}
 
 
