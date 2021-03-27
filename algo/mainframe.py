@@ -29,6 +29,8 @@ class mainframe(QtCore.QObject):
 
         # init handler manager
         # Load defaults
+        self.loader = configLoader.configLoader(SETTINGS_FILE)
+
         config = configparser.ConfigParser()
         config.read(SETTINGS_FILE)
         blockConfigFile = ""
@@ -107,12 +109,12 @@ class mainframe(QtCore.QObject):
 
     def loadBlockConfig(self, config):
         if config:
-            configDict = configLoader.getConfigDictFromFile(config)
+            configDict = self.loader.loadAndReplaceYamlFile(config)
             self.m_blockManager.loadBlocks(configDict)
 
     def loadHandlerConfig(self, config):
         if config:
-            configDict = configLoader.getConfigDictFromFile(config)
+            configDict = self.loader.loadAndReplaceYamlFile(config)
             self.m_handlerManager.loadHandlers(configDict)
 
     def loadConfigs(self, blockConfig, handlerConfig):
