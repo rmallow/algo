@@ -4,6 +4,7 @@ from .trigger import trigger
 from .feed import feed
 from .dataSim import dataSim
 from .dataStream import dataStream
+from .dataFunc import dataFunc
 
 from .util import configLoader
 
@@ -51,6 +52,10 @@ class blockManager():
             return dataSim(key, dataType, index, period, colFilter, lowerConstraint, upperConstraint, dayFirst)
         elif dataSourceType == 'stream':
             return dataStream(key, dataType, index, period, colFilter, lowerConstraint, upperConstraint, dayFirst)
+        elif dataSourceType == 'func':
+            func = configLoader.loadFunc(dataSourceConfig['func'])
+            params = dataSourceConfig['params']
+            return dataFunc(key, dataType, func, params, index, period, colFilter, lowerConstraint, upperConstraint, dayFirst)
 
     def _loadActionList(self, actionListConfig):
         actionList = []
