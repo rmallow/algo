@@ -55,7 +55,8 @@ class blockManager():
         elif dataSourceType == 'func':
             func = configLoader.loadFunc(dataSourceConfig['func'])
             params = dataSourceConfig['params']
-            return dataFunc(key, dataType, func, params, index, period, colFilter, lowerConstraint, upperConstraint, dayFirst)
+            return dataFunc(key, dataType, func, params, index, period, colFilter,
+                            lowerConstraint, upperConstraint, dayFirst)
 
     def _loadActionList(self, actionListConfig):
         actionList = []

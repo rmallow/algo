@@ -3,7 +3,7 @@ from .dataBase import dataBase
 import time
 
 
-class dataStream(dataBase):
+class dataFunc(dataBase):
     def __init__(self, key, dataType, dataFunc, params={}, indexName="Local Time", period=1, columnFilter=None,
                  lowerConstraint=None, upperConstraint=None, dayFirst=False):
         self.m_time = None

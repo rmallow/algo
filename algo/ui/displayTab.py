@@ -3,6 +3,7 @@ from .uiSettings import DISPLAY_TAB_UI_FILE
 from .util import loadingUtil
 
 from ..commonUtil import pathUtil
+from ..commonUtil import errorHandling
 
 from PySide6 import QtWidgets, QtCore, QtGui
 
@@ -51,9 +52,8 @@ class displayTab(QtWidgets.QWidget):
         try:
             item = modelItem.data(ITEM_ROLE)
             innerWidget = self.displayItem(item, displayWidget)
-        except AttributeError as e:
-            print("Error displaying Item: ")
-            print(e)
+        except AttributeError:
+            errorHandling.printTraceback("Error display item")
             innerWidget = QtWidgets.QLabel(text)
         if innerWidget is not None:
             layout.addWidget(innerWidget)
