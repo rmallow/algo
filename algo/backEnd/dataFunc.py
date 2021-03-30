@@ -25,3 +25,6 @@ class dataFunc(dataBase):
 
         self.m_time = time.time()
         return returnVal
+
+    def loadData(self):
+        self.m_params |= self.setupDataFunc(**self.m_params)

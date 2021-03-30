@@ -1,5 +1,5 @@
 from .configWindow import configWindow
-from .uiSettings import MAIN_WINDOW_UI_FILE
+from .uiSettings import MAIN_WINDOW_UI_FILE, TEST_OUTPUT_TAB_FILE
 from .blockTab import blockTab
 from .handlerTab import handlerTab
 
@@ -34,6 +34,15 @@ class mainWindow(QtWidgets.QMainWindow):
         bTab.loadItems(self.m_mainframe.getBlocks())
         bTab.slotItemChanged(bTab.m_itemModel.index(0, 0))
         hTab.loadItems(self.m_mainframe.getHandlers())
+
+        """
+        -------------------
+        TEST OUTPUT SECTION
+        -------------------
+        """
+        outputTabUi = loadingUtil.loadUiWidget(dirPath + "/" + TEST_OUTPUT_TAB_FILE, parent=self)
+        outputTabUi.listView.setModel(self.m_mainframe.m_outputModel)
+        self.ui.tabWidget.addTab(outputTabUi, "Output")
 
         # Set up signal and slots
         self.ui.configButton.clicked.connect(lambda: self.m_configWindow.ui.show())
