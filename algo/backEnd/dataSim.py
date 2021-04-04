@@ -9,12 +9,12 @@ from .util import requestUtil as ru
 
 
 class dataSim(dataBase):
-    def __init__(self, key, dataType, indexName="Local Time", period=1, columnFilter=None, lowerConstraint=None,
-                 upperConstraint=None, dayFirst=False):
+    def __init__(self, key, dataType, index="Local Time", period=1, columnFilter=None, lowerConstraint=None,
+                 upperConstraint=None, dayFirst=False, **kwargs):
         self.m_data = None
         self.m_lastIndex = None
 
-        super().__init__(key, dataType, indexName, period, columnFilter, lowerConstraint, upperConstraint, dayFirst)
+        super().__init__(key, dataType, index, period, columnFilter, lowerConstraint, upperConstraint, dayFirst)
 
     def loadData(self):
         if self.m_dataType == DataTypeEnum.CSV:

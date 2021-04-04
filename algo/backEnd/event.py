@@ -3,7 +3,7 @@ from . import constants as con
 
 
 class event(act.action):
-    def __init__(self, period=1, name="defaultEventName", calcFunc=None, params={}, inputCols=[]):
+    def __init__(self, period=1, name="defaultEventName", calcFunc=None, params={}, inputCols=[], **kwargs):
         super().__init__("event", period=period, name=name, calcFunc=calcFunc, params=params, inputCols=inputCols)
 
     def update(self, feed):

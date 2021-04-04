@@ -7,7 +7,7 @@ handler class, takes message from message router and outputs
 
 
 class handler():
-    def __init__(self, code, name, period, calcFunc, outputFunc, config, params=None):
+    def __init__(self, code, name, period, calcFunc, outputFunc, config, params=None, **kwargs):
         self.m_code = code
         self.m_name = name
         self.m_calcFunc = calcFunc

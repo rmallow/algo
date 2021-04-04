@@ -50,6 +50,7 @@ class blockManager():
         for name, actionConfig in actionListConfig.items():
             action = None
             actionType = actionConfig['actionType']
+            actionConfig['name'] = name
             if actionType == 'trigger':
                 action = trigger(**actionConfig)
             elif actionType == 'event':

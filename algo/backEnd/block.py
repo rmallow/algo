@@ -11,7 +11,7 @@ import time
 
 class block(commandProcessor):
     def __init__(self, actionList, feed, messageRouter, libraries, config, parseSettings=None, name="defaultBlockName",
-                 code=123):
+                 code=123, **kwargs):
         self.m_code = code
         self.m_end = False
         self.m_keepUpdating = True
@@ -47,11 +47,11 @@ class block(commandProcessor):
                     # Use the command processor way of handling command messages
                     self.processCommand(self.m_blockQueue.get())
 
-            # If there is no messages to get but we're also not getting any
-            # more data from the feed then sleep a bit
-            # third of a second seems reasonable as we're just waiting for input
-            if self.m_blockQueue.empty() and not self.m_keepUpdating:
-                time.sleep(.3)
+                # If there is no messages to get but we're also not getting any
+                # more data from the feed then sleep a bit
+                # third of a second seems reasonable as we're just waiting for input
+                if self.m_blockQueue.empty() and not self.m_keepUpdating:
+                    time.sleep(.3)
 
         # Return some data at the end
         return(self.m_feed.m_data, self.m_feed.m_calcData)
