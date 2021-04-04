@@ -6,8 +6,6 @@ from .dataSim import dataSim
 from .dataStream import dataStream
 from .dataFunc import dataFunc
 
-from .util import configLoader
-
 
 class blockManager():
     def __init__(self, messageRouter):
@@ -37,46 +35,27 @@ class blockManager():
 
     def _loadDataSource(self, dataSourceConfig):
         dataSourceType = dataSourceConfig['type']
-        key = dataSourceConfig['key']
-        dataType = dataSourceConfig['dataType']
-        index = dataSourceConfig['index']
-        colFilter = dataSourceConfig['columnFilter']
-        period = dataSourceConfig['period']
-        upperConstraint = None
-        lowerConstraint = None
         if 'constraint' in dataSourceConfig:
-            lowerConstraint = dataSourceConfig['constraint']['lower']
-            upperConstraint = dataSourceConfig['constraint']['upper']
-        dayFirst = dataSourceConfig['dayFirst']
+            dataSourceConfig |= dataSourceConfig['constaint']
+
         if dataSourceType == 'dataSim':
-            return dataSim(key, dataType, index, period, colFilter, lowerConstraint, upperConstraint, dayFirst)
+            return dataSim(**dataSourceConfig)
         elif dataSourceType == 'stream':
-            return dataStream(key, dataType, index, period, colFilter, lowerConstraint, upperConstraint, dayFirst)
+            return dataStream(**dataSourceConfig)
         elif dataSourceType == 'func':
-            func = configLoader.loadFunc(dataSourceConfig['func'])
-            params = dataSourceConfig['params']
-            return dataFunc(key, dataType, func, params, index, period, colFilter,
-                            lowerConstraint, upperConstraint, dayFirst)
+            return dataFunc(**dataSourceConfig)
 
     def _loadActionList(self, actionListConfig):
         actionList = []
         for name, actionConfig in actionListConfig.items():
             action = None
             actionType = actionConfig['actionType']
-            calcFunc = configLoader.loadFunc(actionConfig['calcFunc'])
-            period = actionConfig['period']
-            params = {}
-            inputCols = actionConfig['inputCols']
-            if 'params' in actionConfig:
-                params = actionConfig['params']
             if actionType == 'trigger':
-                action = trigger(name=name, calcFunc=calcFunc, period=period, params=params, inputCols=inputCols)
+                action = trigger(**actionConfig)
             elif actionType == 'event':
-                action = event(name=name, calcFunc=calcFunc, period=period, params=params, inputCols=inputCols)
+                action = event(**actionConfig)
             actionList.append(action)
         return actionList
 
     def _loadFeed(self, feedConfig, dataFunc):
-        period = feedConfig['period']
-        continuous = feedConfig['continuous']
-        return feed(dataFunc, period=period, continuous=continuous)
+        return feed(dataFunc, **feedConfig)

@@ -1,7 +1,5 @@
 from .handlerAsync import handler
 
-from .util import configLoader
-
 
 """
 manages all handlers and issues update commands
@@ -40,17 +38,12 @@ class handlerManager():
             self.m_messageSubscriptions[subscription] = lst
 
     def _loadHandler(self, code, config):
-        name = config['name']
-        period = config['period']
         subscriptions = config['subscriptions']
-        params = {}
+        config['config'] = config
         if 'params' in config:
-            params = config['params']
-        params['subscriptions'] = subscriptions
-        calcFunc = configLoader.loadFunc(config['calcFunc'])
-        outputFunc = configLoader.loadFunc(config['outputFunc'])
+            config['params']['subscriptions'] = subscriptions
 
-        val = handler(code, name, period, calcFunc, outputFunc, config, params=params)
+        val = handler(code, **config)
         self._addSubscriptions(subscriptions, val)
         return val
 

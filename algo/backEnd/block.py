@@ -25,7 +25,7 @@ class block(commandProcessor):
     def start(self):
         if self.m_mainframeQueue is not None:
             self.m_mainframeQueue.put("Starting " + self.m_code)
-        
+
         while not self.m_end:
             if self.m_keepUpdating:
                 newData = self.m_feed.update()

@@ -51,17 +51,39 @@ class configLoader():
                 return self.valueDict[string]
         return string
 
+    def recurseDictForFunc(self, container, parentKey, item):
+        if parentKey.lower().endswith("func"):
+            if isinstance(container, dict):
+                container[parentKey] = loadFunc(item)
+            elif isinstance(container, list):
+                for index, value in enumerate(container):
+                    if value == item:
+                        container[index] = loadFunc(item)
+        elif isinstance(item, dict):
+            for key, value in item.items():
+                self.recurseDictForFunc(item, key, value)
+        elif isinstance(item, list):
+            for value in item:
+                self.recurseDictForFunc(item, parentKey, value)
+
+    def recurseDictForFuncMain(self, d):
+        for key, value in d.items():
+            self.recurseDictForFunc(d, key, value)
+
     def loadAndReplaceYamlFile(self, path):
+        contents = {}
         try:
             fileStrings = ""
             with open(path) as file:
                 fileStrings = file.read()
             if len(fileStrings) > 0:
                 yamlReady = re.sub(r"\$\[[^]]*\]", self.matchReplace, fileStrings)
-                return yaml.safe_load(yamlReady)
+                contents = yaml.safe_load(yamlReady)
+                self.recurseDictForFuncMain(contents)
         except OSError:
             errorHandling.printTraceback("Exception loading file: ")
-        return {}
+        print(contents)
+        return contents
 
 
 def saveObj(obj, name):
