@@ -21,19 +21,19 @@ class mainWindow(QtWidgets.QMainWindow):
         self.ui = loadingUtil.loadUiWidget(dirPath + "/" + MAIN_WINDOW_UI_FILE)
 
         # Load child windows
-        self.m_configWindow = configWindow(self)
+        self.configWindow = configWindow(self)
         bTab = blockTab(self.ui.tabWidget)
         hTab = handlerTab(self.ui.tabWidget)
         self.ui.tabWidget.addTab(bTab, "Blocks")
         self.ui.tabWidget.addTab(hTab, "Handlers")
 
         # Set up connections for mainframe
-        self.m_mainframe = mainframe
+        self.mainframe = mainframe
         self.connectMainframe()
 
-        bTab.loadItems(self.m_mainframe.getBlocks())
-        bTab.slotItemChanged(bTab.m_itemModel.index(0, 0))
-        hTab.loadItems(self.m_mainframe.getHandlers())
+        bTab.loadItems(self.mainframe.getBlocks())
+        bTab.slotItemChanged(bTab.itemModel.index(0, 0))
+        hTab.loadItems(self.mainframe.getHandlers())
 
         """
         -------------------
@@ -41,36 +41,36 @@ class mainWindow(QtWidgets.QMainWindow):
         -------------------
         """
         outputTabUi = loadingUtil.loadUiWidget(dirPath + "/" + TEST_OUTPUT_TAB_FILE, parent=self)
-        outputTabUi.listView.setModel(self.m_mainframe.m_outputModel)
+        outputTabUi.listView.setModel(self.mainframe.outputModel)
         self.ui.tabWidget.addTab(outputTabUi, "Output")
 
         # Set up signal and slots
-        self.ui.configButton.clicked.connect(lambda: self.m_configWindow.ui.show())
+        self.ui.configButton.clicked.connect(lambda: self.configWindow.ui.show())
         self.ui.startAllButton.clicked.connect(self.OnStartAllButtonClicked)
-        self.m_configWindow.ui.loadConfigsButton.clicked.connect(self.slotLoadConfigs)
+        self.configWindow.ui.loadConfigsButton.clicked.connect(self.slotLoadConfigs)
         # self.ui.addBlockButton.clicked.connect(self.slotAddBlock)
 
         self.ui.show()
 
     def connectMainframe(self):
         self.updateData()
-        self.runAllSignal.connect(self.m_mainframe.runAll)
-        self.endAllSignal.connect(self.m_mainframe.endAll)
-        self.m_mainframe.dataChanged.connect(self.updateData)
+        self.runAllSignal.connect(self.mainframe.runAll)
+        self.endAllSignal.connect(self.mainframe.endAll)
+        self.mainframe.dataChanged.connect(self.updateData)
 
     @QtCore.Slot()
     def updateData(self):
         pass
         # self.ui.blockListWidget.clear()
         # self.ui.handlerListWidget.clear()
-        # self.loadBlocks(self.m_mainframe.getBlocks())
-        # self.loadHandlers(self.m_mainframe.getHandlers())
+        # self.loadBlocks(self.mainframe.getBlocks())
+        # self.loadHandlers(self.mainframe.getHandlers())
 
     @QtCore.Slot()
     def slotLoadConfigs(self):
-        blockConfigFile = self.m_configWindow.ui.blockFileLine.text()
-        handlerConfigFile = self.m_configWindow.ui.handlerFileLine.text()
-        self.m_mainframe.loadConfigs(blockConfigFile, handlerConfigFile)
+        blockConfigFile = self.configWindow.ui.blockFileLine.text()
+        handlerConfigFile = self.configWindow.ui.handlerFileLine.text()
+        self.mainframe.loadConfigs(blockConfigFile, handlerConfigFile)
 
     @QtCore.Slot()
     def OnStartAllButtonClicked(self):
@@ -85,9 +85,9 @@ class mainWindow(QtWidgets.QMainWindow):
 """
     def loadBlocks(self, blocks):
         for code, block in blocks.items():
-            self.ui.blockListWidget.addItem(block.m_code)
+            self.ui.blockListWidget.addItem(block.code)
 
     def loadHandlers(self, handlers):
         for code, handler in handlers.items():
-            self.ui.handlerListWidget.addItem(handler.m_code)
+            self.ui.handlerListWidget.addItem(handler.code)
 """

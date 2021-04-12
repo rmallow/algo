@@ -10,10 +10,10 @@ gets update lists and corresponding source codes for updates from message Router
 
 class handlerManager():
     def __init__(self, sharedData):
-        self.m_sharedData = sharedData
-        self.m_messageSubscriptions = {}
+        self.sharedData = sharedData
+        self.messageSubscriptions = {}
 
-        self.m_handlers = {}
+        self.handlers = {}
 
     # wrapper for UI to use
     def loadItem(self, configDict):
@@ -22,20 +22,20 @@ class handlerManager():
     def loadHandlers(self, configDict):
         print("---- Handler Manager Loading Handlers ----")
         for code, config in configDict.items():
-            if code in self.m_handlers:
+            if code in self.handlers:
                 print("Handler code already exists: " + code)
             h = self._loadHandler(code, config)
-            h.m_handlerData = self.m_sharedData
-            self.m_handlers[code] = h
+            h.handlerData = self.sharedData
+            self.handlers[code] = h
 
         print("---- Handler Manager Done Loading ----")
 
     def _addSubscriptions(self, subscriptions, val):
         for subscription in subscriptions:
             subscription = subscription.lower()
-            lst = self.m_messageSubscriptions.get(subscription, [])
+            lst = self.messageSubscriptions.get(subscription, [])
             lst.append(val)
-            self.m_messageSubscriptions[subscription] = lst
+            self.messageSubscriptions[subscription] = lst
 
     def _loadHandler(self, code, config):
         subscriptions = config['subscriptions']
@@ -48,4 +48,4 @@ class handlerManager():
         return val
 
     def clear(self):
-        self.m_handlers = None
+        self.handlers = None

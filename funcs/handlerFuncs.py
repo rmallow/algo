@@ -36,12 +36,12 @@ def printOutput():
 
 def buyCodePrint(_, _2, personal):
     key = list(personal.keys())[-1]
-    print("Buy " + key.m_sourceCode + " at " + str(key.m_time))
+    print("Buy " + key.sourceCode + " at " + str(key.time))
 
 
 def sellCodePrint(_, _2, personal):
     key = list(personal.keys())[-1]
-    print("Sell " + key.m_sourceCode + " at " + str(key.m_time))
+    print("Sell " + key.sourceCode + " at " + str(key.time))
 
 
 def countPersonal(_, _2, personal):

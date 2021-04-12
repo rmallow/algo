@@ -14,8 +14,8 @@ class trigger(action):
     """
     def update(self, feed):
         super().updateDataSet(feed)
-        for inputCol in self.m_inputCols:
-            if con.INSUF_DATA in self.m_dataSet[inputCol].values:
+        for inputCol in self.inputCols:
+            if con.INSUF_DATA in self.dataSet[inputCol].values:
                 return None
-        messages = self.m_calcFunc(self.m_dataSet, parameters=self.m_parameters)
+        messages = self.calcFunc(self.dataSet, parameters=self.parameters)
         return messages

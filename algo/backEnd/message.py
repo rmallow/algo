@@ -1,5 +1,5 @@
 from enum import Enum
-
+from dataclasses import dataclass
 
 class MessageType(Enum):
     COMMAND = 1
@@ -15,22 +15,22 @@ class CommandType(Enum):
     CLEAR = 5
 
 
-class message():
-    def __init__(self, messageType, message, name=None, sourceName=None, key=None):
-        self.m_type = messageType
-        self.m_message = message
-        self.m_name = name
-        self.m_sourceName = sourceName
-        self.m_key = key
+@dataclass
+class message:
+    messageType: MessageType
+    message: str
+    name: str = ""
+    sourceName: str = ""
+    key: str = ""
 
     def keyExists(self):
-        return self.m_key.m_sourceCode is not None and self.m_key.m_time is not None
+        return self.key.sourceCode is not None and self.key.time is not None
 
     def isPriority(self):
-        return self.m_type == MessageType.PRIORITY
+        return self.type == MessageType.PRIORITY
 
     def isCommand(self):
-        return self.m_type == MessageType.COMMAND
+        return self.type == MessageType.COMMAND
 
     def isNormal(self):
-        return self.m_type == MessageType.NORMAL
+        return self.type == MessageType.NORMAL

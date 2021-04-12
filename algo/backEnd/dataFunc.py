@@ -2,30 +2,36 @@ from .dataBase import dataBase
 
 import time
 
+DATA_FUNC_KEYWORDS_LIST = {'getFunc': None, 'setupFunc': None, 'params': {}}
+
 
 class dataFunc(dataBase):
-    def __init__(self, setupFunc, getFunc, dataType=None, key=None, params={}, index="Local Time", period=1,
-                 columnFilter=None, lowerConstraint=None, upperConstraint=None, dayFirst=False, **kwargs):
-        self.m_time = None
-        self.m_getFunc = getFunc
-        self.m_setupFunc = setupFunc
-        self.m_params = params
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-        super().__init__(key, dataType, index, period, columnFilter, lowerConstraint, upperConstraint, dayFirst)
+        self.unpack(kwargs, DATA_FUNC_KEYWORDS_LIST, warn=True)
 
-    def getData(self, timestamp, period):
-        if self.m_time:
+        self.time = None
+
+        self.loadData()
+
+    def getData(self, period):
+        if self.time:
             # this just feels dangerous
-            while self.m_time < time.time() - self.m_period:
+            while self.time < time.time() - self.period:
                 pass
 
-        returnVal = self.m_getFunc(**self.m_params)
+        returnVal = self.getFunc(**self.params)
 
         if returnVal is not None:
             returnVal = self.dataFrameModifications(returnVal)
 
-        self.m_time = time.time()
+        self.time = time.time()
         return returnVal
 
     def loadData(self):
-        self.m_params |= self.m_setupFunc(**self.m_params)
+        if self.setupFunc:
+            if self.params is not None and isinstance(self.params, dict):
+                self.params |= self.setupFunc(**self.params)
+            else:
+                self.params = self.setupFunc

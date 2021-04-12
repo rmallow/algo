@@ -23,7 +23,7 @@ class configWindow(QtWidgets.QWidget):
         if 'Configs' in config:
             self.ui.blockFileLine.setText(os.path.abspath(config.get('Configs', 'Block', fallback="")))
             self.ui.handlerFileLine.setText(os.path.abspath(config.get('Configs', 'Handler', fallback="")))
-            self.m_defaultDir = config.get('Configs', 'Handler', fallback=None)
+            self.defaultDir = config.get('Configs', 'Handler', fallback=None)
 
         # Set up signals and slots
         self.ui.blockLoadButton.clicked.connect(self.showFileDialog)

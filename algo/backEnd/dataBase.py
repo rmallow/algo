@@ -3,6 +3,8 @@ from .constants import OUTSIDE_CONSTRAINT
 
 from .util import pandasUtil as pu
 
+from ..commonUtil.keywordUnpacker import keywordUnpacker
+
 import abc
 import logging
 
@@ -10,27 +12,25 @@ import logging
 Base class for data importers, holds member variables that all should use and other shared functions
 """
 
+DATA_BASE_KEYWORDS_LIST = {'key': None, 'dataType': None, 'indexName': None, 'period': None, 'columnFilter': None,
+                           'upperConstraint': None, 'lowerConstraint': None, 'dayFirst': None,
+                           'ordering': None}
 
-class dataBase(abc.ABC):
-    def __init__(self, key, dataType, indexName, period, columnFilter, lowerConstraint, upperConstraint, dayFirst):
-        self.m_key = key
-        try:
-            self.m_dataType = DataTypeEnum[dataType]
-        except ValueError:
-            logging.warning("Failed setting data type")
-            logging.warning(self.m_dataType)
-        self.m_indexName = indexName.lower()
-        self.m_period = period
-        self.m_columnFilter = [col.lower() for col in columnFilter]
 
-        self.m_upperConstraint = upperConstraint
-        self.m_lowerConstraint = lowerConstraint
+class dataBase(keywordUnpacker, abc.ABC):
+    def __init__(self, *args, **kwargs):
+        self.unpack(kwargs, DATA_BASE_KEYWORDS_LIST, warn=True)
 
-        self.m_dayFirst = dayFirst
+        # Convert data type to enum
+        if self.dataType is not None:
+            try:
+                self.dataType = DataTypeEnum[self.dataType]
+            except ValueError:
+                logging.warning("Failed setting data type")
+                logging.warning(self.dataType)
 
-        self.m_end = False
-        self.m_newCycle = False
-        self.loadData()
+        self.end = False
+        self.newCycle = False
 
     def dataFrameModifications(self, dataFrame):
         """
@@ -41,15 +41,17 @@ class dataBase(abc.ABC):
         @return: Returns modified pandas dataframe or None
         """
         if dataFrame is not None:
+            #
+
             # set columns to lower
             dataFrame.columns = [x.lower() for x in dataFrame.columns]
 
-            dataFrame = pu.setIndex(dataFrame, self.m_indexName)
+            dataFrame = pu.setIndex(dataFrame, self.indexName)
             # remove columns still to be added
-            dataFrame = pu.filterColumns(dataFrame, columnFilter=self.m_columnFilter)
+            dataFrame = pu.filterColumns(dataFrame, columnFilter=self.columnFilter)
 
             if self.hasConstraints():
-                dataFrame = dataFrame.between_time(self.m_lowerConstraint, self.m_upperConstraint)
+                dataFrame = dataFrame.between_time(self.lowerConstraint, self.upperConstraint)
 
             if dataFrame.index[0] > dataFrame.index[1]:
                 dataFrame = dataFrame[::-1]
@@ -57,7 +59,7 @@ class dataBase(abc.ABC):
         return dataFrame
 
     def hasConstraints(self):
-        return self.m_lowerConstraint is not None and self.m_upperConstraint is not None
+        return self.lowerConstraint is not None and self.upperConstraint is not None
 
     def checkConstraint(self, data):
         """
@@ -70,8 +72,8 @@ class dataBase(abc.ABC):
         # if data is not pandas or comparison to index doesn't work this will except
         # as this could be called every get Data wan't to log the except
         try:
-            if data.index[0] < self.m_lowerConstraint or \
-               data.index[-1] > self.m_upperConstraint:
+            if data.index[0] < self.lowerConstraint or \
+               data.index[-1] > self.upperConstraint:
                 return OUTSIDE_CONSTRAINT
             else:
                 return None

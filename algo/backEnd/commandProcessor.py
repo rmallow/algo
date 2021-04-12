@@ -13,7 +13,7 @@ TODO: add customizable default command
 class commandProcessor():
     def __init__(self):
         # get copy of the dict so can make changes later
-        self.m_cmdDict = dict(CMD_DICT)
+        self.cmdDict = dict(CMD_DICT)
 
     def removeCmdFunc(self, key):
         """
@@ -21,7 +21,7 @@ class commandProcessor():
 
         @param: key in cmd dict to remove
         """
-        self.m_cmdDict.pop(key, None)
+        self.cmdDict.pop(key, None)
 
     def addCmdFunc(self, key, func, overwrite=False):
         """
@@ -32,8 +32,8 @@ class commandProcessor():
             rather than passing in self.xyz must pass in className.xyz
         @param: overwrite - bool, whether to overwrite if key already exists
         """
-        if key not in self.m_cmdDict or overwrite:
-            self.m_cmdDict[key] = func
+        if key not in self.cmdDict or overwrite:
+            self.cmdDict[key] = func
 
     def cmdNotFound(self, message):
         """
@@ -81,9 +81,9 @@ class commandProcessor():
         @brief: main command processor, calls function based on message value or default func
 
         @param: message -   message passed into command func
-            message.m_message determines what func to call
+            message.message determines what func to call
         """
-        self.m_cmdDict.get(message.m_message, commandProcessor.cmdNotFound)(self, message)
+        self.cmdDict.get(message.message, commandProcessor.cmdNotFound)(self, message)
 
 
 """

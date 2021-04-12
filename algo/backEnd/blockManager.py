@@ -9,9 +9,9 @@ from .dataFunc import dataFunc
 
 class blockManager():
     def __init__(self, messageRouter):
-        self.m_blocks = {}
-        self.m_dataMangerList = {}
-        self.m_messageRouter = messageRouter
+        self.blocks = {}
+        self.dataMangerList = {}
+        self.messageRouter = messageRouter
 
     def loadItem(self, configDict):
         self.loadBlocks(configDict)
@@ -29,16 +29,16 @@ class blockManager():
         feed = self._loadFeed(blockConfig['feed'], dataSource.getData)
         actionList = self._loadActionList(blockConfig['actionList'])
         libraries = blockConfig['libraries']
-        blk = block(actionList, feed, self.m_messageRouter, libraries, blockConfig, name=name, code=code)
-        self.m_blocks[code] = blk
-        self.m_dataMangerList[code] = dataSource
+        blk = block(actionList, feed, self.messageRouter, libraries, blockConfig, name=name, code=code)
+        self.blocks[code] = blk
+        self.dataMangerList[code] = dataSource
 
     def _loadDataSource(self, dataSourceConfig):
         dataSourceType = dataSourceConfig['type']
         if 'constraint' in dataSourceConfig:
             dataSourceConfig |= dataSourceConfig['constaint']
 
-        if dataSourceType == 'dataSim':
+        if dataSourceType == 'sim':
             return dataSim(**dataSourceConfig)
         elif dataSourceType == 'stream':
             return dataStream(**dataSourceConfig)

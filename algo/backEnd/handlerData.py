@@ -21,7 +21,7 @@ code2:
 
 class handlerData():
     def __init__(self):
-        self.m_dataSet = {}
+        self.dataSet = {}
 
     """
     @brief: internal method to insert into handler data
@@ -30,15 +30,15 @@ class handlerData():
     """
     def _insert(self, message):
         if message is not None and message.keyExists():
-            key = message.m_key
-            if key.m_sourceCode not in self.m_dataSet:
-                self.m_dataSet[key.m_sourceCode] = OrderedDict()
+            key = message.key
+            if key.sourceCode not in self.dataSet:
+                self.dataSet[key.sourceCode] = OrderedDict()
 
-            if key.m_time not in self.m_dataSet[key.m_sourceCode]:
-                indexAndData = (len(self.m_dataSet[key.m_sourceCode]), [])
-                self.m_dataSet[key.m_sourceCode][key.m_time] = indexAndData
+            if key.time not in self.dataSet[key.sourceCode]:
+                indexAndData = (len(self.dataSet[key.sourceCode]), [])
+                self.dataSet[key.sourceCode][key.time] = indexAndData
 
-            self.m_dataSet[key.m_sourceCode][key.m_time][1].append(message)
+            self.dataSet[key.sourceCode][key.time][1].append(message)
 
     """
     insert one message or list of messages
@@ -52,7 +52,7 @@ class handlerData():
 
     def _getCodeDict(self, key):
         try:
-            return self.m_dataSet[key.m_sourceCode]
+            return self.dataSet[key.sourceCode]
         except Exception:
             logging.warning("invalid code for handler data access")
             return None
@@ -65,7 +65,7 @@ class handlerData():
 
         try:
             # the first element is the index of the time, so return the data at second element
-            return codeDict[key.m_time]
+            return codeDict[key.time]
         except Exception:
             logging.warning("invalid time for handler data access")
             return None
@@ -118,4 +118,4 @@ class handlerData():
         pass
 
     def clearCode(self, code):
-        self.m_dataSet.pop(code, None)
+        self.dataSet.pop(code, None)

@@ -5,8 +5,8 @@ import logging
 
 class asyncScheduler():
     def __init__(self, lockBool=False):
-        self.m_loop = None
-        self.m_tasks = []
+        self.loop = None
+        self.tasks = []
 
     # this function is useful for multiprocessing
     # only pass in objects that have a start() that is awaitable
@@ -20,21 +20,21 @@ class asyncScheduler():
         self.start()
 
     def init(self):
-        self.m_loop = asyncio.new_event_loop()
+        self.loop = asyncio.new_event_loop()
 
     def start(self):
-        if self.m_loop is None:
-            self.m_loop = asyncio.new_event_loop()
-        self.m_loop.run_until_complete(asyncio.wait(self.m_tasks))
+        if self.loop is None:
+            self.loop = asyncio.new_event_loop()
+        self.loop.run_until_complete(asyncio.wait(self.tasks))
 
     def end(self):
-        self.m_loop.close()
+        self.loop.close()
 
     def addTask(self, func, name=None):
         if inspect.iscoroutine(func):
-            self.m_tasks.append(self.m_loop.create_task(func, name=name))
+            self.tasks.append(self.loop.create_task(func, name=name))
         else:
             logging.warning("non coroutine function passed")
 
     def addTaskArgs(self, func, args, name=None):
-        self.m_tasks.append(self.m_loop.create_task(func(args)))
+        self.tasks.append(self.loop.create_task(func(args)))

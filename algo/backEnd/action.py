@@ -14,15 +14,16 @@ def findCol(feed, col):
 
     @param: col - column to find throughout feed
     """
-    if feed.m_data is not None and col in feed.m_data.columns:
-        return feed.m_data[col]
-    elif feed.m_calcData is not None and col in feed.m_calcData.columns:
-        if feed.m_newCalcData is not None and col in feed.m_newCalcData.columns:
-            return feed.m_calcData[col].append(feed.m_newCalcData[col])
+    if feed.data is not None and col in feed.data.columns:
+        print(feed.data)
+        return feed.data[col]
+    elif feed.calcData is not None and col in feed.calcData.columns:
+        if feed.newCalcData is not None and col in feed.newCalcData.columns:
+            return feed.calcData[col].append(feed.newCalcData[col])
         else:
-            return feed.m_calcData[col]
-    elif feed.m_newCalcData is not None and col in feed.m_newCalcData.columns:
-        return feed.m_newCalcData[col]
+            return feed.calcData[col]
+    elif feed.newCalcData is not None and col in feed.newCalcData.columns:
+        return feed.newCalcData[col]
     else:
         return None
 
@@ -33,8 +34,8 @@ def findNewCalcCol(feed, col):
 
     @param: col - column to find
     """
-    if feed.m_newCalcData is not None and col in feed.m_newCalcData.columns:
-        return feed.m_newCalcData[col]
+    if feed.newCalcData is not None and col in feed.newCalcData.columns:
+        return feed.newCalcData[col]
     else:
         return None
 
@@ -60,15 +61,15 @@ class action():
     @param: inputCols   - the columns that are used by the action and put into the dataSet
     """
     def __init__(self, actionType, period=1, name="defaultActionName", calcFunc=None, params=None, inputCols=[]):
-        self.m_actionType = actionType
-        self.m_period = period
-        self.m_name = name.lower()
-        self.m_calcFunc = calcFunc
-        self.m_parameters = {**params, 'period': period}
-        self.m_inputCols = inputCols
+        self.actionType = actionType
+        self.period = period
+        self.name = name.lower()
+        self.calcFunc = calcFunc
+        self.parameters = {**params, 'period': period}
+        self.inputCols = inputCols
         # convert to lower, everything LOWER!
-        self.m_inputCols = [x.lower() for x in self.m_inputCols]
-        self.m_dataSet = None
+        self.inputCols = [x.lower() for x in self.inputCols]
+        self.dataSet = None
 
     def update(self, feed):
         """
@@ -77,7 +78,7 @@ class action():
         @param: feed    - feed that this action is acting on
         """
         self.updateDataSet(feed)
-        return self.m_calcFunc(self.m_dataSet, parameters=self.m_parameters)
+        return self.calcFunc(self.dataSet, parameters=self.parameters)
 
     def updateDataSet(self, feed):
         """
@@ -85,12 +86,13 @@ class action():
 
         @param: feed    - feed that this action is acting on
         """
-        start = -1 * self.m_period
-        index = feed.m_data.index[start: len(feed.m_data.index)]
-        self.m_dataSet = pd.DataFrame(index=index)
-        for col in self.m_inputCols:
+        start = -1 * self.period
+        index = feed.data.index[start: len(feed.data.index)]
+        self.dataSet = pd.DataFrame(index=index)
+        for col in self.inputCols:
             try:
-                self.m_dataSet[col] = findCol(feed, col)
+                holder = findCol(feed, col)
+                self.dataSet[col] = holder
             except ValueError as e:
                 logging.warning(e)
                 logging.warning(col + str(index))

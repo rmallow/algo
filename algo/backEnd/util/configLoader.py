@@ -28,6 +28,7 @@ class configLoader():
         if VALUES_SECTION in parser.sections():
             valuesTupleList = parser.items(VALUES_SECTION)
             for settingsKey, settingsValue in valuesTupleList:
+                settingsKey = settingsKey.lower()
                 if os.path.exists(settingsValue):
                     parser = configparser.ConfigParser()
                     with open(settingsValue) as stream:
@@ -46,9 +47,10 @@ class configLoader():
     def matchReplace(self, reMatch):
         string = reMatch.group(0)
         if len(string) > 3:
-            string = string[2:len(string)-1]
-            if string in self.valueDict:
-                return self.valueDict[string]
+            string = string[2: len(string) - 1]
+            # need to use lower() becuase configParser converst keys to lower
+            if string.lower() in self.valueDict:
+                return self.valueDict[string.lower()]
         return string
 
     def recurseDictForFunc(self, container, parentKey, item):

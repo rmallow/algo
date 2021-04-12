@@ -17,29 +17,29 @@ class messageRouter(commandProcessor):
         # initalize command processor
         super().__init__()
 
-        self.m_end = False
-        self.m_messageQueue = queue
-        self.m_messageSubscriptions = messageSubscriptions
-        self.m_handlerUpdateDict = {}
-        self.m_handlerData = handlerData
+        self.end = False
+        self.messageQueue = queue
+        self.messageSubscriptions = messageSubscriptions
+        self.handlerUpdateDict = {}
+        self.handlerData = handlerData
 
-        self.m_blocksToClear = set()
+        self.blocksToClear = set()
 
         self.addCmdFunc(msg.CommandType.CLEAR, messageRouter.cmdClear)
 
-        self.m_loop = asyncScheduler()
+        self.loop = asyncScheduler()
 
     def initAndStartLoop(self):
-        self.m_loop.init()
-        self.m_loop.addTask(self.loop(), name="Router Main Loop")
-        self.m_loop.start()
+        self.loop.init()
+        self.loop.addTask(self.loop(), name="Router Main Loop")
+        self.loop.start()
 
     async def loop(self):
         # main process loop for message router
-        while not self.m_end:
+        while not self.end:
             try:
                 # pylint: disable=no-member
-                message = await self.m_messageQueue.coro_get(timeout=2)
+                message = await self.messageQueue.coro_get(timeout=2)
             except queue.Empty:
                 continue
             else:
@@ -69,21 +69,21 @@ class messageRouter(commandProcessor):
 
     # send to message subscriptions priority
     def broadcastPriority(self, message):
-        self.m_handlerData.insert(message)
-        handlerList = self.m_messageSubscriptions.get(message.m_name, [])
+        self.handlerData.insert(message)
+        handlerList = self.messageSubscriptions.get(message.name, [])
         for handlerToUpdate in handlerList:
-            self.m_loop.addTaskArgs(handlerToUpdate.updatePriority, message)
+            self.loop.addTaskArgs(handlerToUpdate.updatePriority, message)
 
     # send to message subscriptions
     def broadcast(self, message):
-        self.m_handlerData.insert(message)
-        handlerList = self.m_messageSubscriptions.get(message.m_name, [])
-        updateSet = self.m_handlerUpdateDict.get(message.m_key, set())
+        self.handlerData.insert(message)
+        handlerList = self.messageSubscriptions.get(message.name, [])
+        updateSet = self.handlerUpdateDict.get(message.key, set())
         updateSet.update(handlerList)
 
     def receive(self, message):
         # pylint: disable=no-member
-        self.m_messageQueue.put(message)
+        self.messageQueue.put(message)
 
     def cmdStart(self, message):
         """
@@ -93,14 +93,14 @@ class messageRouter(commandProcessor):
 
         @param: message - command message
         """
-        if message.m_key.m_sourceCode in self.m_blocksToClear:
-            self.m_handlerData.clearCode(message.m_key.m_sourceCode)
-            self.m_blocksToClear.remove(message.m_key.m_sourceCode)
-        if message.m_key not in self.m_handlerUpdateDict:
-            self.m_handlerUpdateDict[message.m_key] = set()
+        if message.key.sourceCode in self.blocksToClear:
+            self.handlerData.clearCode(message.key.sourceCode)
+            self.blocksToClear.remove(message.key.sourceCode)
+        if message.key not in self.handlerUpdateDict:
+            self.handlerUpdateDict[message.key] = set()
         else:
             logging.warning("start cmd on existing update list, code:")
-            logging.warning(str(message.m_sourceCode))
+            logging.warning(str(message.sourceCode))
 
     def cmdEnd(self, message):
         """
@@ -109,9 +109,9 @@ class messageRouter(commandProcessor):
 
         @param: message - command message
         """
-        updateSet = self.m_handlerUpdateDict.pop(message.m_key, set())
+        updateSet = self.handlerUpdateDict.pop(message.key, set())
         for handlerToUpdate in updateSet:
-            self.m_loop.addTaskArgs(handlerToUpdate.update, message.m_key)
+            self.loop.addTaskArgs(handlerToUpdate.update, message.key)
 
     def cmdAbort(self, message):
         """
@@ -119,7 +119,7 @@ class messageRouter(commandProcessor):
 
         @param: message - command message
         """
-        self.m_end = True
+        self.end = True
 
     def cmdResume(self, message):
         """
@@ -127,7 +127,7 @@ class messageRouter(commandProcessor):
 
         @param: message - command message
         """
-        self.m_end = False
+        self.end = False
 
     def cmdClear(self, message):
         """
@@ -136,4 +136,4 @@ class messageRouter(commandProcessor):
 
         @param: message - command message
         """
-        self.m_blocksToClear.add(message.m_key.m_sourceCode)
+        self.blocksToClear.add(message.key.sourceCode)

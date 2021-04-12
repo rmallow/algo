@@ -1,10 +1,11 @@
 import praw
 import pandas as pd
+from datetime import datetime
 
 
-def setupReddit(clientId=None, clientSecret=None, userAgent=None):
+def setupReddit(clientId=None, clientSecret=None, userAgent=None, **kwargs):
     if clientId is not None and clientSecret is not None and userAgent is not None:
-        return {'reddit',
+        return {'reddit':
                 praw.Reddit(
                     client_id=clientId,
                     client_secret=clientSecret,
@@ -17,7 +18,7 @@ def setupReddit(clientId=None, clientSecret=None, userAgent=None):
 def setupRedditAuth(clientId=None, clientSecret=None, userAgent=None, username=None, password=None):
     if clientId is not None and clientSecret is not None and userAgent is not None and \
        username is not None and password is not None:
-        return {'reddit',
+        return {'reddit':
                 praw.Reddit(
                     client_id=clientId,
                     client_secret=clientSecret,
@@ -29,13 +30,14 @@ def setupRedditAuth(clientId=None, clientSecret=None, userAgent=None, username=N
         return None
 
 
-def redditTest(reddit=None, subreddit="learnpython"):
+def redditTest(reddit=None, subreddit="learnpython", **kwargs):
     data = None
     if reddit is not None:
-        d = {'title': [], 'time': []}
-        for submission in reddit.subreddit(subreddit).hot(limit=10):
+        d = {'title': [], 'time': [], 'uid': []}
+        for submission in reddit.subreddit(subreddit).new(limit=10):
             d['title'].append(submission.title)
-            d['time'].append(submission.created_utc)
+            d['time'].append(datetime.utcfromtimestamp(submission.created_utc))
+            d['uid'].append(submission.id)
         data = pd.DataFrame(d)
         data.set_index('time', inplace=True)
     return data

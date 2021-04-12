@@ -15,22 +15,22 @@ class event(act.action):
         #   call calcFunc to get calculated data
         #   add to feed, so future calcFunc calls can access it
         start = 0
-        index = feed.m_newCalcData[self.m_name].last_valid_index()
+        index = feed.newCalcData[self.name].last_valid_index()
         if index:
-            start = feed.m_newCalcData.index.get_loc(index) + 1
-        if start < len(feed.m_newCalcData.index):
+            start = feed.newCalcData.index.get_loc(index) + 1
+        if start < len(feed.newCalcData.index):
             # checking whats the first calculated data needs to be fixed
             # first parameter can be used by functions to only do some computations on first attempt
-            if feed.m_newCalcData[self.m_name].iloc[-1] == con.INSUF_DATA:
+            if feed.newCalcData[self.name].iloc[-1] == con.INSUF_DATA:
                 start += 1
-                self.m_parameters['first'] = True
+                self.parameters['first'] = True
                 calcFuncVal = super().update(feed)
-                feed.addToPartialCols({self.m_name: calcFuncVal})
+                feed.addToPartialCols({self.name: calcFuncVal})
 
-            self.m_parameters['first'] = False
-            for _ in range(start, len(feed.m_newCalcData.index)):
+            self.parameters['first'] = False
+            for _ in range(start, len(feed.newCalcData.index)):
                 calcFuncVal = super().update(feed)
-                feed.addToPartialCols({self.m_name: calcFuncVal})
+                feed.addToPartialCols({self.name: calcFuncVal})
 
     def addINF(self, feed):
         """
@@ -46,10 +46,10 @@ class event(act.action):
         """
         lastINFIndex = -1
 
-        rangeIndexStart = self.m_period * -1
+        rangeIndexStart = self.period * -1
 
-        for col in self.m_inputCols:
-            if col not in feed.m_data.columns:
+        for col in self.inputCols:
+            if col not in feed.data.columns:
                 # find the column and get just the parts we care about
                 inputColDf = act.findCol(feed, col)
                 rangeIndexEnd = len(inputColDf.index)
@@ -62,8 +62,8 @@ class event(act.action):
                         lastINFIndex = intIndex
 
                         # there won't be enough data to calculate so we just exit here to avoid unecessary computations
-                        if lastINFIndex > feed.m_newCalcLength - self.m_period:
-                            return [con.INSUF_DATA] * feed.m_newCalcLength
+                        if lastINFIndex > feed.newCalcLength - self.period:
+                            return [con.INSUF_DATA] * feed.newCalcLength
 
         # if we've made it here and lastINFIndex is not 0 then the starting point is just
         # period - 1 as INF was determined by the inputCols
@@ -71,22 +71,22 @@ class event(act.action):
         # need to be reworked
         INFListLength = 0
         if lastINFIndex > -1:
-            # the actual math would be lastINFIndex + 1 + self.m_period - 1
+            # the actual math would be lastINFIndex + 1 + self.period - 1
             # but for obvious reasons i've slimmed that down
             # this is because of indexing stuff for lastIndex that it gets the add and period - 1 is stuff seen below
-            INFListLength = lastINFIndex + self.m_period
+            INFListLength = lastINFIndex + self.period
 
         # check amount of data already calculated
         else:
             sub = 0
-            if feed.m_calcData is not None and self.m_name in feed.m_calcData.columns:
-                sub = len(feed.m_calcData.index)
-            INFListLength = (self.m_period - 1 - sub) if (self.m_period - 1 - sub) > 0 else 0
+            if feed.calcData is not None and self.name in feed.calcData.columns:
+                sub = len(feed.calcData.index)
+            INFListLength = (self.period - 1 - sub) if (self.period - 1 - sub) > 0 else 0
 
-        if INFListLength > feed.m_newCalcLength:
-            INFListLength = feed.m_newCalcLength
+        if INFListLength > feed.newCalcLength:
+            INFListLength = feed.newCalcLength
         return [con.INSUF_DATA] * INFListLength
 
     def setupCols(self, feed):
         rowVals = self.addINF(feed)
-        return {self.m_name: rowVals}
+        return {self.name: rowVals}

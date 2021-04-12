@@ -8,15 +8,15 @@ handler class, takes message from message router and outputs
 
 class handler():
     def __init__(self, code, name, period, calcFunc, outputFunc, config, params=None, **kwargs):
-        self.m_code = code
-        self.m_name = name
-        self.m_calcFunc = calcFunc
-        self.m_outputFunc = outputFunc
-        self.m_period = period
-        self.m_handlerData = None
-        self.m_personalData = OrderedDict()
-        self.m_params = params
-        self.m_config = config
+        self.code = code
+        self.name = name
+        self.calcFunc = calcFunc
+        self.outputFunc = outputFunc
+        self.period = period
+        self.handlerData = None
+        self.personalData = OrderedDict()
+        self.params = params
+        self.config = config
 
     async def updatePriority(self, message):
         # this func will handle priority messages
@@ -37,16 +37,16 @@ class handler():
             which means to update wrapper
         """
         # pass it to wrapper that handles correct number of args for function
-        handlerData = self.m_handlerData.getPeriod(key, self.m_period)
-        rawVal = wrap.adjustArgs(self.m_calcFunc, [handlerData, self.m_params, self.m_personalData])
+        handlerData = self.handlerData.getPeriod(key, self.period)
+        rawVal = wrap.adjustArgs(self.calcFunc, [handlerData, self.params, self.personalData])
         # then unpack the results, personalData return could be None
         # first result should always be boolResult
         boolResult, personalData = wrap.iterableReturnValue(rawVal, 2)
 
         # append personal data
         if personalData is not None:
-            self.m_personalData[key] = personalData
+            self.personalData[key] = personalData
 
         # after adjust personal data, call output function
         if boolResult:
-            wrap.adjustArgs(self.m_outputFunc, [handlerData, self.m_params, self.m_personalData])
+            wrap.adjustArgs(self.outputFunc, [handlerData, self.params, self.personalData])

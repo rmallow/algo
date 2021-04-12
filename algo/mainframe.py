@@ -20,15 +20,15 @@ class mainframe(QtCore.QObject):
 
     def __init__(self):
         super().__init__(None)
-        self.m_processDict = {}
-        self.m_routerProcess = None
-        self.m_AioManager = aioprocessing.AioManager()
-        self.m_MpManager = Manager()
-        self.m_sharedData = handlerData()
-        self.m_handlerManager = None
-        self.m_blockManager = None
-        self.m_mainframeQueue = self.m_MpManager.Queue()
-        self.m_outputModel = QtGui.QStandardItemModel()
+        self.processDict = {}
+        self.routerProcess = None
+        self.AioManager = aioprocessing.AioManager()
+        self.MpManager = Manager()
+        self.sharedData = handlerData()
+        self.handlerManager = None
+        self.blockManager = None
+        self.mainframeQueue = self.MpManager.Queue()
+        self.outputModel = QtGui.QStandardItemModel()
 
         # init handler manager
         # Load defaults
@@ -42,15 +42,15 @@ class mainframe(QtCore.QObject):
             blockConfigFile = config.get('Configs', 'Block', fallback="")
             handlerConfigFile = config.get('Configs', 'Handler', fallback="")
 
-        self.m_handlerManager = handlerManager(self.m_sharedData)
+        self.handlerManager = handlerManager(self.sharedData)
         self.loadHandlerConfig(handlerConfigFile)
 
         # init message router
-        self.m_messageRouter = messageRouter(self.m_handlerManager.m_messageSubscriptions, self.m_sharedData,
-                                             self.m_AioManager.AioQueue())
+        self.messageRouter = messageRouter(self.handlerManager.messageSubscriptions, self.sharedData,
+                                             self.AioManager.AioQueue())
 
         # init block manager
-        self.m_blockManager = blockManager(self.m_messageRouter)
+        self.blockManager = blockManager(self.messageRouter)
         self.loadBlockConfig(blockConfigFile)
 
         # this will set the current working directory from wherever to the directory this file is in
@@ -60,75 +60,75 @@ class mainframe(QtCore.QObject):
 
     def start(self):
         while True:
-            if self.m_mainframeQueue.empty():
+            if self.mainframeQueue.empty():
                 time.sleep(.3)
             else:
-                message = self.m_mainframeQueue.get()
+                message = self.mainframeQueue.get()
                 modelItem = QtGui.QStandardItem(message)
-                self.m_outputModel.appendRow(modelItem)
+                self.outputModel.appendRow(modelItem)
 
     def startRouter(self):
-        self.m_routerProcess = Process(target=self.m_messageRouter.initAndStartLoop, name="Router")
-        self.m_routerProcess.start()
+        self.routerProcess = Process(target=self.messageRouter.initAndStartLoop, name="Router")
+        self.routerProcess.start()
 
     def runAll(self):
-        if self.m_routerProcess is None:
+        if self.routerProcess is None:
             self.startRouter()
 
-        for code, block in self.m_blockManager.m_blocks.items():
-            if code not in self.m_processDict:
+        for code, block in self.blockManager.blocks.items():
+            if code not in self.processDict:
                 self.startBlockProcess(code, block)
             else:
                 print("Error Running Block: " + code)
 
     def runBlock(self, code):
-        if self.m_routerProcess is None:
+        if self.routerProcess is None:
             self.startRouter()
 
-        if code in self.m_blockManager.m_blocks and code not in self.m_processDict:
-            block = self.m_blockManager.m_blocks[code]
+        if code in self.blockManager.blocks and code not in self.processDict:
+            block = self.blockManager.blocks[code]
             self.startBlockProcess(code, block)
         else:
             print("Error Running Block: " + code)
 
     def startBlockProcess(self, code, block):
-        block.m_mainframeQueue = self.m_mainframeQueue
+        block.mainframeQueue = self.mainframeQueue
         processName = "Block-" + str(code)
         blockProcess = Process(target=block.start, name=processName)
-        self.m_processDict[code] = blockProcess
+        self.processDict[code] = blockProcess
         blockProcess.start()
 
     def endAll(self):
-        while self.m_processDict:
-            for key, p in self.m_processDict.items():
+        while self.processDict:
+            for key, p in self.processDict.items():
                 p.join(.5)
                 if p.exitcode is not None:
-                    del self.m_processDict[key]
-        self.m_routerProcess.join()
+                    del self.processDict[key]
+        self.routerProcess.join()
 
     def endBlock(self, code, timeout=None):
-        if code in self.m_processDict:
+        if code in self.processDict:
             if timeout:
-                self.m_processDict[code].join(timeout)
+                self.processDict[code].join(timeout)
             else:
-                self.m_processDict[code].close()
-            del self.m_processDict[code]
+                self.processDict[code].close()
+            del self.processDict[code]
 
     def getBlocks(self):
-        return self.m_blockManager.m_blocks
+        return self.blockManager.blocks
 
     def getHandlers(self):
-        return self.m_handlerManager.m_handlers
+        return self.handlerManager.handlers
 
     def loadBlockConfig(self, config):
         if config:
             configDict = self.loader.loadAndReplaceYamlFile(config)
-            self.m_blockManager.loadBlocks(configDict)
+            self.blockManager.loadBlocks(configDict)
 
     def loadHandlerConfig(self, config):
         if config:
             configDict = self.loader.loadAndReplaceYamlFile(config)
-            self.m_handlerManager.loadHandlers(configDict)
+            self.handlerManager.loadHandlers(configDict)
 
     def loadConfigs(self, blockConfig, handlerConfig):
         self.loadBlockConfig(blockConfig)

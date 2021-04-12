@@ -8,7 +8,7 @@ from ..commonUtil import errorHandling
 from PySide6 import QtWidgets, QtCore, QtGui
 
 
-ITEM_ROLE = QtCore.Qt.UserRole
+ITEROLE = QtCore.Qt.UserRole
 
 
 class displayTab(QtWidgets.QWidget):
@@ -20,8 +20,8 @@ class displayTab(QtWidgets.QWidget):
         dirPath = pathUtil.getFileDirPath(__file__)
         self.ui = loadingUtil.loadUiWidget(dirPath + "/" + DISPLAY_TAB_UI_FILE, parent=self)
 
-        self.m_itemModel = QtGui.QStandardItemModel(self)
-        self.ui.listView.setModel(self.m_itemModel)
+        self.itemModel = QtGui.QStandardItemModel(self)
+        self.ui.listView.setModel(self.itemModel)
 
         self.ui.addButton.clicked.connect(self.slotAddButton)
         self.ui.deleteButton.clicked.connect(self.slotDeleteButton)
@@ -46,11 +46,11 @@ class displayTab(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(displayWidget)
         displayWidget.setLayout(layout)
         innerWidget = None
-        modelItem = self.m_itemModel.item(index.row())
-        text = self.m_itemModel.data(index)
+        modelItem = self.itemModel.item(index.row())
+        text = self.itemModel.data(index)
         # check if subclass has display item implemented otherwise default
         try:
-            item = modelItem.data(ITEM_ROLE)
+            item = modelItem.data(ITEROLE)
             innerWidget = self.displayItem(item, displayWidget)
         except AttributeError:
             errorHandling.printTraceback("Error display item")
@@ -63,15 +63,15 @@ class displayTab(QtWidgets.QWidget):
     def loadItems(self, itemDict):
         for key, value in itemDict.items():
             modelItem = QtGui.QStandardItem(key)
-            modelItem.setData(value, ITEM_ROLE)
-            self.m_itemModel.appendRow(modelItem)
+            modelItem.setData(value, ITEROLE)
+            self.itemModel.appendRow(modelItem)
 
     def displayItem(self, item, parent):
         """
         Tries to display the item based off config in the item, otherwise does nothing
         """
         try:
-            item.m_config
+            item.config
         except AttributeError as e:
             print("Item does not have config, cannot display through default function")
             print(e)
@@ -80,7 +80,7 @@ class displayTab(QtWidgets.QWidget):
             treeView = QtWidgets.QTreeView(parent)
             treeModel = QtGui.QStandardItemModel(parent)
             parentItem = treeModel.invisibleRootItem()
-            recurseItem(parentItem, item.m_config)
+            recurseItem(parentItem, item.config)
             treeView.setModel(treeModel)
             treeView.expandAll()
             return treeView

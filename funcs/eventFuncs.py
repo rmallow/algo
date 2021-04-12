@@ -1,4 +1,3 @@
-
 def testFunc(dataSet, parameters=None):
     return dataSet['close'].iloc[0] + 1
 
