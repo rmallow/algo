@@ -31,10 +31,10 @@ class messageRouter(commandProcessor):
 
     def initAndStartLoop(self):
         self.loop.init()
-        self.loop.addTask(self.loop(), name="Router Main Loop")
+        self.loop.addTask(self.mainLoop(), name="Router Main Loop")
         self.loop.start()
 
-    async def loop(self):
+    async def mainLoop(self):
         # main process loop for message router
         while not self.end:
             try:

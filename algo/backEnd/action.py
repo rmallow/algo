@@ -1,5 +1,5 @@
 import pandas as pd
-import logging
+from ..commonUtil import errorHandling
 
 
 def findCol(feed, col):
@@ -15,7 +15,6 @@ def findCol(feed, col):
     @param: col - column to find throughout feed
     """
     if feed.data is not None and col in feed.data.columns:
-        print(feed.data)
         return feed.data[col]
     elif feed.calcData is not None and col in feed.calcData.columns:
         if feed.newCalcData is not None and col in feed.newCalcData.columns:
@@ -93,6 +92,6 @@ class action():
             try:
                 holder = findCol(feed, col)
                 self.dataSet[col] = holder
-            except ValueError as e:
-                logging.warning(e)
-                logging.warning(col + str(index))
+            except ValueError:
+                errorHandling.printTraceback("Error setting column for updating data set, name: " + self.name)
+                print(feed.data)

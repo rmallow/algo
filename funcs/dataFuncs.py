@@ -39,5 +39,4 @@ def redditTest(reddit=None, subreddit="learnpython", **kwargs):
             d['time'].append(datetime.utcfromtimestamp(submission.created_utc))
             d['uid'].append(submission.id)
         data = pd.DataFrame(d)
-        data.set_index('time', inplace=True)
     return data

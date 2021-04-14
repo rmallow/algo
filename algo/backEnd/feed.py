@@ -69,7 +69,6 @@ class feed():
         if self.unique and 'uid' in rawData.columns:
             self.dropNonUniques(rawData)
 
-        print(rawData)
         if len(rawData.index) <= 0:
             return self.update()
 
@@ -177,7 +176,9 @@ class feed():
             else:
                 dropList = []
                 for index in df.index:
-                    if df.loc[index].uid in self.data.uid:
+                    uid1 = df.loc[index].uid
+                    feedUidSeries = self.data.uid
+                    if uid1 in feedUidSeries.unique():
                         dropList.append(index)
 
-                df.drop(df.index[(dropList)], inplace=True)
+                df.drop(dropList, inplace=True)

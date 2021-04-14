@@ -45,8 +45,8 @@ class dataBase(keywordUnpacker, abc.ABC):
 
             # set columns to lower
             dataFrame.columns = [x.lower() for x in dataFrame.columns]
-
-            dataFrame = pu.setIndex(dataFrame, self.indexName)
+            if self.indexName:
+                dataFrame = pu.setIndex(dataFrame, self.indexName)
             # remove columns still to be added
             dataFrame = pu.filterColumns(dataFrame, columnFilter=self.columnFilter)
 

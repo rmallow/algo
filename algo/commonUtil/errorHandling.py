@@ -11,9 +11,9 @@ def printTraceback(title):
     print(title)
     print("-"*60)
     traceback.print_exc(file=sys.stdout)
-    print("-" * 60)
+    print("-"*60)
 
 
 def warning(title, description):
-    logging.warning(title)
-    logging.warning(description)
+    logging.warning(" " + title)
+    logging.warning(" " + description)
