@@ -1,4 +1,4 @@
-from .handlerAsync import handler
+from .handler import handler
 
 
 """

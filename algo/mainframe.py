@@ -2,7 +2,7 @@ from .commonSettings import SETTINGS_FILE
 
 from .backEnd.messageRouter import messageRouter
 from .backEnd.blockManager import blockManager
-from .backEnd.handlerManagerAsync import handlerManager
+from .backEnd.handlerManager import handlerManager
 from .backEnd.handlerData import handlerData
 from .backEnd.util import configLoader
 
