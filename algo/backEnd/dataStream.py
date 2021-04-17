@@ -1,5 +1,5 @@
 from .dataBase import dataBase
-from .constants import DataTypeEnum
+from .constants import DataSourceTypeEnum
 
 from .util import requestUtil as ru
 
@@ -21,7 +21,7 @@ class dataStream(dataBase):
                 pass
 
         returnVal = None
-        if self.dataType == DataTypeEnum.REAL_TIME_REQUEST:
+        if self.dataType == DataSourceTypeEnum.REAL_TIME_REQUEST:
             returnVal = self.getDataReal(timestamp, period)
 
         if returnVal is not None:

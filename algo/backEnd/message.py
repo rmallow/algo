@@ -1,6 +1,7 @@
 from enum import Enum
 from dataclasses import dataclass
 
+
 class MessageType(Enum):
     COMMAND = 1
     NORMAL = 2

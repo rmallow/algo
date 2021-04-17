@@ -90,7 +90,7 @@ class feed():
         if rawData is None:
             errorHandling.warning("")
         elif not isinstance(rawData, pd.DataFrame):
-            if rawData == con.OUTSIDE_CONSTRAINT:
+            if rawData == con.DataSourceReturnEnum.OUTSIDE_CONSTRAINT:
                 # return constant to block, block will clear feed and tell Message Router to clear
                 return rawData
             else:

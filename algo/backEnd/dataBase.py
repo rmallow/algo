@@ -1,5 +1,4 @@
-from .constants import DataTypeEnum
-from .constants import OUTSIDE_CONSTRAINT
+from .constants import DataSourceTypeEnum, DataSourceReturnEnum
 
 from .util import pandasUtil as pu
 
@@ -24,7 +23,7 @@ class dataBase(keywordUnpacker, abc.ABC):
         # Convert data type to enum
         if self.dataType is not None:
             try:
-                self.dataType = DataTypeEnum[self.dataType]
+                self.dataType = DataSourceTypeEnum[self.dataType]
             except ValueError:
                 logging.warning("Failed setting data type")
                 logging.warning(self.dataType)
@@ -72,14 +71,15 @@ class dataBase(keywordUnpacker, abc.ABC):
 
         @param: data - pandas dataframe with index that can be compared to constraints
 
-        @return: if outside of constraint it will return constants.OUTSIDE_CONSTRAINT otherwise return None
+        @return: if outside of constraint it will return constants.DataSourceReturnEnum.OUTSIDE_CONSTRAINT
+                     otherwise return None
         """
         # if data is not pandas or comparison to index doesn't work this will except
         # as this could be called every get Data wan't to log the except
         try:
             if data.index[0] < self.lowerConstraint or \
                data.index[-1] > self.upperConstraint:
-                return OUTSIDE_CONSTRAINT
+                return DataSourceReturnEnum.OUTSIDE_CONSTRAINT
             else:
                 return None
         except Exception:

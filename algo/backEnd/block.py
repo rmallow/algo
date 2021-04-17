@@ -34,7 +34,7 @@ class block(commandProcessor):
                         mainframeMessage = str(newData.index[0]) + " : " + str(newData.iloc[0].iloc[0])
                         self.mainframeQueue.put(mainframeMessage)
                         self.pool.doActions(newData)
-                    elif newData == con.OUTSIDE_CONSTRAINT:
+                    elif newData == con.DataSourceReturnEnum.OUTSIDE_CONSTRAINT:
                         self.clear()
                 else:
                     # Feed is at end of data so don't want to keep calling it

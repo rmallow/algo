@@ -1,6 +1,6 @@
 from .dataBase import dataBase
-from .constants import DataTypeEnum
-from .constants import OUTSIDE_CONSTRAINT
+from .constants import DataSourceTypeEnum
+from .constants import DataSourceReturnEnum
 
 from .util import csvDataUtil as cdu
 from .util import requestUtil as ru
@@ -21,15 +21,15 @@ class dataSim(dataBase):
         self.loadData()
 
     def loadData(self):
-        if self.dataType == DataTypeEnum.CSV:
+        if self.dataType == DataSourceTypeEnum.CSV:
             keyData = cdu.loadSingleCSV(self.key, index=self.indexName, dayFirst=self.dayFirst)
             self.key = keyData[0]
             self.data = keyData[1]
-        elif self.dataType == DataTypeEnum.DIR:
+        elif self.dataType == DataSourceTypeEnum.DIR:
             keyData = cdu.combineDirCSV(self.key, index="Local time")
             self.key = keyData[0]
             self.data = keyData[1]
-        elif self.dataType == DataTypeEnum.URL:
+        elif self.dataType == DataSourceTypeEnum.URL:
             self.data = ru.getPandasFromUrl(self.key)
 
         self.data = self.dataFrameModifications(self.data)
@@ -45,11 +45,12 @@ class dataSim(dataBase):
             if self.newCycle:
                 self.newCycle = False
             elif self.hasConstraints():
-                # if constraints are set check to make sure were in current cycle, if not send reset OUTSIDE_CONSTRAINT
+                # if constraints are set check to make sure were in current cycle, if not send reset
+                # DataSourceReturnEnum.OUTSIDE_CONSTRAINT
                 # if eventually do something other than times, this will need to be changed
                 if self.lastIndex.day != self.data.loc[self.lastIndex:].index[1].day:
                     self.newCycle = True
-                    return OUTSIDE_CONSTRAINT
+                    return DataSourceReturnEnum.OUTSIDE_CONSTRAINT
 
             # if made it here, set lastIndex to next index
             self.lastIndex = self.data.loc[self.lastIndex:].index[1]
