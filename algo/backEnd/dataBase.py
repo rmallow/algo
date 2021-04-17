@@ -14,7 +14,7 @@ Base class for data importers, holds member variables that all should use and ot
 
 DATA_BASE_KEYWORDS_LIST = {'key': None, 'dataType': None, 'indexName': None, 'period': None, 'columnFilter': None,
                            'upperConstraint': None, 'lowerConstraint': None, 'dayFirst': None,
-                           'ordering': None}
+                           'ordering': None, 'sequential': False}
 
 
 class dataBase(keywordUnpacker, abc.ABC):
@@ -31,6 +31,7 @@ class dataBase(keywordUnpacker, abc.ABC):
 
         self.end = False
         self.newCycle = False
+        self.indexNum = 0
 
     def dataFrameModifications(self, dataFrame):
         """
@@ -47,6 +48,10 @@ class dataBase(keywordUnpacker, abc.ABC):
             dataFrame.columns = [x.lower() for x in dataFrame.columns]
             if self.indexName:
                 dataFrame = pu.setIndex(dataFrame, self.indexName)
+            elif self.sequential:
+                dataFrame.rename(index=lambda x: x + self.indexNum, inplace=True)
+                self.indexNum += len(dataFrame.index)
+
             # remove columns still to be added
             dataFrame = pu.filterColumns(dataFrame, columnFilter=self.columnFilter)
 

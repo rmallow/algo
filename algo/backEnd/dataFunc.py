@@ -17,9 +17,8 @@ class dataFunc(dataBase):
 
     def getData(self, period):
         if self.time:
-            # this just feels dangerous
-            while self.time < time.time() - self.period:
-                pass
+            diff = time.time() - self.time
+            time.sleep(self.period-diff)
 
         returnVal = self.getFunc(**self.params)
 

@@ -15,7 +15,9 @@ class DataTypeEnum(algoEnum):
     URL = 5
 
 
-OUTSIDE_CONSTRAINT = 200
+class DataSourceReturnEnum(algoEnum):
+    NO_DATA = 0
+    OUTSIDE_CONSTRAINT = 1
 
 
 """

@@ -88,8 +88,7 @@ class feed():
     def update(self):
         rawData = self.getDataFunc(self.period)
         if rawData is None:
-            self.end = True
-            return None
+            errorHandling.warning("")
         elif not isinstance(rawData, pd.DataFrame):
             if rawData == con.OUTSIDE_CONSTRAINT:
                 # return constant to block, block will clear feed and tell Message Router to clear

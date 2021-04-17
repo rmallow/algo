@@ -14,6 +14,7 @@ def printTraceback(title):
     print("-"*60)
 
 
-def warning(title, description):
+def warning(title, description=None):
     logging.warning(" " + title)
-    logging.warning(" " + description)
+    if description:
+        logging.warning(" " + description)

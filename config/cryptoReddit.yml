@@ -109,6 +109,7 @@ REDDIT:
             clientSecret: $[praw.clientSecret]
             userAgent: $[praw.userAgent]
             subreddit: pics+videos+askreddit+aww+memes+gaming
+        sequential: True
     feed:
         period: 60
         continuous: False
