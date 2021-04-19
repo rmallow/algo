@@ -1,6 +1,7 @@
 from . import message as msg
-from .commandProcessor import commandProcessor
 from .asyncScheduler import asyncScheduler
+
+from .util.commandProcessor import commandProcessor
 
 import queue
 import logging

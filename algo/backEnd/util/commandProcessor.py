@@ -1,6 +1,6 @@
-from . import message as msg
+from .. import message as msg
 
-from ..commonUtil import errorHandling
+from ...commonUtil import errorHandling
 
 """
 used by classes that need to process commands

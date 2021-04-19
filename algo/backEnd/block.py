@@ -3,7 +3,7 @@ from . import message as msg
 from . import messageKey as msgKey
 from . import constants as con
 
-from .commandProcessor import commandProcessor
+from .util.commandProcessor import commandProcessor
 
 from ..commonUtil import errorHandling
 
