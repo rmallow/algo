@@ -3,8 +3,7 @@ from . import constants as con
 from ..commonUtil import errorHandling
 
 import pandas as pd
-import logging
-import numpy as np
+from numpy import nan as numpyNan
 import collections
 import time
 
@@ -70,7 +69,8 @@ class feed():
             self.dropNonUniques(rawData)
 
         if len(rawData.index) <= 0:
-            return self.update()
+            # Tell block there was nothing unique, need to call update again
+            return con.DataSourceReturnEnum.NO_DATA
 
         self.newData = rawData
         if self.newData is not None:
@@ -88,13 +88,15 @@ class feed():
     def update(self):
         rawData = self.getDataFunc(self.period)
         if rawData is None:
-            errorHandling.warning("")
+            errorHandling.warning("Data source returned none!!!", description="Don't return none, use END_DATA to end.")
+            return rawData
         elif not isinstance(rawData, pd.DataFrame):
-            if rawData == con.DataSourceReturnEnum.OUTSIDE_CONSTRAINT:
+            if (rawData == con.DataSourceReturnEnum.OUTSIDE_CONSTRAINT or rawData == con.DataSourceReturnEnum.NO_DATA
+               or rawData == con.DataSourceReturnEnum.END_DATA):
                 # return constant to block, block will clear feed and tell Message Router to clear
                 return rawData
             else:
-                logging.warning("Unexpected type passed to feed from data input, returning None")
+                errorHandling.warning("Unexpected type passed to feed from data input, returning None")
                 return None
         # rawData could still be empty
         self.updateHelper(rawData)
@@ -129,11 +131,10 @@ class feed():
         if safeLength(value) == len(self.newCalcData.index):
             try:
                 self.newCalcData[key.lower()] = value
-            except ValueError as err:
-                logging.warning("attempted to add col of same length")
-                logging.warning(err)
+            except ValueError:
+                errorHandling.printTraceback("Attempted to add col of same length")
         else:
-            self.newCalcData[key.lower()] = np.nan
+            self.newCalcData[key.lower()] = numpyNan
             if safeLength(value) > 0:
                 self.addToPartialCols({key: value})
 
@@ -153,7 +154,8 @@ class feed():
                 # if key not in there, will add from 0
                 setFrameColRange(self.newCalcData, key, start, value)
             else:
-                logging.warning("key not exist addToPartialCols")
+                errorHandling.warning("Key doesn't exist in AddToPartialCols",
+                                      description="Key: " + str(key))
 
     def clear(self):
         self.data = None

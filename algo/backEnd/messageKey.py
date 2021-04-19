@@ -1,4 +1,4 @@
-class messageKey():
+class messageKey:
     def __init__(self, sourceCode, time):
         self.sourceCode = sourceCode
         self.time = time

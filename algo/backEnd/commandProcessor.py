@@ -1,19 +1,25 @@
 from . import message as msg
-import logging
+
+from ..commonUtil import errorHandling
 
 """
 used by classes that need to process commands
 default commands are start, end, abort and resume
 these funcs will need to be overwritten by child class
-
-TODO: add customizable default command
 """
 
 
-class commandProcessor():
-    def __init__(self):
+class commandProcessor:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         # get copy of the dict so can make changes later
         self.cmdDict = dict(CMD_DICT)
+
+        # set default command function for unrecognized commands
+        if "defaultCmdFunc" in kwargs:
+            self.defaultCmdFunc = kwargs["defaultCmdFunc"]
+        else:
+            self.defaultCmdFunc = commandProcessor.cmdNotFound
 
     def removeCmdFunc(self, key):
         """
@@ -34,56 +40,58 @@ class commandProcessor():
         """
         if key not in self.cmdDict or overwrite:
             self.cmdDict[key] = func
+            if overwrite:
+                errorHandling.warning("Overwriting command processor for key: " + str(key))
 
-    def cmdNotFound(self, message):
+    def cmdNotFound(self, command):
         """
         @brief: default function for if command is not found
 
-        @param: message -   message passed into command func
+        @param: command -   command passed into command func
         """
-        logging.error("command not found")
-        logging.error(str(message))
+        errorHandling.warning("Command Processor command not found",
+                              description=str(command))
 
-    def cmdStart(self, message):
+    def cmdStart(self, command):
         """
         @brief: default function for start command, will call overwritten function in child class
 
-        @param: message -   message passed into command func
+        @param: command -   command passed into command func
         """
-        self.cmdStart(message)
+        self.cmdStart(command)
 
-    def cmdEnd(self, message):
+    def cmdEnd(self, command):
         """
         @brief: default function for endt command, will call overwritten function in child class
 
-        @param: message -   message passed into command func
+        @param: command -   command passed into command func
         """
-        self.cmdEnd(message)
+        self.cmdEnd(command)
 
-    def cmdAbort(self, message):
+    def cmdAbort(self, command):
         """
         @brief: default function for abort command, will call overwritten function in child class
 
-        @param: message -   message passed into command func
+        @param: command -   command passed into command func
         """
-        self.cmdAbort(message)
+        self.cmdAbort(command)
 
-    def cmdResume(self, message):
+    def cmdResume(self, command):
         """
         @brief: default function for resume command, will call overwritten function in child class
 
-        @param: message -   message passed into command func
+        @param: command -   command passed into command func
         """
-        self.cmdResume(message)
+        self.cmdResume(command)
 
-    def processCommand(self, message):
+    def processCommand(self, command):
         """
-        @brief: main command processor, calls function based on message value or default func
+        @brief: main command processor, calls function based on command value or default func
 
-        @param: message -   message passed into command func
-            message.message determines what func to call
+        @param: command -   command passed into command func
+            command.command determines what func to call
         """
-        self.cmdDict.get(message.message, commandProcessor.cmdNotFound)(self, message)
+        self.cmdDict.get(command, commandProcessor.cmdNotFound)(self, command)
 
 
 """

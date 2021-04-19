@@ -1,5 +1,8 @@
 from enum import Enum
 from dataclasses import dataclass
+from .messageKey import messageKey
+
+import typing
 
 
 class MessageType(Enum):
@@ -19,10 +22,10 @@ class CommandType(Enum):
 @dataclass
 class message:
     messageType: MessageType
-    message: str
+    content: typing.Any
     name: str = ""
     sourceName: str = ""
-    key: str = ""
+    key: messageKey = messageKey
 
     def keyExists(self):
         return self.key.sourceCode is not None and self.key.time is not None

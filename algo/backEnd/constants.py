@@ -17,7 +17,8 @@ class DataSourceTypeEnum(algoEnum):
 
 class DataSourceReturnEnum(algoEnum):
     NO_DATA = 0
-    OUTSIDE_CONSTRAINT = 1
+    END_DATA = 1
+    OUTSIDE_CONSTRAINT = 2
 
 
 """
