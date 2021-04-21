@@ -18,3 +18,10 @@ def warning(title, description=None):
     logging.warning(" " + title)
     if description:
         logging.warning(" " + description)
+
+
+def logAssert(title, description=None):
+    logging.critical(" " + title)
+    if description:
+        logging.critical(" " + description)
+    assert False

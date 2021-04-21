@@ -10,7 +10,7 @@ from .util import requestUtil as ru
 
 class dataSim(dataBase):
     def __init__(self, *args, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(*args, **kwargs)
 
         self.data = None
         self.lastIndex = None

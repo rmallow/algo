@@ -1,6 +1,7 @@
 from .. import message as msg
 
 from ...commonUtil import errorHandling
+from ...commonUtil.multiBase import multiBase
 
 """
 used by classes that need to process commands
@@ -9,7 +10,7 @@ these funcs will need to be overwritten by child class
 """
 
 
-class commandProcessor:
+class commandProcessor(multiBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # get copy of the dict so can make changes later

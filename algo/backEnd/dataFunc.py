@@ -2,12 +2,12 @@ from .dataBase import dataBase
 
 import time
 
-DATA_FUNC_KEYWORDS_LIST = {'getFunc': None, 'setupFunc': None, 'params': {}}
+DATA_FUNC_KEYWORDS_LIST = {'getFunc': None, 'setupFunc': None, 'parameters': {}}
 
 
 class dataFunc(dataBase):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.unpack(kwargs, DATA_FUNC_KEYWORDS_LIST, warn=True)
 
@@ -20,7 +20,7 @@ class dataFunc(dataBase):
             diff = time.time() - self.time
             time.sleep(self.period-diff)
 
-        returnVal = self.getFunc(**self.params)
+        returnVal = self.getFunc(**self.parameters)
 
         if returnVal is not None:
             returnVal = self.dataFrameModifications(returnVal)
@@ -30,7 +30,7 @@ class dataFunc(dataBase):
 
     def loadData(self):
         if self.setupFunc:
-            if self.params is not None and isinstance(self.params, dict):
-                self.params |= self.setupFunc(**self.params)
+            if self.parameters is not None and isinstance(self.parameters, dict):
+                self.parameters |= self.setupFunc(**self.parameters)
             else:
-                self.params = self.setupFunc
+                self.parameters = self.setupFunc

@@ -3,8 +3,8 @@ from . import constants as con
 
 
 class trigger(action):
-    def __init__(self, period=1, name="defaultTriggerName", calcFunc=None, params={}, inputCols=[], **kwargs):
-        super().__init__("trigger", period=period, name=name, calcFunc=calcFunc, params=params, inputCols=inputCols)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     """
     TODO: change trigger update to better match event update:

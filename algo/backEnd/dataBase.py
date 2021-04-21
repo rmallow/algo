@@ -11,14 +11,15 @@ import logging
 Base class for data importers, holds member variables that all should use and other shared functions
 """
 
-DATA_BASE_KEYWORDS_LIST = {'key': None, 'dataType': None, 'indexName': None, 'period': None, 'columnFilter': None,
+DATA_BASE_KEYWORDS_DICT = {'key': None, 'dataType': None, 'indexName': None, 'period': None, 'columnFilter': None,
                            'upperConstraint': None, 'lowerConstraint': None, 'dayFirst': None,
                            'ordering': None, 'sequential': False}
 
 
 class dataBase(keywordUnpacker, abc.ABC):
     def __init__(self, *args, **kwargs):
-        self.unpack(kwargs, DATA_BASE_KEYWORDS_LIST, warn=True)
+        super().__init__(*args, **kwargs)
+        self.unpack(kwargs, DATA_BASE_KEYWORDS_DICT, warn=True)
 
         # Convert data type to enum
         if self.dataType is not None:

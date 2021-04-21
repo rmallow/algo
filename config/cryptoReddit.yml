@@ -81,7 +81,7 @@ BTC:
                 location: funcs.triggerFuncs
                 name: under
             period: 1
-            params:
+            parameters:
                 factor: 20
         rsi-sell:
             inputCols:
@@ -91,7 +91,7 @@ BTC:
                 location: funcs.triggerFuncs
                 name: over
             period: 1
-            params:
+            parameters:
                 factor: 80
 REDDIT:
     name: REDDIT
@@ -104,7 +104,7 @@ REDDIT:
             location: funcs.dataFuncs
             name: redditTest
         period: 10
-        params:
+        parameters:
             clientId: $[praw.clientId]
             clientSecret: $[praw.clientSecret]
             userAgent: $[praw.userAgent]

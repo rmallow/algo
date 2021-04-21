@@ -1,5 +1,6 @@
 import pandas as pd
 from ..commonUtil import errorHandling
+from ..commonUtil.keywordUnpacker import keywordUnpacker
 
 
 def findCol(feed, col):
@@ -45,7 +46,13 @@ def getParameter(parameters, key, default):
     return None
 
 
-class action():
+ACTION_KEYWORDS_DICT = {'period': 1, 'name': 'defaultActionName', 'parameters': {},
+                        'inputCols': []}
+
+ACTION_REQUIRED_LIST = ['actionType', 'calcFunc']
+
+
+class action(keywordUnpacker):
     """
     @brief: base class for actions used by action pool
         - update is called in action pool which then calcualtes the apropriate dataSet
@@ -59,14 +66,13 @@ class action():
     @param: params      - extra parameters that are passed in each time to the calcFunc
     @param: inputCols   - the columns that are used by the action and put into the dataSet
     """
-    def __init__(self, actionType, period=1, name="defaultActionName", calcFunc=None, params=None, inputCols=[]):
-        self.actionType = actionType
-        self.period = period
-        self.name = name.lower()
-        self.calcFunc = calcFunc
-        self.parameters = {**params, 'period': period}
-        self.inputCols = inputCols
-        # convert to lower, everything LOWER!
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.unpack(kwargs, ACTION_KEYWORDS_DICT, required=ACTION_REQUIRED_LIST, warn=False)
+        self.name = self.name.lower()
+        if 'period' not in self.parameters:
+            self.parameters['period'] = self.period
+        # convert to lower, everything lower!
         self.inputCols = [x.lower() for x in self.inputCols]
         self.dataSet = None
 

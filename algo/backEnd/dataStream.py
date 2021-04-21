@@ -7,8 +7,8 @@ import time
 
 
 class dataStream(dataBase):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.time = None
 
