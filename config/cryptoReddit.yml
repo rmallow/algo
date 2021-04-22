@@ -125,3 +125,11 @@ REDDIT:
                 location: funcs.triggerFuncs
                 name: testFunc
             period: 1
+        testEvent:
+            inputCols:
+                - title
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: testMessageFunc
+            period: 1
