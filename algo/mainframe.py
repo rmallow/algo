@@ -47,7 +47,7 @@ class mainframe(QtCore.QObject):
 
         # init message router
         self.messageRouter = messageRouter(self.handlerManager.messageSubscriptions, self.sharedData,
-                                             self.AioManager.AioQueue())
+                                           self.AioManager.AioQueue())
 
         # init block manager
         self.blockManager = blockManager(self.messageRouter)

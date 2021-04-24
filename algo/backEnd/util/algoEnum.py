@@ -1,6 +1,7 @@
 from aenum import Enum
 import string
 
+
 class algoEnum(Enum):
 
     @classmethod
