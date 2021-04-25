@@ -1,5 +1,5 @@
 from .configWindow import configWindow
-from .uiSettings import MAIN_WINDOW_UI_FILE, TEST_OUTPUT_TAB_FILE
+from .uiSettings import MAIN_WINDOW_UI_FILE, OUTPUT_TAB_FILE
 from .blockTab import blockTab
 from .handlerTab import handlerTab
 
@@ -20,6 +20,14 @@ class mainWindow(QtWidgets.QMainWindow):
         dirPath = pathUtil.getFileDirPath(__file__)
         self.ui = loadingUtil.loadUiWidget(dirPath + "/" + MAIN_WINDOW_UI_FILE)
 
+        """
+        -------------------
+        OUTPUT SECTION
+        -------------------
+        """
+        outputTabUi = loadingUtil.loadUiWidget(dirPath + "/" + OUTPUT_TAB_FILE, parent=self)
+        self.ui.tabWidget.addTab(outputTabUi, "Output")
+
         # Load child windows
         self.configWindow = configWindow(self)
         bTab = blockTab(self.ui.tabWidget)
@@ -35,15 +43,6 @@ class mainWindow(QtWidgets.QMainWindow):
         bTab.slotItemChanged(bTab.itemModel.index(0, 0))
         hTab.loadItems(self.mainframe.getHandlers())
 
-        """
-        -------------------
-        TEST OUTPUT SECTION
-        -------------------
-        """
-        outputTabUi = loadingUtil.loadUiWidget(dirPath + "/" + TEST_OUTPUT_TAB_FILE, parent=self)
-        outputTabUi.listView.setModel(self.mainframe.outputModel)
-        self.ui.tabWidget.addTab(outputTabUi, "Output")
-
         # Set up signal and slots
         self.ui.configButton.clicked.connect(lambda: self.configWindow.ui.show())
         self.ui.startAllButton.clicked.connect(self.OnStartAllButtonClicked)
@@ -56,7 +55,6 @@ class mainWindow(QtWidgets.QMainWindow):
         self.updateData()
         self.runAllSignal.connect(self.mainframe.runAll)
         self.endAllSignal.connect(self.mainframe.endAll)
-        self.mainframe.dataChanged.connect(self.updateData)
 
     @QtCore.Slot()
     def updateData(self):

@@ -1,20 +1,22 @@
 
 from .mainframe import mainframe
 
-from .ui.mainWindow import mainWindow
-
-from PySide6 import QtWidgets
+from .commonUtil import errorHandling
 import threading
 
 
-def start():
+def start(clArgs):
     # init starter variables
     main = mainframe()
     mainframeThread = threading.Thread(target=main.start)
     mainframeThread.start()
-    # main.runManagerAndRouter()
-    app = QtWidgets.QApplication([])
 
-    mainWindow(main)
-
-    app.exec_()
+    # If ui arg passed in then start, otherwise do not import
+    if "-u" in clArgs:
+        try:
+            from .ui import uiStart
+        except ModuleNotFoundError:
+            errorHandling.logAssert("UI command arg passes (-u) but ui modules not installed",
+                                    description="Make to install ui requirements to run ui")
+        else:
+            uiStart.start(main)

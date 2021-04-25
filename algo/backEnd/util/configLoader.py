@@ -84,7 +84,6 @@ class configLoader():
                 self.recurseDictForFuncMain(contents)
         except OSError:
             errorHandling.printTraceback("Exception loading file: ")
-        print(contents)
         return contents
 
 

@@ -11,15 +11,12 @@ import aioprocessing
 import os
 import sys
 import configparser
-from PySide6 import QtCore, QtGui
 import time
 
 
-class mainframe(QtCore.QObject):
-    dataChanged = QtCore.Signal()
+class mainframe():
 
     def __init__(self):
-        super().__init__(None)
         self.processDict = {}
         self.routerProcess = None
         self.AioManager = aioprocessing.AioManager()
@@ -28,7 +25,6 @@ class mainframe(QtCore.QObject):
         self.handlerManager = None
         self.blockManager = None
         self.mainframeQueue = self.MpManager.Queue()
-        self.outputModel = QtGui.QStandardItemModel()
 
         # init handler manager
         # Load defaults
@@ -63,9 +59,7 @@ class mainframe(QtCore.QObject):
             if self.mainframeQueue.empty():
                 time.sleep(.3)
             else:
-                message = self.mainframeQueue.get()
-                modelItem = QtGui.QStandardItem(message)
-                self.outputModel.appendRow(modelItem)
+                _ = self.mainframeQueue.get()
 
     def startRouter(self):
         self.routerProcess = Process(target=self.messageRouter.initAndStartLoop, name="Router")
