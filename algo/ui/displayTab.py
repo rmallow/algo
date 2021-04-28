@@ -8,7 +8,7 @@ from ..commonUtil import errorHandling
 from PySide6 import QtWidgets, QtCore, QtGui
 
 
-ITEROLE = QtCore.Qt.UserRole
+ITEM_ROLE = QtCore.Qt.UserRole
 
 
 class displayTab(QtWidgets.QWidget):
@@ -50,7 +50,7 @@ class displayTab(QtWidgets.QWidget):
         text = self.itemModel.data(index)
         # check if subclass has display item implemented otherwise default
         try:
-            item = modelItem.data(ITEROLE)
+            item = modelItem.data(ITEM_ROLE)
             innerWidget = self.displayItem(item, displayWidget)
         except AttributeError:
             errorHandling.printTraceback("Error display item")
@@ -63,7 +63,7 @@ class displayTab(QtWidgets.QWidget):
     def loadItems(self, itemDict):
         for key, value in itemDict.items():
             modelItem = QtGui.QStandardItem(key)
-            modelItem.setData(value, ITEROLE)
+            modelItem.setData(value, ITEM_ROLE)
             self.itemModel.appendRow(modelItem)
 
     def displayItem(self, item, parent):

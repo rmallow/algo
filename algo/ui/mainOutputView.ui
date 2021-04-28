@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>outputTab</class>
- <widget class="QWidget" name="outputTab">
+ <class>mainOutputView</class>
+ <widget class="QWidget" name="mainOutputView">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1919</width>
+    <width>1920</width>
     <height>1027</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>mainOutputView</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -30,7 +30,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1893</width>
+        <width>1894</width>
         <height>1001</height>
        </rect>
       </property>

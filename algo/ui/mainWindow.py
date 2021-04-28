@@ -1,7 +1,8 @@
 from .configWindow import configWindow
-from .uiSettings import MAIN_WINDOW_UI_FILE, OUTPUT_TAB_FILE
+from .uiSettings import MAIN_WINDOW_UI_FILE
 from .blockTab import blockTab
 from .handlerTab import handlerTab
+from .mainOutputView import mainOutputView
 
 from .util import loadingUtil
 
@@ -20,13 +21,8 @@ class mainWindow(QtWidgets.QMainWindow):
         dirPath = pathUtil.getFileDirPath(__file__)
         self.ui = loadingUtil.loadUiWidget(dirPath + "/" + MAIN_WINDOW_UI_FILE)
 
-        """
-        -------------------
-        OUTPUT SECTION
-        -------------------
-        """
-        outputTabUi = loadingUtil.loadUiWidget(dirPath + "/" + OUTPUT_TAB_FILE, parent=self)
-        self.ui.tabWidget.addTab(outputTabUi, "Output")
+        oView = mainOutputView(self.ui.tabWidget)
+        self.ui.tabWidget.addTab(oView, "Output")
 
         # Load child windows
         self.configWindow = configWindow(self)
