@@ -3,6 +3,7 @@ from .uiSettings import MAIN_WINDOW_UI_FILE
 from .blockTab import blockTab
 from .handlerTab import handlerTab
 from .mainOutputView import mainOutputView
+from .mainOutputViewModel import mainOutputViewModel
 
 from .util import loadingUtil
 
@@ -21,7 +22,13 @@ class mainWindow(QtWidgets.QMainWindow):
         dirPath = pathUtil.getFileDirPath(__file__)
         self.ui = loadingUtil.loadUiWidget(dirPath + "/" + MAIN_WINDOW_UI_FILE)
 
-        oView = mainOutputView(self.ui.tabWidget)
+        # Set up connections for mainframe
+        self.mainframe = mainframe
+        self.connectMainframe()
+
+        self.oViewModel = mainOutputViewModel(self.mainframe)
+
+        oView = mainOutputView(self.oViewModel, self.ui.tabWidget)
         self.ui.tabWidget.addTab(oView, "Output")
 
         # Load child windows
@@ -30,10 +37,6 @@ class mainWindow(QtWidgets.QMainWindow):
         hTab = handlerTab(self.ui.tabWidget)
         self.ui.tabWidget.addTab(bTab, "Blocks")
         self.ui.tabWidget.addTab(hTab, "Handlers")
-
-        # Set up connections for mainframe
-        self.mainframe = mainframe
-        self.connectMainframe()
 
         bTab.loadItems(self.mainframe.getBlocks())
         bTab.slotItemChanged(bTab.itemModel.index(0, 0))
