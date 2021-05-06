@@ -1,12 +1,14 @@
 from .uiSettings import MAIN_OUTPUT_VIEW_UI_FILE
 from .outputSelect import outputSelect
+from .outputViewFeed import outputViewFeed
+from .uiConstants import outputTypesEnum, TYPE
 
-from .util import loadingUtil
+from .util import loadingUtil, animations
 
 from ..commonUtil import pathUtil
 # from ..commonUtil import errorHandling
 
-from PySide6 import QtWidgets
+from PySide6 import QtWidgets, QtCore
 
 
 class mainOutputView(QtWidgets.QWidget):
@@ -30,6 +32,7 @@ class mainOutputView(QtWidgets.QWidget):
 
         self.initButtons()
 
+        # manually call slot to insert first selector at startup
         self.addButtonClicked()
 
         self.mainLayout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding,
@@ -69,6 +72,7 @@ class mainOutputView(QtWidgets.QWidget):
     def addButtonClicked(self):
         index = self.mainLayout.indexOf(self.buttonWidget)
         selector = outputSelect(self.model)
+        selector.selectionFinished.connect(self.onSelectionFinished)
         self.mainLayout.insertWidget(index, selector)
 
     def subButtonClicked(self):
@@ -79,3 +83,13 @@ class mainOutputView(QtWidgets.QWidget):
                 w = item.widget()
                 if w:
                     w.deleteLater()
+
+    @QtCore.Slot()
+    def onSelectionFinished(self, selectionSettings):
+        oView = None
+        slot = None
+        if selectionSettings[TYPE] == outputTypesEnum.FEED.value:
+            oView = outputViewFeed(self)
+            slot = oView.updateOnLoad
+
+        animations.fadeStart(self, self.sender(), oView, self.mainLayout, finishedSlot=slot)

@@ -12,4 +12,7 @@ Output Item UI Files
 OUTPUT_SELECT_ITEM_UI_FILE = "outputSelectItem.ui"
 OUTPUT_SELECT_TYPE_UI_FILE = "outputSelectType.ui"
 
-OUTPUT_TYPES = ['Feed', 'Graph']
+"""
+Output View UI Files
+"""
+OUTPUT_VIEW_FEED_UI_FILE = "outputViewFeed.ui"

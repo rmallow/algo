@@ -1,6 +1,8 @@
 from .uiSettings import OUTPUT_SELECT_ITEM_UI_FILE, OUTPUT_SELECT_TYPE_UI_FILE
 
-from .util import loadingUtil
+from .uiConstants import TYPE, ITEM
+
+from .util import loadingUtil, animations
 
 from ..commonUtil import pathUtil
 
@@ -8,6 +10,8 @@ from PySide6 import QtWidgets, QtCore
 
 
 class outputSelect(QtWidgets.QWidget):
+    selectionFinished = QtCore.Signal(dict)
+
     def __init__(self, model):
         super().__init__()
 
@@ -46,6 +50,7 @@ class outputSelect(QtWidgets.QWidget):
     def initSelectType(self):
         self.selectTypeUI.typeComboBox.setModel(self.model.typeModel)
         self.selectTypeUI.typeComboBox.setCurrentIndex(-1)
+        self.selectTypeUI.typeComboBox.textActivated.connect(self.typeSelected)
 
     def backButtonSetup(self):
         backWidget = QtWidgets.QWidget(self)
@@ -64,41 +69,22 @@ class outputSelect(QtWidgets.QWidget):
         if self.mainLayout.indexOf(self.selectItemUI) != -1:
             pass
         elif self.mainLayout.indexOf(self.selectTypeUI) != -1:
-            self.fadeStart(self.selectTypeUI, self.selectItemUI)
+            animations.fadeStart(self, self.selectTypeUI, self.selectItemUI, self.mainLayout)
 
     @QtCore.Slot()
     def itemSelected(self, text):
         self.item = text
-        if "block" in self.sender().objectName():
-            self.isBlockItem = True
+        self.isBlockItem = "block" in self.sender().objectName()
 
         if self.isBlockItem:
             self.selectTypeUI.itemLabel.setText("Block: " + str(self.item))
+            self.selectItemUI.handlerComboBox.setCurrentIndex(-1)
         else:
             self.selectTypeUI.itemLabel.setText("Handler: " + str(self.item))
+            self.selectItemUI.blockComboBox.setCurrentIndex(-1)
 
-        self.fadeStart(self.selectItemUI, self.selectTypeUI)
+        animations.fadeStart(self, self.selectItemUI, self.selectTypeUI, self.mainLayout)
 
-    def fadeStart(self, fromWidget, toWidget):
-        self.eff = QtWidgets.QGraphicsOpacityEffect(fromWidget)
-        fromWidget.setGraphicsEffect(self.eff)
-        self.anim = QtCore.QPropertyAnimation(fromWidget.graphicsEffect(), QtCore.QByteArray("opacity"))
-        self.anim.setDuration(500)
-        self.anim.setStartValue(1)
-        self.anim.setEndValue(0)
-        self.anim.setEasingCurve(QtCore.QEasingCurve.Linear)
-        self.anim.finished.connect(lambda: self.fadeEnd(fromWidget, toWidget))
-        self.anim.start()
-
-    def fadeEnd(self, fromWidget, toWidget):
-        self.mainLayout.replaceWidget(fromWidget, toWidget)
-        fromWidget.hide()
-        toWidget.show()
-        self.eff = QtWidgets.QGraphicsOpacityEffect(toWidget)
-        toWidget.setGraphicsEffect(self.eff)
-        self.anim = QtCore.QPropertyAnimation(toWidget.graphicsEffect(), QtCore.QByteArray("opacity"))
-        self.anim.setDuration(500)
-        self.anim.setStartValue(0)
-        self.anim.setEndValue(1)
-        self.anim.setEasingCurve(QtCore.QEasingCurve.Linear)
-        self.anim.start()
+    @QtCore.Slot()
+    def typeSelected(self, text):
+        self.selectionFinished.emit({TYPE: text, ITEM: self.item})
