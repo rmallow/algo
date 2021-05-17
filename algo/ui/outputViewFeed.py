@@ -9,8 +9,8 @@ from PySide6 import QtGui, QtCore
 
 
 class outputViewFeed(outputView):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, outputViewModel, parent=None):
+        super().__init__(outputViewModel, parent)
 
         # Load UI file
         dirPath = pathUtil.getFileDirPath(__file__)

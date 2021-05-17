@@ -1,10 +1,11 @@
 from .uiSettings import MAIN_OUTPUT_VIEW_UI_FILE
 from .outputSelect import outputSelect
 from .outputViewFeed import outputViewFeed
-from .uiConstants import outputTypesEnum, TYPE
+from .uiConstants import outputTypesEnum
 
 from .util import loadingUtil, animations
 
+from ..commonGlobals import TYPE
 from ..commonUtil import pathUtil
 # from ..commonUtil import errorHandling
 
@@ -12,10 +13,10 @@ from PySide6 import QtWidgets, QtCore
 
 
 class mainOutputView(QtWidgets.QWidget):
-    def __init__(self, model, parent=None):
+    def __init__(self, mainOutputViewModel, parent=None):
         super().__init__(parent)
 
-        self.model = model
+        self.mainOutputViewModel = mainOutputViewModel
 
         # Load UI file
         dirPath = pathUtil.getFileDirPath(__file__)
@@ -71,7 +72,7 @@ class mainOutputView(QtWidgets.QWidget):
 
     def addButtonClicked(self):
         index = self.mainLayout.indexOf(self.buttonWidget)
-        selector = outputSelect(self.model)
+        selector = outputSelect(self.mainOutputViewModel)
         selector.selectionFinished.connect(self.onSelectionFinished)
         self.mainLayout.insertWidget(index, selector)
 
@@ -86,10 +87,14 @@ class mainOutputView(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def onSelectionFinished(self, selectionSettings):
+        """
+        Output select is finished, send settings to mainOutputViewModel to translate to message
+        """
+        outputViewModel = self.mainOutputViewModel.setupOutputView(selectionSettings)
         oView = None
         slot = None
         if selectionSettings[TYPE] == outputTypesEnum.FEED.value:
-            oView = outputViewFeed(self)
+            oView = outputViewFeed(outputViewModel, self)
             slot = oView.updateOnLoad
 
         animations.fadeStart(self, self.sender(), oView, self.mainLayout, finishedSlot=slot)

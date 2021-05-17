@@ -1,7 +1,6 @@
 from enum import Enum
 
-TYPE = "type"
-ITEM = "item"
+LOOP_INTERVAL_MSECS = 300
 
 
 class outputTypesEnum(Enum):

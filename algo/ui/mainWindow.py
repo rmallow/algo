@@ -4,6 +4,7 @@ from .blockTab import blockTab
 from .handlerTab import handlerTab
 from .mainOutputView import mainOutputView
 from .mainOutputViewModel import mainOutputViewModel
+from .mainModel import mainModel
 
 from .util import loadingUtil
 
@@ -22,11 +23,13 @@ class mainWindow(QtWidgets.QMainWindow):
         dirPath = pathUtil.getFileDirPath(__file__)
         self.ui = loadingUtil.loadUiWidget(dirPath + "/" + MAIN_WINDOW_UI_FILE)
 
+        self.mainModel = mainModel(mainframe)
+
         # Set up connections for mainframe
         self.mainframe = mainframe
         self.connectMainframe()
 
-        self.oViewModel = mainOutputViewModel(self.mainframe)
+        self.oViewModel = mainOutputViewModel(self.mainframe, self.mainModel)
 
         oView = mainOutputView(self.oViewModel, self.ui.tabWidget)
         self.ui.tabWidget.addTab(oView, "Output")
@@ -43,7 +46,12 @@ class mainWindow(QtWidgets.QMainWindow):
         hTab.loadItems(self.mainframe.getHandlers())
 
         # Set up signal and slots
+
+        # For mysterious reasons this signal slot cannot be deleted for the rest of the UI to work
+        # After brief investigation I have no idea why this is the case
         self.ui.configButton.clicked.connect(lambda: self.configWindow.ui.show())
+        # Spooky, noted to fix in later development
+
         self.ui.startAllButton.clicked.connect(self.OnStartAllButtonClicked)
         self.configWindow.ui.loadConfigsButton.clicked.connect(self.slotLoadConfigs)
         # self.ui.addBlockButton.clicked.connect(self.slotAddBlock)
@@ -77,14 +85,3 @@ class mainWindow(QtWidgets.QMainWindow):
         else:
             self.ui.startAllButton.setText("Start All")
             self.endAllSignal.emit()
-
-
-"""
-    def loadBlocks(self, blocks):
-        for code, block in blocks.items():
-            self.ui.blockListWidget.addItem(block.code)
-
-    def loadHandlers(self, handlers):
-        for code, handler in handlers.items():
-            self.ui.handlerListWidget.addItem(handler.code)
-"""

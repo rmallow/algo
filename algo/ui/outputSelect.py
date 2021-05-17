@@ -1,9 +1,8 @@
 from .uiSettings import OUTPUT_SELECT_ITEM_UI_FILE, OUTPUT_SELECT_TYPE_UI_FILE
 
-from .uiConstants import TYPE, ITEM
-
 from .util import loadingUtil, animations
 
+from ..commonGlobals import TYPE, ITEM
 from ..commonUtil import pathUtil
 
 from PySide6 import QtWidgets, QtCore

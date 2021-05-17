@@ -12,8 +12,9 @@ import time
 
 
 class block(commandProcessor):
-    def __init__(self, actionList, feed, messageRouter, libraries, config, parseSettings=None, name="defaultBlockName",
-                 code=123, **kwargs):
+    def __init__(self, actionList, feed, messageRouter, libraries, config, *args, parseSettings=None, 
+                 name="defaultBlockName", code=123, **kwargs):
+        super().__init__(*args, **kwargs)
         self.code = code
         self.end = False
         self.keepUpdating = True
@@ -23,6 +24,9 @@ class block(commandProcessor):
         self.config = config
         self.mainframeQueue = None
         self.blockQueue = None
+        self.track = False
+
+        self.addCmdFunc(msg.CommandType.ADD_OUTPUT_VIEW, block.addOutputView)
 
     def start(self):
         if self.mainframeQueue is not None:
@@ -33,8 +37,6 @@ class block(commandProcessor):
                 newData = self.feed.update()
                 if newData is not None:
                     if isinstance(newData, pd.DataFrame):
-                        mainframeMessage = str(newData.index[0]) + " : " + str(newData.iloc[0].iloc[0])
-                        self.mainframeQueue.put(mainframeMessage)
                         self.pool.doActions(newData)
                     elif newData == con.DataSourceReturnEnum.OUTSIDE_CONSTRAINT:
                         self.clear()
@@ -56,7 +58,7 @@ class block(commandProcessor):
                 # spamming this with commands
                 while not self.blockQueue.empty():
                     # Use the command processor way of handling command messages
-                    commandMessage = self.m_blockQueue.get()
+                    commandMessage = self.blockQueue.get()
                     if commandMessage.messageType == msg.MessageType.COMMAND:
                         self.processCommand(commandMessage.content)
 
@@ -65,6 +67,13 @@ class block(commandProcessor):
                 # third of a second seems reasonable as we're just waiting for input
                 if self.blockQueue.empty() and not self.keepUpdating:
                     time.sleep(.3)
+
+            if self.track:
+                calcTail = self.feed.calcData.tail(len(self.feed.newData))
+                combinedDf = pd.concat([self.feed.newData, calcTail], axis=1)
+                m = msg.message(msg.MessageType.UI_UPDATE, combinedDf,
+                                key=msgKey.messageKey(self.code, combinedDf.index[0]))
+                self.mainframeQueue.put(m)
 
         # Return some data at the end
         return(self.feed.data, self.feed.calcData)
@@ -75,3 +84,6 @@ class block(commandProcessor):
         message = msg.message(msg.MessageType.COMMAND, msg.CommandType.CLEAR,
                               key=msgKey.messageKey(self.code, None))
         self.messageRouter.receive(message)
+
+    def addOutputView(self, _):
+        self.track = True

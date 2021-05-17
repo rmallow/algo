@@ -1,10 +1,13 @@
 from .commonSettings import SETTINGS_FILE
+from .commonGlobals import ITEM
 
+from .backEnd import message as msg
 from .backEnd.messageRouter import messageRouter
 from .backEnd.blockManager import blockManager
 from .backEnd.handlerManager import handlerManager
 from .backEnd.handlerData import handlerData
 from .backEnd.util import configLoader
+from .backEnd.util.commandProcessor import commandProcessor
 
 from multiprocess import Process, Manager
 import aioprocessing
@@ -14,9 +17,10 @@ import configparser
 import time
 
 
-class mainframe():
+class mainframe(commandProcessor):
 
-    def __init__(self):
+    def __init__(self, uiQueue=None):
+        super().__init__()
         self.processDict = {}
         self.routerProcess = None
         self.AioManager = aioprocessing.AioManager()
@@ -25,6 +29,10 @@ class mainframe():
         self.handlerManager = None
         self.blockManager = None
         self.mainframeQueue = self.MpManager.Queue()
+        self.uiQueue = uiQueue
+
+        # add commands for processor
+        self.addCmdFunc(msg.CommandType.ADD_OUTPUT_VIEW, mainframe.addOutputView)
 
         # init handler manager
         # Load defaults
@@ -49,6 +57,10 @@ class mainframe():
         self.blockManager = blockManager(self.messageRouter)
         self.loadBlockConfig(blockConfigFile)
 
+        for _, block in self.blockManager.blocks.items():
+            block.blockQueue = self.MpManager.Queue()
+            block.mainframeQueue = self.mainframeQueue
+
         # this will set the current working directory from wherever to the directory this file is in
         # sys.path.append(os.path.dirname(os.path.abspath(sys.modules[__name__].__file__)))
         dirPath = os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))
@@ -59,7 +71,18 @@ class mainframe():
             if self.mainframeQueue.empty():
                 time.sleep(.3)
             else:
-                _ = self.mainframeQueue.get()
+                message = self.mainframeQueue.get()
+                if isinstance(message, msg.message):
+                    if message.isCommand():
+                        self.processCommand(message.content, message.details)
+                    elif message.isUIUpdate():
+                        if self.uiQueue is not None:
+                            self.uiQueue.put(message)
+
+    def addOutputView(self, command, details):
+        if details[ITEM] in self.blockManager.blocks:
+            block = self.blockManager.blocks[details[ITEM]]
+            block.blockQueue.put(msg.message(msg.MessageType.COMMAND, command, details=details))
 
     def startRouter(self):
         self.routerProcess = Process(target=self.messageRouter.initAndStartLoop, name="Router")
@@ -86,7 +109,6 @@ class mainframe():
             print("Error Running Block: " + code)
 
     def startBlockProcess(self, code, block):
-        block.mainframeQueue = self.mainframeQueue
         processName = "Block-" + str(code)
         blockProcess = Process(target=block.start, name=processName)
         self.processDict[code] = blockProcess

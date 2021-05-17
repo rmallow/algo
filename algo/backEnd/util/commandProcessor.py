@@ -44,7 +44,7 @@ class commandProcessor(multiBase):
             if overwrite:
                 errorHandling.warning("Overwriting command processor for key: " + str(key))
 
-    def cmdNotFound(self, command):
+    def cmdNotFound(self, command, details=None):
         """
         @brief: default function for if command is not found
 
@@ -53,7 +53,7 @@ class commandProcessor(multiBase):
         errorHandling.warning("Command Processor command not found",
                               description=str(command))
 
-    def cmdStart(self, command):
+    def cmdStart(self, command, details=None):
         """
         @brief: default function for start command, will call overwritten function in child class
 
@@ -61,7 +61,7 @@ class commandProcessor(multiBase):
         """
         self.cmdStart(command)
 
-    def cmdEnd(self, command):
+    def cmdEnd(self, command, details=None):
         """
         @brief: default function for endt command, will call overwritten function in child class
 
@@ -69,7 +69,7 @@ class commandProcessor(multiBase):
         """
         self.cmdEnd(command)
 
-    def cmdAbort(self, command):
+    def cmdAbort(self, command, details=None):
         """
         @brief: default function for abort command, will call overwritten function in child class
 
@@ -77,7 +77,7 @@ class commandProcessor(multiBase):
         """
         self.cmdAbort(command)
 
-    def cmdResume(self, command):
+    def cmdResume(self, command, details=None):
         """
         @brief: default function for resume command, will call overwritten function in child class
 
@@ -85,14 +85,18 @@ class commandProcessor(multiBase):
         """
         self.cmdResume(command)
 
-    def processCommand(self, command):
+    def processCommand(self, command, details=None):
         """
         @brief: main command processor, calls function based on command value or default func
 
-        @param: command -   command passed into command func
-            command.command determines what func to call
+        @param: command         -  command passed into command func
+                    command determines what func to call
+        @param: details (None)  - extra details for command processing
         """
-        self.cmdDict.get(command, commandProcessor.cmdNotFound)(self, command)
+        if details is None:
+            self.cmdDict.get(command, commandProcessor.cmdNotFound)(self, command)
+        else:
+            self.cmdDict.get(command, commandProcessor.cmdNotFound)(self, command, details)
 
 
 """
