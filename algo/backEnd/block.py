@@ -70,7 +70,8 @@ class block(commandProcessor):
 
             if self.track:
                 calcTail = self.feed.calcData.tail(len(self.feed.newData))
-                combinedDf = pd.concat([self.feed.newData, calcTail], axis=1)
+                dataTail = self.feed.data.tail(len(self.feed.newData))
+                combinedDf = pd.concat([dataTail, calcTail], axis=1)
                 m = msg.message(msg.MessageType.UI_UPDATE, combinedDf,
                                 key=msgKey.messageKey(self.code, combinedDf.index[0]))
                 self.mainframeQueue.put(m)

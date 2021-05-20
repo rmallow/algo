@@ -1,9 +1,13 @@
 from .uiConstants import LOOP_INTERVAL_MSECS
 
+from ..backEnd import message as msg
+
 from PySide6 import QtCore
 
 
 class mainModel(QtCore.QObject):
+    uiUpdateSignal = QtCore.Signal(msg.message)
+
     def __init__(self, mainframe):
         super().__init__()
         self.uiQueue = mainframe.uiQueue
@@ -22,4 +26,4 @@ class mainModel(QtCore.QObject):
         while not self.uiQueue.empty():
             m = self.uiQueue.get()
             if m.isUIUpdate():
-                print(m.content)
+                self.uiUpdateSignal.emit(m)

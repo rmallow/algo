@@ -1,4 +1,5 @@
 from .uiConstants import outputTypesEnum
+from .pandasModel import pandasModel
 
 from ..commonGlobals import ITEM
 from ..backEnd import message as msg
@@ -28,6 +29,8 @@ class mainOutputViewModel():
         self.mainModel = mainModel
         self.outputViewModels = {}
 
+        self.mainModel.uiUpdateSignal.connect(self.receiveData)
+
     def addItem(self, model, key, value):
         item = QtGui.QStandardItem(str(key))
         item.setData(value)
@@ -41,6 +44,12 @@ class mainOutputViewModel():
         for key, value in handlerDict.items():
             self.addItem(self.handlerComboModel, key, value)
 
+    def receiveData(self, data: msg.message):
+        if data.key.sourceCode in self.outputViewModels:
+            modelList = self.outputViewModels[data.key.sourceCode]
+            for model in modelList:
+                model.appendRow(data.content)
+
     def setupOutputView(self, selectionDict):
         """
         Output select has finished selecting output, message mainframe to start sending data
@@ -51,7 +60,8 @@ class mainOutputViewModel():
                         details=selectionDict)
         self.mainModel.messageMainframe(m)
 
-        model = QtGui.QStandardItemModel()
+        model = pandasModel()
         modelList = self.outputViewModels.get(selectionDict[ITEM], [])
         modelList.append(model)
+        self.outputViewModels[selectionDict[ITEM]] = modelList
         return model
