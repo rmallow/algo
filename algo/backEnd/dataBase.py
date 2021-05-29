@@ -58,7 +58,7 @@ class dataBase(keywordUnpacker, abc.ABC):
             if self.hasConstraints():
                 dataFrame = dataFrame.between_time(self.lowerConstraint, self.upperConstraint)
 
-            if dataFrame.index[0] > dataFrame.index[1]:
+            if len(dataFrame.index) > 1 and dataFrame.index[0] > dataFrame.index[1]:
                 dataFrame = dataFrame[::-1]
             # dataFrame.index = dataFrame.index.tz_localize('UTC').tz_convert('US/Central')
         return dataFrame

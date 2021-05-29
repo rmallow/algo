@@ -94,7 +94,7 @@ class mainOutputView(QtWidgets.QWidget):
         oView = None
         slot = None
         if selectionSettings[TYPE] == outputTypesEnum.FEED.value:
-            oView = outputViewFeed(outputViewModel, self)
+            oView = outputViewFeed(outputViewModel, selectionSettings, self)
             slot = oView.updateOnLoad
 
         animations.fadeStart(self, self.sender(), oView, self.mainLayout, finishedSlot=slot)

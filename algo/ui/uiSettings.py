@@ -11,6 +11,7 @@ Output Item UI Files
 """
 OUTPUT_SELECT_ITEM_UI_FILE = "outputSelectItem.ui"
 OUTPUT_SELECT_TYPE_UI_FILE = "outputSelectType.ui"
+OUTPUT_SELECT_SETTINGS_UI_FILE = "outputSelectSettings.ui"
 
 """
 Output View UI Files

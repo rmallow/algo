@@ -4,12 +4,13 @@ from .uiSettings import OUTPUT_VIEW_FEED_UI_FILE
 from .util import loadingUtil
 
 from ..commonUtil import pathUtil
+from ..commonGlobals import ITEM, TYPE
 
-from PySide6 import QtGui, QtCore
+from PySide6 import QtCore
 
 
 class outputViewFeed(outputView):
-    def __init__(self, outputViewModel, parent=None):
+    def __init__(self, outputViewModel, selectionSettings, parent=None):
         super().__init__(outputViewModel, parent)
 
         # Load UI file
@@ -17,17 +18,9 @@ class outputViewFeed(outputView):
         self.ui = loadingUtil.loadUiWidget(dirPath + "/" + OUTPUT_VIEW_FEED_UI_FILE, parent=self)
 
         self.setup()
-        """
-        self.model = QtGui.QStandardItemModel()
-        for i in range(0, 20):
-            self.model.appendRow(QtGui.QStandardItem("test row: " + str(i)))
-        """
         self.ui.tableView.setModel(self.outputViewModel)
+        self.ui.itemLabel.setText(selectionSettings[ITEM] + " - " + selectionSettings[TYPE])
 
     @QtCore.Slot()
     def updateOnLoad(self):
         pass
-        # Table has some weird graphical glitch where it's not loading properly
-        # Lazy way to get around this as no other easy solution worked well is this
-        # self.outputViewModel.insertRow(0, QtGui.QStandardItem(""))
-        # self.outputViewModel.takeRow(0)

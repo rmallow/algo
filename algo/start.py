@@ -5,9 +5,21 @@ from .commonUtil import errorHandling
 
 import threading
 from queue import Queue
+import os
+
+
+def setEnvVarsMac():
+    # Ran into issues with forking, threading, QT, and url requests
+    # so we're setting some environment variables to get around this
+    # links above each are where i found the solution
+    # https://stackoverflow.com/questions/30816565/python-urllib-does-not-work-with-pyqt-multiprocessing
+    os.environ["no_proxy"] = "*"
+    # https://stackoverflow.com/questions/50168647/multiprocessing-causes-python-to-crash-and-gives-an-error-may-have-been-in-progr
+    os.environ["OBJC_DISABLE_INITIALIZE_FORK_SAFETY"] = "YES"
 
 
 def start(clArgs):
+    setEnvVarsMac()
     uiArgPresent = False
     uiQueue = None
     if "-u" in clArgs:
@@ -27,3 +39,5 @@ def start(clArgs):
                                     description="Make to install ui requirements to run ui")
         else:
             uiStart.start(main)
+    else:
+        main.runAll()

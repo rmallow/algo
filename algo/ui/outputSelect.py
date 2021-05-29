@@ -1,8 +1,8 @@
-from .uiSettings import OUTPUT_SELECT_ITEM_UI_FILE, OUTPUT_SELECT_TYPE_UI_FILE
+from .uiSettings import OUTPUT_SELECT_ITEM_UI_FILE, OUTPUT_SELECT_TYPE_UI_FILE, OUTPUT_SELECT_SETTINGS_UI_FILE
 
 from .util import loadingUtil, animations
 
-from ..commonGlobals import TYPE, ITEM
+from ..commonGlobals import TYPE, ITEM, PERIOD
 from ..commonUtil import pathUtil
 
 from PySide6 import QtWidgets, QtCore
@@ -19,9 +19,13 @@ class outputSelect(QtWidgets.QWidget):
         dirPath = pathUtil.getFileDirPath(__file__)
         self.selectItemUI = loadingUtil.loadUiWidget(dirPath + "/" + OUTPUT_SELECT_ITEM_UI_FILE)
         self.selectTypeUI = loadingUtil.loadUiWidget(dirPath + "/" + OUTPUT_SELECT_TYPE_UI_FILE)
+        self.selectSettingsUI = loadingUtil.loadUiWidget(dirPath + "/" + OUTPUT_SELECT_SETTINGS_UI_FILE)
+
+        self.selectionSettings = {}
 
         self.initSelectItem()
         self.initSelectType()
+        self.initSelectSettings()
 
         self.mainLayout = QtWidgets.QVBoxLayout()
 
@@ -51,6 +55,9 @@ class outputSelect(QtWidgets.QWidget):
         self.selectTypeUI.typeComboBox.setCurrentIndex(-1)
         self.selectTypeUI.typeComboBox.textActivated.connect(self.typeSelected)
 
+    def initSelectSettings(self):
+        self.selectSettingsUI.acceptButton.clicked.connect(self.settingsSelected)
+
     def backButtonSetup(self):
         backWidget = QtWidgets.QWidget(self)
         backLayout = QtWidgets.QHBoxLayout()
@@ -68,7 +75,10 @@ class outputSelect(QtWidgets.QWidget):
         if self.mainLayout.indexOf(self.selectItemUI) != -1:
             pass
         elif self.mainLayout.indexOf(self.selectTypeUI) != -1:
+            self.selectionSettings = {}
             animations.fadeStart(self, self.selectTypeUI, self.selectItemUI, self.mainLayout)
+        elif self.mainLayout.indexOf(self.selectSettingsUI) != -1:
+            animations.fadeStart(self, self.selectSettingsUI, self.selectTypeUI, self.mainLayout)
 
     @QtCore.Slot()
     def itemSelected(self, text):
@@ -82,8 +92,15 @@ class outputSelect(QtWidgets.QWidget):
             self.selectTypeUI.itemLabel.setText("Handler: " + str(self.item))
             self.selectItemUI.blockComboBox.setCurrentIndex(-1)
 
+        self.selectionSettings[ITEM] = text
         animations.fadeStart(self, self.selectItemUI, self.selectTypeUI, self.mainLayout)
 
     @QtCore.Slot()
     def typeSelected(self, text):
-        self.selectionFinished.emit({TYPE: text, ITEM: self.item})
+        self.selectionSettings[TYPE] = text
+        animations.fadeStart(self, self.selectTypeUI, self.selectSettingsUI, self.mainLayout)
+
+    @QtCore.Slot()
+    def settingsSelected(self):
+        self.selectionSettings[PERIOD] = self.selectSettingsUI.periodSpinBox.value()
+        self.selectionFinished.emit(self.selectionSettings)

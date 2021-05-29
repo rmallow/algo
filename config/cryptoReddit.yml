@@ -1,14 +1,14 @@
 BTC:
     name: BTCUSD
     dataSource:
-        type: sim
-        key: https://financialmodelingprep.com/api/v3/historical-chart/1min/BTCUSD?apikey=$[fmp.key]
-        dataType: url
-        indexName: date
+        type: stream
+        key: https://financialmodelingprep.com/api/v3/quote/BTCUSD?apikey=$[fmp.key]
+        dataType: REAL_TIME_REQUEST
+        indexName: timestamp
         columnFilter:
-            - close
+            - price
             - volume
-        period: 1
+        period: 60
         dayFirst: False
     feed:
         period: 60
@@ -18,7 +18,7 @@ BTC:
     actionList:
         closeChange:
             inputCols:
-                - close
+                - price
             actionType: event
             calcFunc:
                 location: funcs.eventFuncs

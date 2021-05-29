@@ -16,15 +16,15 @@ class mainOutputViewModel():
 
         # All selectors will refer back to the same models
         # this way we only need to update one set of models and all selectors will be updated
-        self.blockComboModel = QtGui.QStandardItemModel()
-        self.handlerComboModel = QtGui.QStandardItemModel()
+        self.blockComboModel: QtGui.QStandardItemModel = QtGui.QStandardItemModel()
+        self.handlerComboModel: QtGui.QStandardItemModel = QtGui.QStandardItemModel()
 
         self.addBlocks(mainframe.getBlocks())
         self.addHandlers(mainframe.getHandlers())
 
         # All output Types are already known at runtime
         # But availability is determined per item
-        self.typeModel = QtCore.QStringListModel([val.value for val in outputTypesEnum])
+        self.typeModel: QtCore.QStringListModel = QtCore.QStringListModel([val.value for val in outputTypesEnum])
 
         self.mainModel = mainModel
         self.outputViewModels = {}
@@ -60,7 +60,7 @@ class mainOutputViewModel():
                         details=selectionDict)
         self.mainModel.messageMainframe(m)
 
-        model = pandasModel()
+        model = pandasModel(**selectionDict)
         modelList = self.outputViewModels.get(selectionDict[ITEM], [])
         modelList.append(model)
         self.outputViewModels[selectionDict[ITEM]] = modelList

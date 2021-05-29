@@ -12,7 +12,7 @@ import time
 
 
 class block(commandProcessor):
-    def __init__(self, actionList, feed, messageRouter, libraries, config, *args, parseSettings=None, 
+    def __init__(self, actionList, feed, messageRouter, libraries, config, *args, parseSettings=None,
                  name="defaultBlockName", code=123, **kwargs):
         super().__init__(*args, **kwargs)
         self.code = code

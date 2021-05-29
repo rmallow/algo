@@ -34,9 +34,12 @@ def redditTest(reddit=None, subreddit="learnpython", **kwargs):
     data = None
     if reddit is not None:
         d = {'title': [], 'time': [], 'uid': []}
-        for submission in reddit.subreddit(subreddit).new(limit=10):
-            d['title'].append(submission.title)
-            d['time'].append(datetime.utcfromtimestamp(submission.created_utc))
-            d['uid'].append(submission.id)
-        data = pd.DataFrame(d)
+        redditVals = None
+        redditVals = reddit.subreddit(subreddit).new(limit=10)
+        if redditVals:
+            for submission in redditVals:
+                d['title'].append(submission.title)
+                d['time'].append(datetime.utcfromtimestamp(submission.created_utc))
+                d['uid'].append(submission.id)
+            data = pd.DataFrame(d)
     return data

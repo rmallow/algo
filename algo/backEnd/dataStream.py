@@ -14,15 +14,15 @@ class dataStream(dataBase):
 
         self.loadData()
 
-    def getData(self, timestamp, period):
+    def getData(self, period):
         if self.time:
             # this just feels dangerous
-            while self.time < time.time() - self.period:
+            while self.time > time.time() - self.period:
                 pass
 
         returnVal = None
         if self.dataType == DataSourceTypeEnum.REAL_TIME_REQUEST:
-            returnVal = self.getDataReal(timestamp, period)
+            returnVal = self.getDataReal(period)
 
         if returnVal is not None:
             returnVal = self.dataFrameModifications(returnVal)
@@ -30,7 +30,7 @@ class dataStream(dataBase):
         self.time = time.time()
         return returnVal
 
-    def getDataReal(self, timestamp, period):
+    def getDataReal(self, period):
         return ru.getPandasFromUrl(self.key)
 
     def loadData(self):

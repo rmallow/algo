@@ -1,14 +1,19 @@
+from ..commonGlobals import PERIOD
+from ..commonUtil.keywordUnpacker import keywordUnpacker
 
 import typing
 
 from PySide6 import QtCore
 import pandas as pd
 
+PANDAS_MODEL_KEYWORDS_DICT = {PERIOD: None}
 
-class pandasModel(QtCore.QAbstractTableModel):
-    def __init__(self):
+
+class pandasModel(keywordUnpacker, QtCore.QAbstractTableModel):
+    def __init__(self, *args, **kwargs):
         super().__init__()
         self.df = pd.DataFrame()
+        self.unpack(kwargs, PANDAS_MODEL_KEYWORDS_DICT, warn=False)
 
     def rowCount(self, parent: QtCore.QModelIndex = QtCore.QModelIndex()) -> int:
         return len(self.df.index)
@@ -44,6 +49,11 @@ class pandasModel(QtCore.QAbstractTableModel):
         Add new rows to the dataframe, if df is empty, resetModel to get column changes
         otherwise just beginInsertRows as it is far more efficient
         """
+        if self.period is not None:
+            if len(self.df.index) + len(dataframe.index) > self.period:
+                # Remove rows so that the combined dataframes won't be more than the period
+                self.removeRows(0, (len(self.df.index) + len(dataframe.index)) - self.period)
+
         resetModel = False
         if len(self.df.index) == 0 or len(self.df.columns) == 0:
             self.beginResetModel()
@@ -55,3 +65,11 @@ class pandasModel(QtCore.QAbstractTableModel):
             self.endResetModel()
         else:
             self.endInsertRows()
+
+    def removeRows(self, rowStart, count):
+        """
+        Function to remove rows from the dataframe and from the table model
+        """
+        self.beginRemoveRows(QtCore.QModelIndex(), rowStart, rowStart + count)
+        self.df.drop(self.df.index[rowStart:rowStart+count])
+        self.endRemoveRows()
