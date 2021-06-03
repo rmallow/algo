@@ -48,7 +48,7 @@ class mainOutputViewModel():
         if data.key.sourceCode in self.outputViewModels:
             modelList = self.outputViewModels[data.key.sourceCode]
             for model in modelList:
-                model.appendRow(data.content)
+                model.appendDataFrame(data.content)
 
     def setupOutputView(self, selectionDict):
         """

@@ -1,4 +1,5 @@
 import praw
+from praw.models import MoreComments
 import pandas as pd
 from datetime import datetime
 
@@ -9,7 +10,7 @@ def setupReddit(clientId=None, clientSecret=None, userAgent=None, **kwargs):
                 praw.Reddit(
                     client_id=clientId,
                     client_secret=clientSecret,
-                    user_agent=userAgent,
+                    user_agent=userAgent
                 )}
     else:
         return None
@@ -24,7 +25,7 @@ def setupRedditAuth(clientId=None, clientSecret=None, userAgent=None, username=N
                     client_secret=clientSecret,
                     user_agent=userAgent,
                     username=username,
-                    password=password,
+                    password=password
                 )}
     else:
         return None
@@ -33,12 +34,22 @@ def setupRedditAuth(clientId=None, clientSecret=None, userAgent=None, username=N
 def redditTest(reddit=None, subreddit="learnpython", **kwargs):
     data = None
     if reddit is not None:
-        d = {'title': [], 'time': [], 'uid': []}
+        d = {'title': [], 'time': [], 'uid': [], 'comment': []}
         redditVals = None
-        redditVals = reddit.subreddit(subreddit).new(limit=10)
+        redditVals = reddit.subreddit(subreddit).hot(limit=10)
         if redditVals:
             for submission in redditVals:
                 d['title'].append(submission.title)
+                commentString = ""
+                first = True
+                for comment in submission.comments:
+                    if isinstance(comment, MoreComments):
+                        continue
+                    if not first:
+                        commentString += "\n"
+                    commentString += comment.body
+
+                d['comment'].append(commentString)
                 d['time'].append(datetime.utcfromtimestamp(submission.created_utc))
                 d['uid'].append(submission.id)
             data = pd.DataFrame(d)

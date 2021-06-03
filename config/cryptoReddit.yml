@@ -8,7 +8,7 @@ BTC:
         columnFilter:
             - price
             - volume
-        period: 60
+        period: 15
         dayFirst: False
     feed:
         period: 60
@@ -108,7 +108,7 @@ REDDIT:
             clientId: $[praw.clientId]
             clientSecret: $[praw.clientSecret]
             userAgent: $[praw.userAgent]
-            subreddit: pics+videos+askreddit+aww+memes+gaming
+            subreddit: CryptoCurrency+CryptoMarkets+CryptoCurrencyTrading+Bitcoin+BTC+Ethereum+EthTrader+dogecoin
         sequential: True
     feed:
         period: 60

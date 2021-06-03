@@ -54,3 +54,9 @@ def divide(dataSet, parameters=None):
 
 def rsi(dataSet, parameters=None):
     return (100 - (100 / (1 + dataSet.iloc[0][0])))
+
+
+def wordCheck(dataSet, parameters=None):
+    if 'word' in parameters:
+        return 1
+    return 0

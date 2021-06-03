@@ -44,32 +44,54 @@ class pandasModel(keywordUnpacker, QtCore.QAbstractTableModel):
                     return str(self.df.index[section])
         return None
 
-    def appendRow(self, dataframe):
+    def appendDataFrame(self, dataframe):
+        """
+        Add new rows to the dataframe and remove if needed for period
+        """
+        removeRows = False
+        if self.period is not None:
+            if len(self.df.index) + len(dataframe.index) > self.period:
+                # Remove rows so that the combined dataframes won't be more than the period
+                removeRows = True
+
+        # If we're adding and removing rows then we'll reset the model ourself
+        # otherwise let insert rows function handle it
+        if removeRows:
+            self.beginResetModel()
+
+        self.insertRows(self.rowCount(), dataframe, beginChanges=(not removeRows))
+
+        if removeRows:
+            self.removeRows(0, (len(self.df.index) + len(dataframe.index)) - self.period, beginRemove=False)
+
+            self.endResetModel()
+
+    def removeRows(self, rowStart, count, beginRemove=True):
+        """
+        Function to remove rows from the dataframe and from the table model
+        """
+        if beginRemove:
+            self.beginRemoveRows(QtCore.QModelIndex(), rowStart, rowStart + count - 1)
+        self.df = self.df.drop(self.df.index[rowStart:rowStart+count-1])
+        if beginRemove:
+            self.endRemoveRows()
+
+    def insertRows(self, rowStart, dataframe, beginChanges=True):
         """
         Add new rows to the dataframe, if df is empty, resetModel to get column changes
         otherwise just beginInsertRows as it is far more efficient
         """
-        if self.period is not None:
-            if len(self.df.index) + len(dataframe.index) > self.period:
-                # Remove rows so that the combined dataframes won't be more than the period
-                self.removeRows(0, (len(self.df.index) + len(dataframe.index)) - self.period)
-
         resetModel = False
-        if len(self.df.index) == 0 or len(self.df.columns) == 0:
-            self.beginResetModel()
-            resetModel = True
-        else:
-            self.beginInsertRows(QtCore.QModelIndex(), self.rowCount(), self.rowCount() + len(dataframe.index) - 1)
+        if beginChanges:
+            if len(self.df.index) == 0 or len(self.df.columns) == 0:
+                self.beginResetModel()
+                resetModel = True
+            else:
+                self.beginInsertRows(QtCore.QModelIndex(), rowStart, self.rowCount() + len(dataframe.index) - 1)
+
         self.df = self.df.append(dataframe)
+
         if resetModel:
             self.endResetModel()
-        else:
+        elif beginChanges:
             self.endInsertRows()
-
-    def removeRows(self, rowStart, count):
-        """
-        Function to remove rows from the dataframe and from the table model
-        """
-        self.beginRemoveRows(QtCore.QModelIndex(), rowStart, rowStart + count)
-        self.df.drop(self.df.index[rowStart:rowStart+count])
-        self.endRemoveRows()

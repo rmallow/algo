@@ -84,6 +84,7 @@ class feed():
             self.end = True
         self.newCalcData = pd.DataFrame(index=self.newData.index)
         self.newCalcLength = len(self.newCalcData.index)  # conveience
+        return None
 
     def update(self):
         rawData = self.getDataFunc(self.period)
@@ -99,7 +100,9 @@ class feed():
                 errorHandling.warning("Unexpected type passed to feed from data input, returning None")
                 return None
         # rawData could still be empty
-        self.updateHelper(rawData)
+        helperReturn = self.updateHelper(rawData)
+        if helperReturn and helperReturn == con.DataSourceReturnEnum.NO_DATA:
+            self.update()
 
         return self.newData
 
@@ -127,7 +130,6 @@ class feed():
                 self.safeAddCol(key, value)
 
     def safeAddCol(self, key, value):
-        # safeValue = makeDataSafeList(value)
         if safeLength(value) == len(self.newCalcData.index):
             try:
                 self.newCalcData[key.lower()] = value
