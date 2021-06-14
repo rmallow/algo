@@ -6,7 +6,8 @@ from PySide6 import QtCore
 
 
 class mainModel(QtCore.QObject):
-    uiUpdateSignal = QtCore.Signal(msg.message)
+    updateOutputSignal = QtCore.Signal(msg.message)
+    updateLoggingSignal = QtCore.Signal(msg.message)
 
     def __init__(self, mainframe):
         super().__init__()
@@ -25,5 +26,8 @@ class mainModel(QtCore.QObject):
     def checkQueue(self):
         while not self.uiQueue.empty():
             m = self.uiQueue.get()
-            if m.isUIUpdate():
-                self.uiUpdateSignal.emit(m)
+            if m.isUIUpdate() and m.content is not None:
+                if m.content == msg.UiUpdateType.BLOCK or m.content == msg.UiUpdateType.HANDLER:
+                    self.updateOutputSignal.emit(m)
+                elif m.content == msg.UiUpdateType.LOGGING:
+                    self.updateLoggingSignal.emit(m)

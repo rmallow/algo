@@ -133,3 +133,13 @@ REDDIT:
                 location: funcs.eventFuncs
                 name: testMessageFunc
             period: 1
+        wordCountEvent:
+            inputCols:
+                - comment
+            actionType: event
+            calcFunc:
+                location: funcs.eventFuncs
+                name: wordCheck
+            period: 1
+            parameters:
+                word: "the"

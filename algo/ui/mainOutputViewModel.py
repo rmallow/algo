@@ -29,7 +29,7 @@ class mainOutputViewModel():
         self.mainModel = mainModel
         self.outputViewModels = {}
 
-        self.mainModel.uiUpdateSignal.connect(self.receiveData)
+        self.mainModel.updateOutputSignal.connect(self.receiveData)
 
     def addItem(self, model, key, value):
         item = QtGui.QStandardItem(str(key))
@@ -48,7 +48,7 @@ class mainOutputViewModel():
         if data.key.sourceCode in self.outputViewModels:
             modelList = self.outputViewModels[data.key.sourceCode]
             for model in modelList:
-                model.appendDataFrame(data.content)
+                model.appendDataFrame(data.details)
 
     def setupOutputView(self, selectionDict):
         """

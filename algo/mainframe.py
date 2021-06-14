@@ -1,6 +1,8 @@
 from .commonSettings import SETTINGS_FILE
 from .commonGlobals import ITEM
 
+from .commonUtil import mpLogging
+
 from .backEnd import message as msg
 from .backEnd.messageRouter import messageRouter
 from .backEnd.blockManager import blockManager
@@ -9,7 +11,9 @@ from .backEnd.handlerData import handlerData
 from .backEnd.util import configLoader
 from .backEnd.util.commandProcessor import commandProcessor
 
+# multiprocess is Dill version of multiprocessing
 from multiprocess import Process, Manager
+import multiprocessing as mp
 import aioprocessing
 import os
 import sys
@@ -28,8 +32,14 @@ class mainframe(commandProcessor):
         self.sharedData = handlerData()
         self.handlerManager = None
         self.blockManager = None
-        self.mainframeQueue = self.MpManager.Queue()
+        self.mainframeQueue = self.MpManager.Queue(-1)
+        # we use regular multiprocessing here because otherwise the Dill queue will send to log which
+        # causes an infinite loop in our mpLogging module
+        # we don't need dill for this queue so it's okay to just use regular multiprocessing queue
+        self.loggingQueue = mp.Queue(-1)
         self.uiQueue = uiQueue
+        
+        self.uiConnected = (self.uiQueue is not None)
 
         # add commands for processor
         self.addCmdFunc(msg.CommandType.ADD_OUTPUT_VIEW, mainframe.addOutputView)
@@ -68,9 +78,9 @@ class mainframe(commandProcessor):
 
     def start(self):
         while True:
-            if self.mainframeQueue.empty():
-                time.sleep(.3)
-            else:
+            empty = True
+            if not self.mainframeQueue.empty():
+                empty = False
                 message = self.mainframeQueue.get()
                 if isinstance(message, msg.message):
                     if message.isCommand():
@@ -79,13 +89,27 @@ class mainframe(commandProcessor):
                         if self.uiQueue is not None:
                             self.uiQueue.put(message)
 
+            if not self.loggingQueue.empty():
+                recordData = self.loggingQueue.get()
+                if recordData:
+                    if self.uiQueue is not None:
+                        uiLoggingMessage = msg.message(msg.MessageType.UI_UPDATE, content=msg.UiUpdateType.LOGGING,
+                                                       details=recordData)
+                        self.uiQueue.put(uiLoggingMessage)
+                    mpLogging.handleRecordData(recordData)
+
+            if empty:
+                time.sleep(.3)
+
     def addOutputView(self, command, details):
         if details[ITEM] in self.blockManager.blocks:
             block = self.blockManager.blocks[details[ITEM]]
             block.blockQueue.put(msg.message(msg.MessageType.COMMAND, command, details=details))
 
     def startRouter(self):
-        self.routerProcess = Process(target=self.messageRouter.initAndStartLoop, name="Router")
+        self.routerProcess = Process(target=mpLogging.loggedProcess,
+                                     args=(self.loggingQueue, self.messageRouter.initAndStartLoop), name="Router")
+        # self.routerProcess = Process(target=self.messageRouter.initAndStartLoop, name="Router")
         self.routerProcess.start()
 
     def runAll(self):

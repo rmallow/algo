@@ -25,6 +25,7 @@ class UiUpdateType(Enum):
     OUTPUT = 1
     BLOCK = 2
     HANDLER = 3
+    LOGGING = 4
 
 
 """

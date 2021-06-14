@@ -3,6 +3,8 @@ from .asyncScheduler import asyncScheduler
 
 from .util.commandProcessor import commandProcessor
 
+from ..commonUtil import mpLogging
+
 import queue
 import logging
 from collections.abc import Iterable
@@ -31,6 +33,7 @@ class messageRouter(commandProcessor):
         self.loop = asyncScheduler()
 
     def initAndStartLoop(self):
+        mpLogging.info("Starting Message Roouter", title="Router")
         self.loop.init()
         self.loop.addTask(self.mainLoop(), name="Router Main Loop")
         self.loop.start()

@@ -36,7 +36,7 @@ def redditTest(reddit=None, subreddit="learnpython", **kwargs):
     if reddit is not None:
         d = {'title': [], 'time': [], 'uid': [], 'comment': []}
         redditVals = None
-        redditVals = reddit.subreddit(subreddit).hot(limit=10)
+        redditVals = reddit.subreddit(subreddit).new(limit=10)
         if redditVals:
             for submission in redditVals:
                 d['title'].append(submission.title)
