@@ -1,16 +1,23 @@
 from ..backEnd.message import message
 
+import time
 import typing
 
 from PySide6 import QtCore
 
-_loggingColumns = ["Severity", "Source", "Title", "Description"]
+_loggingColumns = ["Time", "Severity", "Key", "Group", "Title"]
+_notAvail = "----"
 
 
 class loggingModel(QtCore.QAbstractTableModel):
+    addKey = QtCore.Signal(str)
+    addGroup = QtCore.Signal(str)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.logMessages = []
+        self.keys = set()
+        self.groups = set()
 
     def rowCount(self, parent: QtCore.QModelIndex = QtCore.QModelIndex()) -> int:
         return len(self.logMessages)
@@ -43,15 +50,43 @@ class loggingModel(QtCore.QAbstractTableModel):
         Recieve the logging message from the main model and parse it into a data structure for the Qt Table Model
         Turn logging message into list and add to main list
         """
-        self.beginResetModel()
-        #self.beginInsertRows(QtCore.QModelIndex(), len(self.logMessages), len(self.logMessages) + 1)
-        messageList = [message.details['levelname']]
-        messageList.append("Test Source")
-        title = "----"
-        if 'title' in message.details:
-            title = message.details['title']
-        messageList.append(title)
+        self.beginInsertRows(QtCore.QModelIndex(), len(self.logMessages), len(self.logMessages))
+
+        messageList = []
+
+        # Time
+        messageList.append(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(message.details['created'])))
+
+        # Severity
+        messageList.append(message.details['levelname'])
+
+        # Key
+        key = _notAvail
+        if 'mpKey' in message.details:
+            key = message.details['mpKey']
+            if key not in self.keys:
+                self.keys.add(key)
+                self.addKey.emit(key)
+        messageList.append(key)
+
+        # Group
+        group = _notAvail
+        if 'group' in message.details:
+            group = message.details['group']
+            if group not in self.groups:
+                self.groups.add(group)
+                self.addGroup.emit(group)
+        messageList.append(group)
+
+        # Title
         messageList.append(message.details['msg'])
+
+        # Description
+        description = "Location: " + message.details['filename'] + " : " + str(message.details['lineno']) + '\n\n'
+        description += message.details['msg']
+        if 'description' in message.details:
+            description += ":\n" + message.details['description']
+        messageList.append(description)
+
         self.logMessages.append(messageList)
-        #self.endInsertRows()
-        self.endResetModel()
+        self.endInsertRows()

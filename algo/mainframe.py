@@ -108,7 +108,8 @@ class mainframe(commandProcessor):
 
     def startRouter(self):
         self.routerProcess = Process(target=mpLogging.loggedProcess,
-                                     args=(self.loggingQueue, self.messageRouter.initAndStartLoop), name="Router")
+                                     args=(self.loggingQueue, "router", self.messageRouter.initAndStartLoop), 
+                                     name="Router")
         # self.routerProcess = Process(target=self.messageRouter.initAndStartLoop, name="Router")
         self.routerProcess.start()
 
@@ -134,7 +135,12 @@ class mainframe(commandProcessor):
 
     def startBlockProcess(self, code, block):
         processName = "Block-" + str(code)
-        blockProcess = Process(target=block.start, name=processName)
+        # blockProcess = Process(target=mpLogging.loggedProcess
+        # block.start, name=processName)
+        blockProcess = Process(target=mpLogging.loggedProcess,
+                               args=(self.loggingQueue, code, block.start),
+                               name=processName)
+
         self.processDict[code] = blockProcess
         blockProcess.start()
 

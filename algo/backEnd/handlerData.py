@@ -1,4 +1,4 @@
-import logging
+from ..commonUtil import mpLogging
 from collections import OrderedDict
 
 """
@@ -17,6 +17,8 @@ code2:
 }
 
 """
+
+HANDLER_DATA_GROUP = "Handler Data"
 
 
 class handlerData():
@@ -54,7 +56,8 @@ class handlerData():
         try:
             return self.dataSet[key.sourceCode]
         except Exception:
-            logging.warning("invalid code for handler data access")
+            mpLogging.warning("Invalid code for handler data access",
+                              description="Key: " + str(key), title=HANDLER_DATA_GROUP)
             return None
 
     def _getTimeData(self, key):
@@ -67,7 +70,8 @@ class handlerData():
             # the first element is the index of the time, so return the data at second element
             return codeDict[key.time]
         except Exception:
-            logging.warning("invalid time for handler data access")
+            mpLogging.warning("Invalid code for handler data access",
+                              description="Key: " + str(key), title=HANDLER_DATA_GROUP)
             return None
 
     def get(self, key, default=None):

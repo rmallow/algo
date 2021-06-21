@@ -6,8 +6,9 @@ from .util.commandProcessor import commandProcessor
 from ..commonUtil import mpLogging
 
 import queue
-import logging
 from collections.abc import Iterable
+
+ROUTER_GROUP = "Router"
 
 
 class messageRouter(commandProcessor):
@@ -33,7 +34,7 @@ class messageRouter(commandProcessor):
         self.loop = asyncScheduler()
 
     def initAndStartLoop(self):
-        mpLogging.info("Starting Message Roouter", title="Router")
+        mpLogging.info("Starting Message Roouter", group=ROUTER_GROUP)
         self.loop.init()
         self.loop.addTask(self.mainLoop(), name="Router Main Loop")
         self.loop.start()
@@ -53,23 +54,23 @@ class messageRouter(commandProcessor):
                         # just one message, check what type
                         if message.isCommand():
                             # calls processorCommand func
-                            self.processCommand(message)
+                            self.processCommand(message.content, details=message)
                         elif message.isPriority():
                             # immediately broadcast a priority message
                             self.broadcastPriority(message)
                         else:
-                            logging.warning("unexpected message type:")
-                            logging.warning(str(message))
+                            mpLogging.warning("Unexpected message type",
+                                              description="Message: " + str(message), group=ROUTER_GROUP)
                     elif isinstance(message, Iterable):
                         for singleMessage in message:
                             if isinstance(singleMessage, msg.message) and singleMessage.isNormal():
                                 self.broadcast(singleMessage)
                             else:
-                                logging.warning("unexpected value in message router message list:")
-                                logging.warning(str(singleMessage))
+                                mpLogging.warning("Unexpected value in message router message list",
+                                                  dsecription="Message: " + str(singleMessage), group=ROUTER_GROUP)
                     else:
-                        logging.warning("unexpected value in message router")
-                        logging.warning(str(message))
+                        mpLogging.warning("Unexpected value in router",
+                                          description="Message: " + str(message), group=ROUTER_GROUP)
 
     # send to message subscriptions priority
     def broadcastPriority(self, message):
@@ -89,55 +90,60 @@ class messageRouter(commandProcessor):
         # pylint: disable=no-member
         self.messageQueue.put(message)
 
-    def cmdStart(self, message):
+    def cmdStart(self, command, details=None):
         """
         @brief: called from command processor super class when Start command is received
             signals the start of messages for this key
             clears data for code if it's been marked to clear
 
-        @param: message - command message
+        @param: command - command being executed
+        @param: details - rest of message command came on
         """
-        if message.key.sourceCode in self.blocksToClear:
-            self.handlerData.clearCode(message.key.sourceCode)
-            self.blocksToClear.remove(message.key.sourceCode)
-        if message.key not in self.handlerUpdateDict:
-            self.handlerUpdateDict[message.key] = set()
+        if details.key.sourceCode in self.blocksToClear:
+            self.handlerData.clearCode(details.key.sourceCode)
+            self.blocksToClear.remove(details.key.sourceCode)
+        if details.key not in self.handlerUpdateDict:
+            self.handlerUpdateDict[details.key] = set()
         else:
-            logging.warning("start cmd on existing update list, code:")
-            logging.warning(str(message.sourceCode))
+            mpLogging.warning("start cmd on existing update list",
+                              description="Message details: " + str(details), group=ROUTER_GROUP)
 
-    def cmdEnd(self, message):
+    def cmdEnd(self, command, details=None):
         """
         @brief: called from command processor super class when End command is received
             signals the end of messages for this key
 
-        @param: message - command message
+        @param: command - command being executed
+        @param: details - rest of message command came on
         """
-        updateSet = self.handlerUpdateDict.pop(message.key, set())
+        updateSet = self.handlerUpdateDict.pop(details.key, set())
         for handlerToUpdate in updateSet:
-            self.loop.addTaskArgs(handlerToUpdate.update, message.key)
+            self.loop.addTaskArgs(handlerToUpdate.update, details.key)
 
-    def cmdAbort(self, message):
+    def cmdAbort(self, command, details=None):
         """
         @brief: called from command processor super class when Abort command is received
 
-        @param: message - command message
+        @param: command - command being executed
+        @param: details - rest of message command came on
         """
         self.end = True
 
-    def cmdResume(self, message):
+    def cmdResume(self, command, details=None):
         """
         @brief: called from command processor super class when Resume command is received
 
-        @param: message - command message
+        @param: command - command being executed
+        @param: details - rest of message command came on
         """
         self.end = False
 
-    def cmdClear(self, message):
+    def cmdClear(self, command, details=None):
         """
         @brief: called from command processor super class when Clear command is received
             Adds code to set, this code will be cleared when start is called for same code
 
-        @param: message - command message
+        @param: command - command being executed
+        @param: details - rest of message command came on
         """
-        self.blocksToClear.add(message.key.sourceCode)
+        self.blocksToClear.add(details.key.sourceCode)

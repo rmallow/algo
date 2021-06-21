@@ -59,7 +59,7 @@ class commandProcessor(multiBase):
 
         @param: command -   command passed into command func
         """
-        self.cmdStart(command)
+        self.cmdStart(command, details=details)
 
     def cmdEnd(self, command, details=None):
         """
@@ -67,7 +67,7 @@ class commandProcessor(multiBase):
 
         @param: command -   command passed into command func
         """
-        self.cmdEnd(command)
+        self.cmdEnd(command, details=details)
 
     def cmdAbort(self, command, details=None):
         """
@@ -75,7 +75,7 @@ class commandProcessor(multiBase):
 
         @param: command -   command passed into command func
         """
-        self.cmdAbort(command)
+        self.cmdAbort(command, details=details)
 
     def cmdResume(self, command, details=None):
         """
@@ -83,7 +83,7 @@ class commandProcessor(multiBase):
 
         @param: command -   command passed into command func
         """
-        self.cmdResume(command)
+        self.cmdResume(command, details=details)
 
     def processCommand(self, command, details=None):
         """

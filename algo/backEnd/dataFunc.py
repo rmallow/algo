@@ -1,5 +1,7 @@
 from .dataBase import dataBase
 
+from ..commonUtil import mpLogging
+
 import time
 
 DATA_FUNC_KEYWORDS_LIST = {'getFunc': None, 'setupFunc': None, 'parameters': {}}
@@ -16,6 +18,7 @@ class dataFunc(dataBase):
         self.loadData()
 
     def getData(self, period):
+        mpLogging.info("Data func getting data", group="dataFunc")
         if self.time:
             diff = time.time() - self.time
             if self.period - diff > 0:
