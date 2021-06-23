@@ -5,11 +5,15 @@ _extraKwargs = ['group', 'source', 'description']
 _mpKwarg = '_mpKwarg'
 
 
-def adjustKwarg(kwargDict):
-    if 'extra' not in kwargDict:
-        kwargDict['extra'] = {}
-    kwargDict['extra'][_mpKwarg] = True
-    kwargDict['exc_info'] = True
+def adjustKwarg(kwargs):
+    if 'extra' not in kwargs:
+        kwargs['extra'] = {}
+    kwargs['extra'][_mpKwarg] = True
+    kwargs['exc_info'] = True
+    for kwarg in _extraKwargs:
+        if kwarg in kwargs:
+            kwargs['extra'][kwarg] = kwargs[kwarg]
+            del kwargs[kwarg]
 
 
 def handleRecordData(recordData):
@@ -54,38 +58,27 @@ class MPLogger(logging.Logger):
         super().handle(record)
 
     def log(self, level, msg, *args, **kwargs):
-        for kwarg in _extraKwargs:
-            if kwarg in kwargs:
-                if 'extra' not in kwargs:
-                    kwargs['extra'] = {}
-                kwargs['extra'][kwarg] = kwargs[kwarg]
-                del kwargs[kwarg]
         # stacklevel is used in logging.findCaller, it is the number of frames on the stack
-        # to go back, in our case it needs to go four back to find where the mpLogging was caleld
+        # to go back, in our case it needs to go four back to find where the mpLogging was called
         super().log(level, msg, *args, **kwargs, stacklevel=4)
 
-    def mpCritical(self, msg, *args, **kwargs):
-        adjustKwarg(kwargs)
+    def critical(self, msg, *args, **kwargs):
         self.log(logging.CRITICAL, msg, *args, **kwargs)
 
-    def mpError(self, msg, *args, **kwargs):
-        adjustKwarg(kwargs)
+    def error(self, msg, *args, **kwargs):
         self.log(logging.ERROR, msg, *args, **kwargs)
 
-    def mpWarning(self, msg, *args, **kwargs):
-        adjustKwarg(kwargs)
+    def warning(self, msg, *args, **kwargs):
         self.log(logging.WARNING, msg, *args, **kwargs)
 
-    def mpInfo(self, msg, *args, **kwargs):
-        adjustKwarg(kwargs)
+    def info(self, msg, *args, **kwargs):
         self.log(logging.INFO, msg, *args, **kwargs)
 
-    def mpDebug(self, msg, *args, **kwargs):
-        adjustKwarg(kwargs)
+    def debug(self, msg, *args, **kwargs):
         self.log(logging.DEBUG, msg, *args, **kwargs)
 
 
-def loggedProcess(queue, mpKey, func, *args, **kwargs):
+def makeMpLogged(queue, mpKey):
     MPLogger.log_queue = queue
     MPLogger.mpKey = mpKey
     logging.setLoggerClass(MPLogger)
@@ -94,27 +87,50 @@ def loggedProcess(queue, mpKey, func, *args, **kwargs):
     for logger in logging.Logger.manager.loggerDict.values():
         if not isinstance(logger, logging.PlaceHolder):
             logger.__class__ = MPLogger
+
+
+def loggedProcess(queue, mpKey, func, *args, **kwargs):
+    makeMpLogged(queue, mpKey)
     func(*args, **kwargs)
 
 # Basic functions to mimic logging.debug type functions but for mpLogging
-# If not using loggedProcess then shouldn't be using mpLogging funcs
+# These are safe to use as regular logging too
+
+
+def mpLoggingCheck(msg, kwargs):
+    if not isinstance(logging.getLogger(), MPLogger):
+        for kwarg in _extraKwargs:
+            if kwarg in kwargs:
+                msg += f" {kwarg}: {kwargs[kwarg]}"
+                del kwargs[kwarg]
+    return msg
 
 
 def critical(msg, *args, **kwargs):
-    logging.getLogger().mpCritical(msg, *args, **kwargs)
+    msg = mpLoggingCheck(msg, kwargs)
+    adjustKwarg(kwargs)
+    logging.getLogger().critical(msg, *args, **kwargs)
 
 
 def error(msg, *args, **kwargs):
-    logging.getLogger().mpError(msg, *args, **kwargs)
+    msg = mpLoggingCheck(msg, kwargs)
+    adjustKwarg(kwargs)
+    logging.getLogger().error(msg, *args, **kwargs)
 
 
 def warning(msg, *args, **kwargs):
-    logging.getLogger().mpWarning(msg, *args, **kwargs)
+    msg = mpLoggingCheck(msg, kwargs)
+    adjustKwarg(kwargs)
+    logging.getLogger().warning(msg, *args, **kwargs)
 
 
 def info(msg, *args, **kwargs):
-    logging.getLogger().mpInfo(msg, *args, **kwargs)
+    msg = mpLoggingCheck(msg, kwargs)
+    adjustKwarg(kwargs)
+    logging.getLogger().info(msg, *args, **kwargs)
 
 
 def debug(msg, *args, **kwargs):
-    logging.getLogger().mpDebug(msg, *args, **kwargs)
+    msg = mpLoggingCheck(msg, kwargs)
+    adjustKwarg(kwargs)
+    logging.getLogger().debug(msg, *args, **kwargs)

@@ -1,5 +1,6 @@
 from .configWindow import configWindow
 from .loggingWindow import loggingWindow
+from .statusWindow import statusWindow
 from .uiSettings import MAIN_WINDOW_UI_FILE
 from .blockTab import blockTab
 from .handlerTab import handlerTab
@@ -35,8 +36,12 @@ class mainWindow(QtWidgets.QMainWindow):
         # Create and connect logging window
         self.loggingWindow = loggingWindow(self)
         self.mainModel.updateLoggingSignal.connect(self.loggingWindow.loggingModel.receiveData)
-
         self.ui.loggingButton.clicked.connect(lambda: self.loggingWindow.ui.show())
+
+        # Create and connect status window
+        self.statusWindow = statusWindow(self)
+        self.mainModel.updateStatusSignal.connect(self.statusWindow.statusModel.receiveData)
+        self.ui.statusButton.clicked.connect(lambda: self.statusWindow.ui.show())
 
         # Create and add output view
         oView = mainOutputView(self.oViewModel, self.ui.tabWidget)

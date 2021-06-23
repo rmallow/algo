@@ -1,4 +1,6 @@
 from ..commonUtil import mpLogging
+from ..commonGlobals import HANDLER_GROUP
+
 from collections import OrderedDict
 
 """
@@ -17,8 +19,6 @@ code2:
 }
 
 """
-
-HANDLER_DATA_GROUP = "Handler Data"
 
 
 class handlerData():
@@ -57,7 +57,7 @@ class handlerData():
             return self.dataSet[key.sourceCode]
         except Exception:
             mpLogging.warning("Invalid code for handler data access",
-                              description="Key: " + str(key), title=HANDLER_DATA_GROUP)
+                              description="Key: " + str(key), title=HANDLER_GROUP)
             return None
 
     def _getTimeData(self, key):
@@ -71,7 +71,7 @@ class handlerData():
             return codeDict[key.time]
         except Exception:
             mpLogging.warning("Invalid code for handler data access",
-                              description="Key: " + str(key), title=HANDLER_DATA_GROUP)
+                              description="Key: " + str(key), title=HANDLER_GROUP)
             return None
 
     def get(self, key, default=None):

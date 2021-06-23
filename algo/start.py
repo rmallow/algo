@@ -1,7 +1,7 @@
 
 from .mainframe import mainframe
 
-from .commonUtil import errorHandling
+import logging
 
 import threading
 from queue import Queue
@@ -35,8 +35,7 @@ def start(clArgs):
         try:
             from .ui import uiStart
         except ModuleNotFoundError:
-            errorHandling.logAssert("UI command arg passes (-u) but ui modules not installed",
-                                    description="Make to install ui requirements to run ui")
+            logging.critical("UI command arg passes (-u) but ui modules not installed")
         else:
             uiStart.start(main)
     else:

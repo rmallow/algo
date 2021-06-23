@@ -1,5 +1,6 @@
 import pandas as pd
-from ..commonUtil import errorHandling
+from ..commonUtil import mpLogging
+from ..commonGlobals import ACTION_GROUP
 from ..commonUtil.keywordUnpacker import keywordUnpacker
 
 
@@ -99,5 +100,6 @@ class action(keywordUnpacker):
                 holder = findCol(feed, col)
                 self.dataSet[col] = holder
             except ValueError:
-                errorHandling.printTraceback("Error setting column for updating data set, name: " + self.name)
+                mpLogging.errror("Error setting column for updating data set", group=ACTION_GROUP,
+                                 description=f"Name of action: {self.name} and input cols: {self.inputCols}")
                 print(feed.data)

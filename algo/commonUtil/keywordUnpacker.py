@@ -1,4 +1,4 @@
-from . import errorHandling
+from . import mpLogging
 from .multiBase import multiBase
 
 """
@@ -39,12 +39,12 @@ class keywordUnpacker(multiBase):
                 requiredListCopy.remove(k)
 
         if len(requiredListCopy) > 0:
-            errorHandling.logAssert("Missing required parameter in defention of " + str(self.__class__.__name__),
-                                    description="Missing required parameters: " + str(requiredListCopy))
+            mpLogging.error("Missing required parameter in defention of " + str(self.__class__.__name__),
+                            description="Missing required parameters: " + str(requiredListCopy))
 
         if warn and keywordsDefaultCopy:
-            errorHandling.warning("Missing keyword in defenition of " + str(self.__class__.__name__),
-                                  description="Keywords to set as default: " + str(list(keywordsDefaultCopy.keys())))
+            mpLogging.warning("Missing keyword in defenition of " + str(self.__class__.__name__),
+                              description="Keywords to set as default: " + str(list(keywordsDefaultCopy.keys())))
 
         for kDefault, vDefault in keywordsDefaultCopy.items():
             setattr(self, kDefault, vDefault)

@@ -1,6 +1,7 @@
+from ..commonUtil import mpLogging
+
 import asyncio
 import inspect
-import logging
 
 
 class asyncScheduler():
@@ -34,7 +35,7 @@ class asyncScheduler():
         if inspect.iscoroutine(func):
             self.tasks.append(self.loop.create_task(func, name=name))
         else:
-            logging.warning("non coroutine function passed")
+            mpLogging.warning("non coroutine function passed")
 
     def addTaskArgs(self, func, args, name=None):
         self.tasks.append(self.loop.create_task(func(args)))

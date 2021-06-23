@@ -64,18 +64,18 @@ class loggingModel(QtCore.QAbstractTableModel):
         key = _notAvail
         if 'mpKey' in message.details:
             key = message.details['mpKey']
-            if key not in self.keys:
-                self.keys.add(key)
-                self.addKey.emit(key)
+        if key not in self.keys:
+            self.keys.add(key)
+            self.addKey.emit(key)
         messageList.append(key)
 
         # Group
         group = _notAvail
         if 'group' in message.details:
             group = message.details['group']
-            if group not in self.groups:
-                self.groups.add(group)
-                self.addGroup.emit(group)
+        if group not in self.groups:
+            self.groups.add(group)
+            self.addGroup.emit(group)
         messageList.append(group)
 
         # Title

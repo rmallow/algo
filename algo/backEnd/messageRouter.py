@@ -4,11 +4,10 @@ from .asyncScheduler import asyncScheduler
 from .util.commandProcessor import commandProcessor
 
 from ..commonUtil import mpLogging
+from ..commonGlobals import ROUTER_GROUP
 
 import queue
 from collections.abc import Iterable
-
-ROUTER_GROUP = "Router"
 
 
 class messageRouter(commandProcessor):

@@ -1,6 +1,6 @@
 from .. import message as msg
 
-from ...commonUtil import errorHandling
+from ...commonUtil import mpLogging
 from ...commonUtil.multiBase import multiBase
 
 """
@@ -42,7 +42,7 @@ class commandProcessor(multiBase):
         if key not in self.cmdDict or overwrite:
             self.cmdDict[key] = func
             if overwrite:
-                errorHandling.warning("Overwriting command processor for key: " + str(key))
+                mpLogging.warning("Overwriting command processor for key: " + str(key))
 
     def cmdNotFound(self, command, details=None):
         """
@@ -50,8 +50,8 @@ class commandProcessor(multiBase):
 
         @param: command -   command passed into command func
         """
-        errorHandling.warning("Command Processor command not found",
-                              description=str(command))
+        mpLogging.warning("Command Processor command not found",
+                          description=str(command))
 
     def cmdStart(self, command, details=None):
         """

@@ -1,6 +1,7 @@
 from .dataBase import dataBase
 
 from ..commonUtil import mpLogging
+from ..commonGlobals import DATA_GROUP
 
 import time
 
@@ -18,7 +19,7 @@ class dataFunc(dataBase):
         self.loadData()
 
     def getData(self, period):
-        mpLogging.info("Data func getting data", group="dataFunc")
+        mpLogging.info("Data func getting data", group=DATA_GROUP)
         if self.time:
             diff = time.time() - self.time
             if self.period - diff > 0:

@@ -3,10 +3,10 @@ from .uiSettings import DISPLAY_TAB_UI_FILE
 from .util import loadingUtil
 
 from ..commonUtil import pathUtil
-from ..commonUtil import errorHandling
+from ..commonUtil import mpLogging
+from ..commonGlobals import UI_GROUP
 
 from PySide6 import QtWidgets, QtCore, QtGui
-
 
 ITEM_ROLE = QtCore.Qt.UserRole
 
@@ -53,7 +53,7 @@ class displayTab(QtWidgets.QWidget):
             item = modelItem.data(ITEM_ROLE)
             innerWidget = self.displayItem(item, displayWidget)
         except AttributeError:
-            errorHandling.printTraceback("Error display item")
+            mpLogging.error("Error display item", group=UI_GROUP, description=str(text))
             innerWidget = QtWidgets.QLabel(text)
         if innerWidget is not None:
             layout.addWidget(innerWidget)

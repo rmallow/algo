@@ -5,7 +5,7 @@ import pickle
 import yaml
 import configparser
 import re
-from ...commonUtil import errorHandling
+from ...commonUtil import mpLogging
 
 VALUES_SECTION = 'Values'
 
@@ -83,7 +83,7 @@ class configLoader():
                 contents = yaml.safe_load(yamlReady)
                 self.recurseDictForFuncMain(contents)
         except OSError:
-            errorHandling.printTraceback("Exception loading file: ")
+            mpLogging.error("Exception loading file", descripti=f"File: {path}")
         return contents
 
 

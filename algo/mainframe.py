@@ -1,9 +1,11 @@
 from .commonSettings import SETTINGS_FILE
-from .commonGlobals import ITEM
+from .commonGlobals import ITEM, SEND_TIME, BACK_TIME
 
 from .commonUtil import mpLogging
+from .commonUtil.helpers import getStrTime
 
 from .backEnd import message as msg
+from .backEnd import messageKey as msgKey
 from .backEnd.messageRouter import messageRouter
 from .backEnd.blockManager import blockManager
 from .backEnd.handlerManager import handlerManager
@@ -19,6 +21,11 @@ import os
 import sys
 import configparser
 import time
+import threading
+
+MAINFRAME_QUEUE_CHECK_TIMER = .3
+LOGGING_QUEUE_CHECK_TIMER = .5
+STATUS_CHECK_TIMER = 1
 
 
 class mainframe(commandProcessor):
@@ -33,12 +40,13 @@ class mainframe(commandProcessor):
         self.handlerManager = None
         self.blockManager = None
         self.mainframeQueue = self.MpManager.Queue(-1)
+        self.statusDict = {}
         # we use regular multiprocessing here because otherwise the Dill queue will send to log which
         # causes an infinite loop in our mpLogging module
         # we don't need dill for this queue so it's okay to just use regular multiprocessing queue
         self.loggingQueue = mp.Queue(-1)
         self.uiQueue = uiQueue
-        
+
         self.uiConnected = (self.uiQueue is not None)
 
         # add commands for processor
@@ -76,30 +84,63 @@ class mainframe(commandProcessor):
         dirPath = os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))
         os.chdir(dirPath)
 
-    def start(self):
-        while True:
-            empty = True
-            if not self.mainframeQueue.empty():
-                empty = False
-                message = self.mainframeQueue.get()
-                if isinstance(message, msg.message):
-                    if message.isCommand():
-                        self.processCommand(message.content, message.details)
-                    elif message.isUIUpdate():
-                        if self.uiQueue is not None:
-                            self.uiQueue.put(message)
-
-            if not self.loggingQueue.empty():
-                recordData = self.loggingQueue.get()
-                if recordData:
+    def checkMainframeQueue(self):
+        while not self.mainframeQueue.empty():
+            message = self.mainframeQueue.get()
+            if isinstance(message, msg.message):
+                if message.isCommand():
+                    self.processCommand(message.content, message.details)
+                elif message.isUIUpdate():
+                    if message.content == msg.UiUpdateType.STATUS:
+                        # Extra handling for status, adding back time and removing from status dict
+                        # we want to do this, removing from the dict, even if uiQueue is not present
+                        code = message.key.sourceCode
+                        if code in self.statusDict:
+                            del self.statusDict[code]
+                            message.details[BACK_TIME] = getStrTime(time.time())
+                        else:
+                            mpLogging.error("Trying to remove code from status dict that isn't present",
+                                            description=f"Code: {code}")
+                            continue
                     if self.uiQueue is not None:
-                        uiLoggingMessage = msg.message(msg.MessageType.UI_UPDATE, content=msg.UiUpdateType.LOGGING,
-                                                       details=recordData)
-                        self.uiQueue.put(uiLoggingMessage)
-                    mpLogging.handleRecordData(recordData)
+                        self.uiQueue.put(message)
+        # schedule it again after the timer
+        threading.Timer(MAINFRAME_QUEUE_CHECK_TIMER, self.checkMainframeQueue).start()
 
-            if empty:
-                time.sleep(.3)
+    def checkLoggingQueue(self):
+        # Check whta's in the logging queue, if the ui queue exists send to that
+        while not self.loggingQueue.empty():
+            recordData = self.loggingQueue.get()
+            if recordData:
+                if self.uiQueue is not None:
+                    uiLoggingMessage = msg.message(msg.MessageType.UI_UPDATE, content=msg.UiUpdateType.LOGGING,
+                                                   details=recordData)
+                    self.uiQueue.put(uiLoggingMessage)
+        # schedule it again after the timer
+        threading.Timer(LOGGING_QUEUE_CHECK_TIMER, self.checkLoggingQueue).start()
+
+    def checkStatus(self):
+        # Check the status of the current running blocks
+        for code, block in self.blockManager.blocks.items():
+            if code not in self.statusDict:
+                sendTime = getStrTime(time.time())
+                block.blockQueue.put(msg.message(msg.MessageType.COMMAND, content=msg.CommandType.CHECK_STATUS,
+                                     details={SEND_TIME: sendTime}))
+                self.statusDict[code] = sendTime
+            else:
+                if time.time() - self.statusDict[code] > 60:
+                    # block has not responded for more than 60 seconds to we're assuming it's not responsive
+                    # so we'll remove it from the status dict so it's checked again
+                    if self.uiQueue is not None:
+                        self.uiQueue.put(msg.message(msg.MessageType.UI_UPDATE, content=msg.UiUpdateType.STATUS,
+                                         details={SEND_TIME: self.statusDict[code]}, key=msgKey.messageKey(code, None)))
+                    del self.statusDict[code]
+        # schedule it again after the timer
+        threading.Timer(STATUS_CHECK_TIMER, self.checkStatus).start()
+
+    def start(self):
+        threading.Timer(MAINFRAME_QUEUE_CHECK_TIMER, self.checkMainframeQueue).start()
+        threading.Timer(LOGGING_QUEUE_CHECK_TIMER, self.checkLoggingQueue).start()
 
     def addOutputView(self, command, details):
         if details[ITEM] in self.blockManager.blocks:
@@ -122,6 +163,8 @@ class mainframe(commandProcessor):
                 self.startBlockProcess(code, block)
             else:
                 print("Error Running Block: " + code)
+
+        threading.Timer(STATUS_CHECK_TIMER, self.checkStatus).start()
 
     def runBlock(self, code):
         if self.routerProcess is None:

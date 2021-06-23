@@ -3,9 +3,10 @@ from .constants import DataSourceTypeEnum, DataSourceReturnEnum
 from .util import pandasUtil as pu
 
 from ..commonUtil.keywordUnpacker import keywordUnpacker
+from ..commonUtil import mpLogging
+from ..commonGlobals import DATA_GROUP
 
 import abc
-import logging
 
 """
 Base class for data importers, holds member variables that all should use and other shared functions
@@ -26,9 +27,8 @@ class dataBase(keywordUnpacker, abc.ABC):
             try:
                 self.dataType = DataSourceTypeEnum[self.dataType]
             except ValueError:
-                logging.warning("Failed setting data type")
-                logging.warning(self.dataType)
-
+                mpLogging.warning("Failed setting data type",
+                                  description=f"Data Type: {self.dataType}", group=DATA_GROUP)
         self.end = False
         self.newCycle = False
         self.indexNum = 0
@@ -84,7 +84,9 @@ class dataBase(keywordUnpacker, abc.ABC):
             else:
                 return None
         except Exception:
-            logging.warning("Exception in check constraint, check constraints were set correctly")
+            mpLogging.warning("Exception in check constraint, check constraints were set correctly", group=DATA_GROUP,
+                              description=f"Lower constraint: {self.lowerConstraint} \
+                                  Upper Constraint: {self.upperConstraint}")
             return None
 
     """

@@ -1,6 +1,7 @@
 from . import constants as con
 
-from ..commonUtil import errorHandling
+from ..commonUtil import mpLogging
+from ..commonGlobals import FEED_GROUP
 
 import pandas as pd
 from numpy import nan as numpyNan
@@ -89,7 +90,8 @@ class feed():
     def update(self):
         rawData = self.getDataFunc(self.period)
         if rawData is None:
-            errorHandling.warning("Data source returned none!!!", description="Don't return none, use END_DATA to end.")
+            mpLogging.warning("Data source returned none", group=FEED_GROUP,
+                              description="Don't return none, use END_DATA to end.")
             return rawData
         elif not isinstance(rawData, pd.DataFrame):
             if (rawData == con.DataSourceReturnEnum.OUTSIDE_CONSTRAINT or rawData == con.DataSourceReturnEnum.NO_DATA
@@ -97,7 +99,7 @@ class feed():
                 # return constant to block, block will clear feed and tell Message Router to clear
                 return rawData
             else:
-                errorHandling.warning("Unexpected type passed to feed from data input, returning None")
+                mpLogging.warning("Unexpected type passed to feed from data input, returning None", group=FEED_GROUP)
                 return None
         # rawData could still be empty
         helperReturn = self.updateHelper(rawData)
@@ -134,7 +136,8 @@ class feed():
             try:
                 self.newCalcData[key.lower()] = value
             except ValueError:
-                errorHandling.printTraceback("Attempted to add col of same length")
+                mpLogging.warning("Attempted to add col of same length", group=FEED_GROUP,
+                                  description=f"Key: {key}")
         else:
             self.newCalcData[key.lower()] = numpyNan
             if safeLength(value) > 0:
@@ -156,8 +159,8 @@ class feed():
                 # if key not in there, will add from 0
                 setFrameColRange(self.newCalcData, key, start, value)
             else:
-                errorHandling.warning("Key doesn't exist in AddToPartialCols",
-                                      description="Key: " + str(key))
+                mpLogging.warning("Key doesn't exist in AddToPartialCols", group=FEED_GROUP,
+                                  description=f"Key: {key}")
 
     def clear(self):
         self.data = None
@@ -174,8 +177,9 @@ class feed():
                 self.data.uid
                 df.uid
             except AttributeError:
-                errorHandling.printTraceback("uid not found in either self.data or newData of \
-                    feed but unique set to true")
+                mpLogging.printTraceback("uid not found", group=FEED_GROUP,
+                                         description="uid not found in either self.data or newData of \
+                                            feed but unique set to true")
             else:
                 dropList = []
                 for index in df.index:

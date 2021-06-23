@@ -19,6 +19,7 @@ class CommandType(Enum):
     RESUME = 4
     CLEAR = 5
     ADD_OUTPUT_VIEW = 6
+    CHECK_STATUS = 7
 
 
 class UiUpdateType(Enum):
@@ -26,6 +27,7 @@ class UiUpdateType(Enum):
     BLOCK = 2
     HANDLER = 3
     LOGGING = 4
+    STATUS = 5
 
 
 """

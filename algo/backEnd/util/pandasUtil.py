@@ -1,4 +1,4 @@
-from ...commonUtil import errorHandling
+from ...commonUtil import mpLogging
 """
 Functions used for pandas dataFrame modifications
 """
@@ -10,7 +10,8 @@ def setIndex(dataFrame, indexName):
     if indexName and indexName in colList:
         return dataFrame.set_index(indexName)
     else:
-        errorHandling.warning("Tried to set index that isn't in the dataframe", "index tried to set: " + str(indexName))
+        mpLogging.warning("Tried to set index that isn't in the dataframe",
+                          description=f"index that was attempted to be set: {indexName}")
     return dataFrame
 
 
