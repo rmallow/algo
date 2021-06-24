@@ -112,3 +112,15 @@ def loadFunc(funcConfig):
     else:
         logging.warning("module not found: " + funcConfig['location'])
     return None
+
+
+def getKeyValueIni(iniFile):
+    valueDict = {}
+    parser = configparser.ConfigParser()
+    with open(iniFile) as stream:
+        # appending a section just in case a section was never passed in
+        parser.read_string("[top]\n" + stream.read())
+    for section in parser.sections():
+        for fileKey, fileValue in parser.items(section):
+            valueDict[str(fileKey)] = fileValue
+    return valueDict

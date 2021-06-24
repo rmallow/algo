@@ -16,6 +16,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Mainframe start loop is now running off of threading timers
+- Moved qt .ui classes to their own subdirectory as ui folder was getting crowded
+- Converted current logging over to mpLogging
 
 ## [0.5.0] - 2021-05-15
 ### Added

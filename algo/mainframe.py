@@ -1,9 +1,13 @@
+# Local common includes
 from .commonSettings import SETTINGS_FILE
 from .commonGlobals import ITEM, SEND_TIME, BACK_TIME
 
+# Common Util includes
 from .commonUtil import mpLogging
 from .commonUtil.helpers import getStrTime
+from .commonUtil import queueManager as qm
 
+# Back End includes
 from .backEnd import message as msg
 from .backEnd import messageKey as msgKey
 from .backEnd.messageRouter import messageRouter
@@ -13,15 +17,20 @@ from .backEnd.handlerData import handlerData
 from .backEnd.util import configLoader
 from .backEnd.util.commandProcessor import commandProcessor
 
-# multiprocess is Dill version of multiprocessing
-from multiprocess import Process, Manager
+# Multi/Asyncio/Threading includes
 import multiprocessing as mp
+# multiprocess is Dill version of multiprocessing
+import multiprocessing as dillMp
+# Lots of appreciation for aioprocessing:
+# https://github.com/dano/aioprocessing
 import aioprocessing
+import threading
+
+# python lib includes
 import os
 import sys
 import configparser
 import time
-import threading
 
 MAINFRAME_QUEUE_CHECK_TIMER = .3
 LOGGING_QUEUE_CHECK_TIMER = .5
@@ -30,32 +39,53 @@ STATUS_CHECK_TIMER = 1
 
 class mainframe(commandProcessor):
 
-    def __init__(self, uiQueue=None):
+    def __init__(self):
         super().__init__()
-        self.processDict = {}
-        self.routerProcess = None
-        self.AioManager = aioprocessing.AioManager()
-        self.MpManager = Manager()
-        self.sharedData = handlerData()
+        # Set up item managers, unrelated to multiprocessing managers
         self.handlerManager = None
         self.blockManager = None
-        self.mainframeQueue = self.MpManager.Queue(-1)
+        self.sharedData = handlerData()
+
+        # Load defaults
+        self.loader = configLoader.configLoader(SETTINGS_FILE)
+
+        # Set up multiprocessing items
+        self.processDict = {}
         self.statusDict = {}
+        self.routerProcess = None
+        # This manager is for providing queues for the Router process
+        self.AioManager = aioprocessing.AioManager()
+
+        # This manager is for providing dill queues for the block processes
+        self.dillBlockManager = dillMp.Manager()
+
+        # address is empty as the client will be acessing it
+        # This manager is for cleint sessions to acess these queues
+        self.clientSeverManager = qm.QueueManager(address=('', int(self.loader.valueDict["server.port"])),
+                                                  authkey=str.encode(self.loader.valueDict["server.authkey"]))
+
+        # This queue is complicated as it's used both by local processes, that won't going through manager to get it
+        # But it will also be used by queues that are only going to be acessing it by manager
+        self.mainframeQueue = mp.Queue(-1)
+        qm.QueueManager.register("getMainframeQueue", callable=lambda: self.mainframeQueue)
+
+        # This queue will only be used by mainframe and ui main model
+        self.uiQueue = mp.Queue(-1)
+        qm.QueueManager.register("getUiQueue", callable=lambda: self.uiQueue)
+
         # we use regular multiprocessing here because otherwise the Dill queue will send to log which
         # causes an infinite loop in our mpLogging module
         # we don't need dill for this queue so it's okay to just use regular multiprocessing queue
+        # this queue is only used "locally" so it won't need to be connected to the manager
         self.loggingQueue = mp.Queue(-1)
-        self.uiQueue = uiQueue
 
-        self.uiConnected = (self.uiQueue is not None)
+        # set up flag variables
+        self.uiConnected = False
 
         # add commands for processor
         self.addCmdFunc(msg.CommandType.ADD_OUTPUT_VIEW, mainframe.addOutputView)
 
-        # init handler manager
-        # Load defaults
-        self.loader = configLoader.configLoader(SETTINGS_FILE)
-
+        # Get other config files to load
         config = configparser.ConfigParser()
         config.read(SETTINGS_FILE)
         blockConfigFile = ""
@@ -64,10 +94,14 @@ class mainframe(commandProcessor):
             blockConfigFile = config.get('Configs', 'Block', fallback="")
             handlerConfigFile = config.get('Configs', 'Handler', fallback="")
 
+        # init handler manager
         self.handlerManager = handlerManager(self.sharedData)
         self.loadHandlerConfig(handlerConfigFile)
 
         # init message router
+        # we use an aio queue here as it needs to be compatible with asyncio
+        # router and handlers use asyncio as handlers could have a lot of output operations
+        # that are best suited to asyncio
         self.messageRouter = messageRouter(self.handlerManager.messageSubscriptions, self.sharedData,
                                            self.AioManager.AioQueue())
 
@@ -76,7 +110,7 @@ class mainframe(commandProcessor):
         self.loadBlockConfig(blockConfigFile)
 
         for _, block in self.blockManager.blocks.items():
-            block.blockQueue = self.MpManager.Queue()
+            block.blockQueue = self.dillBlockManager.Queue()
             block.mainframeQueue = self.mainframeQueue
 
         # this will set the current working directory from wherever to the directory this file is in
@@ -123,10 +157,10 @@ class mainframe(commandProcessor):
         # Check the status of the current running blocks
         for code, block in self.blockManager.blocks.items():
             if code not in self.statusDict:
-                sendTime = getStrTime(time.time())
+                sendTimeFloat = time.time()
                 block.blockQueue.put(msg.message(msg.MessageType.COMMAND, content=msg.CommandType.CHECK_STATUS,
-                                     details={SEND_TIME: sendTime}))
-                self.statusDict[code] = sendTime
+                                     details={SEND_TIME: getStrTime(sendTimeFloat)}))
+                self.statusDict[code] = sendTimeFloat
             else:
                 if time.time() - self.statusDict[code] > 60:
                     # block has not responded for more than 60 seconds to we're assuming it's not responsive
@@ -148,9 +182,9 @@ class mainframe(commandProcessor):
             block.blockQueue.put(msg.message(msg.MessageType.COMMAND, command, details=details))
 
     def startRouter(self):
-        self.routerProcess = Process(target=mpLogging.loggedProcess,
-                                     args=(self.loggingQueue, "router", self.messageRouter.initAndStartLoop), 
-                                     name="Router")
+        self.routerProcess = dillMp.Process(target=mpLogging.loggedProcess,
+                                            args=(self.loggingQueue, "router", self.messageRouter.initAndStartLoop),
+                                            name="Router")
         # self.routerProcess = Process(target=self.messageRouter.initAndStartLoop, name="Router")
         self.routerProcess.start()
 
@@ -180,9 +214,9 @@ class mainframe(commandProcessor):
         processName = "Block-" + str(code)
         # blockProcess = Process(target=mpLogging.loggedProcess
         # block.start, name=processName)
-        blockProcess = Process(target=mpLogging.loggedProcess,
-                               args=(self.loggingQueue, code, block.start),
-                               name=processName)
+        blockProcess = dillMp.Process(target=mpLogging.loggedProcess,
+                                      args=(self.loggingQueue, code, block.start),
+                                      name=processName)
 
         self.processDict[code] = blockProcess
         blockProcess.start()

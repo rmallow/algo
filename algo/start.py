@@ -4,7 +4,6 @@ from .mainframe import mainframe
 import logging
 
 import threading
-from queue import Queue
 import os
 
 
@@ -21,12 +20,10 @@ def setEnvVarsMac():
 def start(clArgs):
     setEnvVarsMac()
     uiArgPresent = False
-    uiQueue = None
     if "-u" in clArgs:
         uiArgPresent = True
-        uiQueue = Queue()
     # init starter variables
-    main = mainframe(uiQueue)
+    main = mainframe()
     mainframeThread = threading.Thread(target=main.start)
     mainframeThread.start()
 
