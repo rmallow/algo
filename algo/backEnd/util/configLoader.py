@@ -41,6 +41,8 @@ class configLoader():
                                 self.valueDict[str(settingsKey)+"."+str(section)+"." + str(fileKey)] = fileValue
                                 self.valueDict[str(section)+"." + str(fileKey)] = fileValue
                             self.valueDict[str(fileKey)] = fileValue
+                else:
+                    mpLogging.warning("Path provided but not found", description=f"Key: {settingsKey} Value/Path: {settingsValue}")
         else:
             print("No default values provided")
 
