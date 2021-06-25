@@ -189,10 +189,13 @@ class mainframe(commandProcessor):
 
     def sendStartupData(self, _):
         details = {}
-        details[BLOCK] = self.getBlocks()
-        details[HANDLER] = self.getHandlers()
+        # we just want the basic information of the blocks and handlers and not the full information
+        # right now it's just sending the code as a dict, but in case we want to send more information
+        # then the value of the dict for each code and be updated
+        details[BLOCK] = dict(zip(self.getBlocks().keys(), self.getBlocks().keys()))
+        details[HANDLER] = dict(zip(self.getHandlers().keys(), self.getHandlers().keys()))
         m = msg.message(msg.MessageType.UI_UPDATE, msg.UiUpdateType.STARTUP, details=details)
-        if self.uiQueue:
+        if self.uiQueue is not None:
             self.uiQueue.put(m)
 
     def startRouter(self):
