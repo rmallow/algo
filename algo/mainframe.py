@@ -65,7 +65,7 @@ class mainframe(commandProcessor):
         authkey = str.encode(self.loader.valueDict["server.authkey"])
         self.clientSeverManager = qm.QueueManager(address=address, authkey=authkey)
 
-        mpLogging.debug("Starting up server manager", description=f"Address ip: {address[0]} port: {address[1]} \
+        print("Starting up server manager", description=f"Address ip: {address[0]} port: {address[1]} \
                          and authkey: {authkey}")
         # This queue is complicated as it's used both by local processes, that won't going through manager to get it
         # But it will also be used by queues that are only going to be acessing it by manager
