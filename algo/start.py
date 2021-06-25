@@ -3,6 +3,7 @@ from .mainframe import mainframe
 
 import logging
 
+import argparse
 import threading
 import os
 
@@ -17,23 +18,29 @@ def setEnvVarsMac():
     os.environ["OBJC_DISABLE_INITIALIZE_FORK_SAFETY"] = "YES"
 
 
-def start(clArgs):
+def start():
     setEnvVarsMac()
-    uiArgPresent = False
-    if "-u" in clArgs:
-        uiArgPresent = True
-    # init starter variables
-    main = mainframe()
-    mainframeThread = threading.Thread(target=main.start)
-    mainframeThread.start()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-u', '--ui', help='Start the ui', action='store_true')
+    parser.add_argument('-s', '--server', help='Start the server', action='store_true')
+    parser.add_argument('-b', '--both', help='Start both ui and server for full local app', action='store_true')
+    args, _ = parser.parse_known_args()
+
+    # init server
+    if args.server or args.both:
+        main = mainframe()
+        mainframeThread = threading.Thread(target=main.start)
+        mainframeThread.start()
 
     # If ui arg passed in then start, otherwise do not import
-    if uiArgPresent:
+    if args.ui or args.both:
         try:
             from .ui import uiStart
         except ModuleNotFoundError:
             logging.critical("UI command arg passes (-u) but ui modules not installed")
         else:
-            uiStart.start(main)
+            # if ui is present we will allow the ui to run it
+            uiStart.start()
     else:
         main.runAll()

@@ -19,19 +19,15 @@ class mainWindow(QtWidgets.QMainWindow):
     runAllSignal = QtCore.Signal()
     endAllSignal = QtCore.Signal()
 
-    def __init__(self, mainframe, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
         # Load UI file
         dirPath = pathUtil.getFileDirPath(__file__)
         self.ui = loadingUtil.loadUiWidget(dirPath + "/" + MAIN_WINDOW_UI_FILE)
 
-        self.mainModel = mainModel(mainframe)
+        self.mainModel = mainModel()
 
-        # Set up connections for mainframe
-        self.mainframe = mainframe
-        self.connectMainframe()
-
-        self.oViewModel = mainOutputViewModel(self.mainframe, self.mainModel)
+        self.oViewModel = mainOutputViewModel(self.mainModel)
 
         # Create and connect logging window
         self.loggingWindow = loggingWindow(self)
@@ -56,9 +52,9 @@ class mainWindow(QtWidgets.QMainWindow):
         self.ui.tabWidget.addTab(bTab, "Blocks")
         self.ui.tabWidget.addTab(hTab, "Handlers")
 
-        bTab.loadItems(self.mainframe.getBlocks())
+        # bTab.loadItems()
         bTab.slotItemChanged(bTab.itemModel.index(0, 0))
-        hTab.loadItems(self.mainframe.getHandlers())
+        # hTab.loadItems()
 
         # Set up signal and slots
 
@@ -73,24 +69,12 @@ class mainWindow(QtWidgets.QMainWindow):
 
         self.ui.show()
 
-    def connectMainframe(self):
-        self.updateData()
-        self.runAllSignal.connect(self.mainframe.runAll)
-        self.endAllSignal.connect(self.mainframe.endAll)
-
-    @QtCore.Slot()
-    def updateData(self):
-        pass
-        # self.ui.blockListWidget.clear()
-        # self.ui.handlerListWidget.clear()
-        # self.loadBlocks(self.mainframe.getBlocks())
-        # self.loadHandlers(self.mainframe.getHandlers())
-
     @QtCore.Slot()
     def slotLoadConfigs(self):
-        blockConfigFile = self.configWindow.ui.blockFileLine.text()
-        handlerConfigFile = self.configWindow.ui.handlerFileLine.text()
-        self.mainframe.loadConfigs(blockConfigFile, handlerConfigFile)
+        pass
+        # blockConfigFile = self.configWindow.ui.blockFileLine.text()
+        # handlerConfigFile = self.configWindow.ui.handlerFileLine.text()
+        # tell mainframe to load configs
 
     @QtCore.Slot()
     def OnStartAllButtonClicked(self):

@@ -8,7 +8,7 @@ from PySide6 import QtGui, QtCore
 
 
 class mainOutputViewModel():
-    def __init__(self, mainframe, mainModel):
+    def __init__(self, mainModel):
 
         # Is it not confusing that QStandardItemModel is in QtGui
         # yet other models are all in QtCore???
@@ -19,8 +19,8 @@ class mainOutputViewModel():
         self.blockComboModel: QtGui.QStandardItemModel = QtGui.QStandardItemModel()
         self.handlerComboModel: QtGui.QStandardItemModel = QtGui.QStandardItemModel()
 
-        self.addBlocks(mainframe.getBlocks())
-        self.addHandlers(mainframe.getHandlers())
+        #self.addBlocks(mainframe.getBlocks())
+        #self.addHandlers(mainframe.getHandlers())
 
         # All output Types are already known at runtime
         # But availability is determined per item

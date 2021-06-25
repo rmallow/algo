@@ -3,9 +3,9 @@ from .mainWindow import mainWindow
 from PySide6 import QtWidgets
 
 
-def start(mainframe):
+def start():
     app = QtWidgets.QApplication([])
 
-    mainWindow(mainframe)
+    mainWindow()
 
     app.exec_()

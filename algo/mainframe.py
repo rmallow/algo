@@ -73,6 +73,9 @@ class mainframe(commandProcessor):
         self.uiQueue = mp.Queue(-1)
         qm.QueueManager.register("getUiQueue", callable=lambda: self.uiQueue)
 
+        # start up the manager thread for serving its objects
+        threading.Thread(target=self.clientSeverManager.get_server().serve_forever).start()
+
         # we use regular multiprocessing here because otherwise the Dill queue will send to log which
         # causes an infinite loop in our mpLogging module
         # we don't need dill for this queue so it's okay to just use regular multiprocessing queue
