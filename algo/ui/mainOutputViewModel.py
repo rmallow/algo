@@ -11,7 +11,7 @@ class mainOutputViewModel(QtCore.QObject):
     addOutputViewSignal = QtCore.Signal(msg.message)
 
     def __init__(self, parent=None):
-        super.__init__(parent)
+        super().__init__(parent)
 
         # Is it not confusing that QStandardItemModel is in QtGui
         # yet other models are all in QtCore???

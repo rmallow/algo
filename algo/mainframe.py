@@ -1,6 +1,6 @@
 # Local common includes
 from .commonSettings import SETTINGS_FILE
-from .commonGlobals import ITEM, SEND_TIME, BACK_TIME
+from .commonGlobals import ITEM, SEND_TIME, BACK_TIME, BLOCK, HANDLER
 
 # Common Util includes
 from .commonUtil import mpLogging
@@ -89,6 +89,7 @@ class mainframe(commandProcessor):
 
         # add commands for processor
         self.addCmdFunc(msg.CommandType.ADD_OUTPUT_VIEW, mainframe.addOutputView)
+        self.addCmdFunc(msg.CommandType.UI_STARTUP, mainframe.sendStartupData)
 
         # Get other config files to load
         config = configparser.ConfigParser()
@@ -185,6 +186,14 @@ class mainframe(commandProcessor):
         if details[ITEM] in self.blockManager.blocks:
             block = self.blockManager.blocks[details[ITEM]]
             block.blockQueue.put(msg.message(msg.MessageType.COMMAND, command, details=details))
+
+    def sendStartupData(self, _):
+        details = {}
+        details[BLOCK] = self.getBlocks()
+        details[HANDLER] = self.getHandlers()
+        m = msg.message(msg.MessageType.UI_UPDATE, msg.UiUpdateType.STARTUP, details=details)
+        if self.uiQueue:
+            self.uiQueue.put(m)
 
     def startRouter(self):
         self.routerProcess = dillMp.Process(target=mpLogging.loggedProcess,

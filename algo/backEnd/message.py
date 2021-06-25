@@ -29,6 +29,7 @@ class UiUpdateType(Enum):
     HANDLER = 3
     LOGGING = 4
     STATUS = 5
+    STARTUP = 6
 
 
 """
