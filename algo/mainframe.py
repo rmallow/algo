@@ -61,9 +61,12 @@ class mainframe(commandProcessor):
 
         # address is empty as the client will be acessing it
         # This manager is for cleint sessions to acess these queues
-        self.clientSeverManager = qm.QueueManager(address=('', int(self.loader.valueDict["server.port"])),
-                                                  authkey=str.encode(self.loader.valueDict["server.authkey"]))
+        address = ('', int(self.loader.valueDict["server.port"]))
+        authkey = str.encode(self.loader.valueDict["server.authkey"])
+        self.clientSeverManager = qm.QueueManager(address=address, authkey=authkey)
 
+        mpLogging.debug("Starting up server manager", description=f"Address ip: {address[0]} port: {address[1]} \
+                         and authkey: {authkey}")
         # This queue is complicated as it's used both by local processes, that won't going through manager to get it
         # But it will also be used by queues that are only going to be acessing it by manager
         self.mainframeQueue = mp.Queue(-1)
