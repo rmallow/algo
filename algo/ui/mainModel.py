@@ -30,8 +30,9 @@ class mainModel(QtCore.QObject):
         if serverDict is None or not all(key in serverDict for key in _requiredServerKeys):
             serverDict = {"ip": "127.0.0.1", "port": 50000, "authkey": b"abc"}
 
-        address = (serverDict['ip'], serverDict['port'])
-        self.clientSeverManager = qm.QueueManager(address=address, authkey=str.encode(serverDict['authkey']))
+        address = (serverDict['ip'], int(serverDict['port']))
+        authkey = str.encode(serverDict['authkey'])
+        self.clientSeverManager = qm.QueueManager(address=address, authkey=authkey)
         self.mainframeQueue = self.clientSeverManager.getMainframeQueue()
         self.uiQueue = self.clientSeverManager.getUiQueue()
 

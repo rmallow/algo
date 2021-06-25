@@ -2,10 +2,10 @@
 # multiprocess is dill wherhas multiprocessing is python built in
 # Choosing SyncManger over BaseManager as this manager will also supply the blocks
 # but those will not be acessible by outside connections
-from multiprocess.managers import SyncManager
+from multiprocess.managers import BaseManager
 
 
-class QueueManager(SyncManager):
+class QueueManager(BaseManager):
     pass
 
 
