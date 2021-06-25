@@ -42,5 +42,5 @@ def start():
         else:
             # if ui is present we will allow the ui to run it
             uiStart.start()
-    else:
+    elif args.server:
         main.runAll()

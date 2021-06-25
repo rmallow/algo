@@ -1,3 +1,6 @@
+# Dict Keys
+BLOCK = "block"
+HANDLER = "handler"
 TYPE = "type"
 ITEM = "item"
 KEY = "key"

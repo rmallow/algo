@@ -25,9 +25,16 @@ class mainWindow(QtWidgets.QMainWindow):
         dirPath = pathUtil.getFileDirPath(__file__)
         self.ui = loadingUtil.loadUiWidget(dirPath + "/" + MAIN_WINDOW_UI_FILE)
 
-        self.mainModel = mainModel()
+        self.mainModel = mainModel(self)
 
-        self.oViewModel = mainOutputViewModel(self.mainModel)
+        # setup main output view model
+        self.oViewModel = mainOutputViewModel(self)
+        self.mainModel.updateOutputSignal.connect(self.oViewModel.receiveData)
+        self.oViewModel.addOutputViewSignal.connect(self.mainModel.messageMainframe)
+
+        # Create and add output view
+        oView = mainOutputView(self.oViewModel, self.ui.tabWidget)
+        self.ui.tabWidget.addTab(oView, "Output")
 
         # Create and connect logging window
         self.loggingWindow = loggingWindow(self)
@@ -38,10 +45,6 @@ class mainWindow(QtWidgets.QMainWindow):
         self.statusWindow = statusWindow(self)
         self.mainModel.updateStatusSignal.connect(self.statusWindow.statusModel.receiveData)
         self.ui.statusButton.clicked.connect(lambda: self.statusWindow.ui.show())
-
-        # Create and add output view
-        oView = mainOutputView(self.oViewModel, self.ui.tabWidget)
-        self.ui.tabWidget.addTab(oView, "Output")
 
         # Create config window
         self.configWindow = configWindow(self)
@@ -65,7 +68,6 @@ class mainWindow(QtWidgets.QMainWindow):
 
         self.ui.startAllButton.clicked.connect(self.OnStartAllButtonClicked)
         self.configWindow.ui.loadConfigsButton.clicked.connect(self.slotLoadConfigs)
-        # self.ui.addBlockButton.clicked.connect(self.slotAddBlock)
 
         self.ui.show()
 

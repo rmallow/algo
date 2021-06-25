@@ -1,14 +1,17 @@
 from .uiConstants import outputTypesEnum
 from .pandasModel import pandasModel
 
-from ..commonGlobals import ITEM
+from ..commonGlobals import ITEM, BLOCK, HANDLER
 from ..backEnd import message as msg
 
 from PySide6 import QtGui, QtCore
 
 
-class mainOutputViewModel():
-    def __init__(self, mainModel):
+class mainOutputViewModel(QtCore.QObject):
+    addOutputViewSignal = QtCore.Signal(msg.message)
+
+    def __init__(self, parent=None):
+        super.__init__(parent)
 
         # Is it not confusing that QStandardItemModel is in QtGui
         # yet other models are all in QtCore???
@@ -19,17 +22,11 @@ class mainOutputViewModel():
         self.blockComboModel: QtGui.QStandardItemModel = QtGui.QStandardItemModel()
         self.handlerComboModel: QtGui.QStandardItemModel = QtGui.QStandardItemModel()
 
-        #self.addBlocks(mainframe.getBlocks())
-        #self.addHandlers(mainframe.getHandlers())
-
         # All output Types are already known at runtime
         # But availability is determined per item
         self.typeModel: QtCore.QStringListModel = QtCore.QStringListModel([val.value for val in outputTypesEnum])
 
-        self.mainModel = mainModel
         self.outputViewModels = {}
-
-        self.mainModel.updateOutputSignal.connect(self.receiveData)
 
     def addItem(self, model, key, value):
         item = QtGui.QStandardItem(str(key))
@@ -58,10 +55,20 @@ class mainOutputViewModel():
 
         m = msg.message(msg.MessageType.COMMAND, msg.CommandType.ADD_OUTPUT_VIEW,
                         details=selectionDict)
-        self.mainModel.messageMainframe(m)
+
+        self.addOutputViewSignal.emit(m)
 
         model = pandasModel(**selectionDict)
         modelList = self.outputViewModels.get(selectionDict[ITEM], [])
         modelList.append(model)
         self.outputViewModels[selectionDict[ITEM]] = modelList
         return model
+
+    @QtCore.Slot()
+    def onStartupMessage(self, message: msg.message):
+        """ On startup message add blocks and handlers to their combo models """
+        if message.details:
+            if BLOCK in message.details:
+                self.addBlocks(message.details[BLOCK])
+            if HANDLER in message.details:
+                self.addHandlers(message.details[HANDLER])
