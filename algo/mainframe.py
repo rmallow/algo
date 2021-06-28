@@ -139,6 +139,7 @@ class mainframe(commandProcessor):
     def sendPendingUiMessages(self):
         m = msg.message(msg.MessageType.MESSAGE_LIST, self.pendingUiMessages)
         self.uiQueue.put(m)
+        self.pendingUiMessages = []
 
     def checkMainframeQueue(self):
         while not self.mainframeQueue.empty():
