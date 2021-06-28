@@ -21,7 +21,8 @@ class CommandType(Enum):
     CLEAR = 5
     ADD_OUTPUT_VIEW = 6
     CHECK_STATUS = 7
-    UI_STARTUP = 8
+    CHECK_UI_STATUS = 8
+    UI_STARTUP = 9
 
 
 class UiUpdateType(Enum):

@@ -67,6 +67,8 @@ class mainOutputViewModel(QtCore.QObject):
     @QtCore.Slot()
     def onStartupMessage(self, message: msg.message):
         """ On startup message add blocks and handlers to their combo models """
+        self.blockComboModel.clear()
+        self.handlerComboModel.clear()
         if message.details:
             if BLOCK in message.details:
                 self.addBlocks(message.details[BLOCK])

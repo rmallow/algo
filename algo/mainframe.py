@@ -35,6 +35,7 @@ import time
 MAINFRAME_QUEUE_CHECK_TIMER = .3
 LOGGING_QUEUE_CHECK_TIMER = .5
 STATUS_CHECK_TIMER = 1
+UI_STATUS_CHECK_TIMER = 10
 
 
 class mainframe(commandProcessor):
@@ -87,10 +88,12 @@ class mainframe(commandProcessor):
         # set up flag variables
         self.uiConnected = False
         self.pendingUiMessages = []
+        self.uiStatusTimer = None
 
         # add commands for processor
         self.addCmdFunc(msg.CommandType.ADD_OUTPUT_VIEW, mainframe.addOutputView)
         self.addCmdFunc(msg.CommandType.UI_STARTUP, mainframe.sendStartupData)
+        self.addCmdFunc(msg.CommandType.CHECK_UI_STATUS, mainframe.checkUiStatus)
 
         # Get other config files to load
         config = configparser.ConfigParser()
@@ -174,6 +177,21 @@ class mainframe(commandProcessor):
         # schedule it again after the timer
         threading.Timer(LOGGING_QUEUE_CHECK_TIMER, self.checkLoggingQueue).start()
 
+    def checkUiStatus(self):
+        if self.uiConnected:
+            if self.uiStatusTimer is None:
+                self.sendToUI(msg.message(msg.MessageType.COMMAND, content=msg.CommandType.CHECK_UI_STATUS))
+                self.uiStatusTimer.cancel()
+                self.uiStatusTimer = threading.Timer(UI_STATUS_CHECK_TIMER, self.checkUiStatus)
+                self.uiStatusTimer.start()
+            else:
+                # This function was called by the timer and not the mainframe processing a response message
+                # Therefore the ui should be disconnected
+                self.uiConnected = False
+                self.uiStatusTimer = None
+        else:
+            self.sendStartupData()
+
     def checkStatus(self):
         # Check the status of the current running blocks
         for code, block in self.blockManager.blocks.items():
@@ -204,6 +222,7 @@ class mainframe(commandProcessor):
 
     def sendStartupData(self, _):
         self.uiConnected = True
+        self.uiStatus = True
         details = {}
         # we just want the basic information of the blocks and handlers and not the full information
         # right now it's just sending the code as a dict, but in case we want to send more information
@@ -215,6 +234,9 @@ class mainframe(commandProcessor):
         # We want the startup message to be processed first so we add it to the start
         self.pendingUiMessages.insert(0, m)
         self.sendPendingUiMessages()
+
+        # Want to start periodically checking UI status to make sure it is still there
+        threading.Timer(UI_STATUS_CHECK_TIMER, self.checkUiStatus).start()
 
     def startRouter(self):
         self.routerProcess = dillMp.Process(target=mpLogging.loggedProcess,

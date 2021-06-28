@@ -47,15 +47,19 @@ class mainModel(commandProcessor, QtCore.QObject):
         m = msg.message(msg.MessageType.COMMAND, msg.CommandType.UI_STARTUP)
         self.messageMainframe(m)
 
-        self.timer = QtCore.QTimer(self)
-        self.timer.timeout.connect(self.checkQueue)
-        self.timer.start(LOOP_INTERVAL_MSECS)
-
+        # ui update messages to qt signals
         self.addCmdFunc(msg.UiUpdateType.BLOCK, lambda obj, _, details=None: obj.updateOutputSignal.emit(details))
         self.addCmdFunc(msg.UiUpdateType.HANDLER, lambda obj, _, details=None: obj.updateOutputSignal.emit(details))
         self.addCmdFunc(msg.UiUpdateType.LOGGING, lambda obj, _, details=None: obj.updateLoggingSignal.emit(details))
         self.addCmdFunc(msg.UiUpdateType.STATUS, lambda obj, _, details=None: obj.updateStatusSignal.emit(details))
         self.addCmdFunc(msg.UiUpdateType.STARTUP, lambda obj, _, details=None: obj.startupSignal.emit(details))
+
+        # command processor functions
+        self.addCmdFunc(msg.CommandType.CHECK_UI_STATUS, self.checkStatus)
+
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.checkQueue)
+        self.timer.start(LOOP_INTERVAL_MSECS)
 
     @QtCore.Slot()
     def messageMainframe(self, message):
@@ -66,9 +70,12 @@ class mainModel(commandProcessor, QtCore.QObject):
     def checkQueue(self):
         while self.uiQueue and not self.uiQueue.empty():
             m: msg.message = self.uiQueue.get()
-            if m.isUIUpdate() and m.content is not None:
+            if not m.isMessageList():
                 self.processCommand(m.content, details=m)
-            elif m.isMessageList() and m.content is not None:
+            else:
                 for msgIter in m.content:
                     if msgIter.isUIUpdate() and msgIter.content is not None:
                         self.processCommand(msgIter.content, details=msgIter)
+
+    def checkStatus(self, _, details=None):
+        self.messageMainframe(details)
