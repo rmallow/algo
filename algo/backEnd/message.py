@@ -10,7 +10,7 @@ class MessageType(Enum):
     NORMAL = 2
     PRIORITY = 3
     UI_UPDATE = 4
-    MESSAGE_LIST = 4
+    MESSAGE_LIST = 5
 
 
 class CommandType(Enum):
