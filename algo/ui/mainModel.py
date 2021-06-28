@@ -5,13 +5,14 @@ from ..commonUtil import queueManager as qm
 
 from ..backEnd import message as msg
 from ..backEnd.util import configLoader
+from ..backEnd.util.commandProcessor import commandProcessor
 
 from PySide6 import QtCore
 
 _requiredServerKeys = ['ip', 'port', 'authkey']
 
 
-class mainModel(QtCore.QObject):
+class mainModel(commandProcessor, QtCore.QObject):
     updateOutputSignal = QtCore.Signal(msg.message)
     updateLoggingSignal = QtCore.Signal(msg.message)
     updateStatusSignal = QtCore.Signal(msg.message)
@@ -50,6 +51,12 @@ class mainModel(QtCore.QObject):
         self.timer.timeout.connect(self.checkQueue)
         self.timer.start(LOOP_INTERVAL_MSECS)
 
+        self.addCmdFunc(msg.UiUpdateType.BLOCK, lambda obj, _, details=None: obj.updateOutputSignal.emit(details))
+        self.addCmdFunc(msg.UiUpdateType.HANDLER, lambda obj, _, details=None: obj.updateOutputSignal.emit(details))
+        self.addCmdFunc(msg.UiUpdateType.LOGGING, lambda obj, _, details=None: obj.updateLoggingSignal.emit(details))
+        self.addCmdFunc(msg.UiUpdateType.STATUS, lambda obj, _, details=None: obj.updateStatusSignal.emit(details))
+        self.addCmdFunc(msg.UiUpdateType.STARTUP, lambda obj, _, details=None: obj.startupSignal.emit(details))
+
     @QtCore.Slot()
     def messageMainframe(self, message):
         if self.mainframeQueue:
@@ -60,11 +67,8 @@ class mainModel(QtCore.QObject):
         while self.uiQueue and not self.uiQueue.empty():
             m: msg.message = self.uiQueue.get()
             if m.isUIUpdate() and m.content is not None:
-                if m.content == msg.UiUpdateType.BLOCK or m.content == msg.UiUpdateType.HANDLER:
-                    self.updateOutputSignal.emit(m)
-                elif m.content == msg.UiUpdateType.LOGGING:
-                    self.updateLoggingSignal.emit(m)
-                elif m.content == msg.UiUpdateType.STATUS:
-                    self.updateStatusSignal.emit(m)
-                elif m.content == msg.UiUpdateType.STARTUP:
-                    self.startupSignal.emit(m)
+                self.processCommand(m.content, details=m)
+            elif m.isMessageList() and m.content is not None:
+                for msgIter in m.content:
+                    if msgIter.isUIUpdate() and msgIter.content is not None:
+                        self.processCommand(msgIter.content, details=msgIter)

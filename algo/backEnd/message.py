@@ -10,6 +10,7 @@ class MessageType(Enum):
     NORMAL = 2
     PRIORITY = 3
     UI_UPDATE = 4
+    MESSAGE_LIST = 4
 
 
 class CommandType(Enum):
@@ -65,3 +66,6 @@ class message:
 
     def isUIUpdate(self):
         return self.messageType == MessageType.UI_UPDATE
+
+    def isMessageList(self):
+        return self.messageType == MessageType.MESSAGE_LIST

@@ -41,14 +41,24 @@ class outputSelect(QtWidgets.QWidget):
         self.isBlockItem = False
         self.outputType = None
 
+    def resetHandlerModel(self):
+        self.selectItemUI.handlerComboBox.setCurrentIndex(-1)
+
+    def resetBlockModel(self):
+        self.selectItemUI.blockComboBox.setCurrentIndex(-1)
+
     def initSelectItem(self):
         self.selectItemUI.blockComboBox.setModel(self.model.blockComboModel)
-        self.selectItemUI.blockComboBox.setCurrentIndex(-1)
+        self.resetBlockModel()
         self.selectItemUI.blockComboBox.textActivated.connect(self.itemSelected)
+        self.model.blockComboModel.rowsInserted.connect(self.resetBlockModel)
+        self.model.blockComboModel.rowsRemoved.connect(self.resetBlockModel)
 
         self.selectItemUI.handlerComboBox.setModel(self.model.handlerComboModel)
-        self.selectItemUI.handlerComboBox.setCurrentIndex(-1)
+        self.resetHandlerModel()
         self.selectItemUI.handlerComboBox.textActivated.connect(self.itemSelected)
+        self.model.handlerComboModel.rowsInserted.connect(self.resetHandlerModel)
+        self.model.handlerComboModel.rowsRemoved.connect(self.resetHandlerModel)
 
     def initSelectType(self):
         self.selectTypeUI.typeComboBox.setModel(self.model.typeModel)

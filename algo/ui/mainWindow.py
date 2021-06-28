@@ -31,6 +31,7 @@ class mainWindow(QtWidgets.QMainWindow):
         self.oViewModel = mainOutputViewModel(self)
         self.mainModel.updateOutputSignal.connect(self.oViewModel.receiveData)
         self.oViewModel.addOutputViewSignal.connect(self.mainModel.messageMainframe)
+        self.mainModel.startupSignal.connect(self.oViewModel.onStartupMessage)
 
         # Create and add output view
         oView = mainOutputView(self.oViewModel, self.ui.tabWidget)
@@ -54,10 +55,6 @@ class mainWindow(QtWidgets.QMainWindow):
         hTab = handlerTab(self.ui.tabWidget)
         self.ui.tabWidget.addTab(bTab, "Blocks")
         self.ui.tabWidget.addTab(hTab, "Handlers")
-
-        # bTab.loadItems()
-        bTab.slotItemChanged(bTab.itemModel.index(0, 0))
-        # hTab.loadItems()
 
         # Set up signal and slots
 

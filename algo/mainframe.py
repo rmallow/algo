@@ -86,6 +86,7 @@ class mainframe(commandProcessor):
 
         # set up flag variables
         self.uiConnected = False
+        self.pendingUiMessages = []
 
         # add commands for processor
         self.addCmdFunc(msg.CommandType.ADD_OUTPUT_VIEW, mainframe.addOutputView)
@@ -124,6 +125,21 @@ class mainframe(commandProcessor):
         dirPath = os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))
         os.chdir(dirPath)
 
+    def sendToUi(self, message):
+        if self.uiQueue is not None:
+            if self.uiConnected:
+                if len(self.pendingUiMessages) > 0:
+                    self.sendPendingUiMessages()
+                self.uiQueue.put(message)
+            else:
+                self.pendingUiMessages.append(message)
+        else:
+            mpLogging.error("Major error, ui queue is none, this should never happen")
+
+    def sendPendingUiMessages(self):
+        m = msg.message(msg.MessageType.MESSAGE_LIST, self.pendingUiMessages)
+        self.uiQueue.put(m)
+
     def checkMainframeQueue(self):
         while not self.mainframeQueue.empty():
             message = self.mainframeQueue.get()
@@ -142,8 +158,7 @@ class mainframe(commandProcessor):
                             mpLogging.error("Trying to remove code from status dict that isn't present",
                                             description=f"Code: {code}")
                             continue
-                    if self.uiQueue is not None:
-                        self.uiQueue.put(message)
+                    self.sendToUi(message)
         # schedule it again after the timer
         threading.Timer(MAINFRAME_QUEUE_CHECK_TIMER, self.checkMainframeQueue).start()
 
@@ -152,10 +167,9 @@ class mainframe(commandProcessor):
         while not self.loggingQueue.empty():
             recordData = self.loggingQueue.get()
             if recordData:
-                if self.uiQueue is not None:
-                    uiLoggingMessage = msg.message(msg.MessageType.UI_UPDATE, content=msg.UiUpdateType.LOGGING,
-                                                   details=recordData)
-                    self.uiQueue.put(uiLoggingMessage)
+                uiLoggingMessage = msg.message(msg.MessageType.UI_UPDATE, content=msg.UiUpdateType.LOGGING,
+                                               details=recordData)
+                self.sendToUi(uiLoggingMessage)
         # schedule it again after the timer
         threading.Timer(LOGGING_QUEUE_CHECK_TIMER, self.checkLoggingQueue).start()
 
@@ -171,9 +185,9 @@ class mainframe(commandProcessor):
                 if time.time() - self.statusDict[code] > 60:
                     # block has not responded for more than 60 seconds to we're assuming it's not responsive
                     # so we'll remove it from the status dict so it's checked again
-                    if self.uiQueue is not None:
-                        self.uiQueue.put(msg.message(msg.MessageType.UI_UPDATE, content=msg.UiUpdateType.STATUS,
-                                         details={SEND_TIME: self.statusDict[code]}, key=msgKey.messageKey(code, None)))
+                    m = msg.message(msg.MessageType.UI_UPDATE, content=msg.UiUpdateType.STATUS,
+                                    details={SEND_TIME: self.statusDict[code]}, key=msgKey.messageKey(code, None))
+                    self.sendToUi(m)
                     del self.statusDict[code]
         # schedule it again after the timer
         threading.Timer(STATUS_CHECK_TIMER, self.checkStatus).start()
@@ -188,6 +202,7 @@ class mainframe(commandProcessor):
             block.blockQueue.put(msg.message(msg.MessageType.COMMAND, command, details=details))
 
     def sendStartupData(self, _):
+        self.uiConnected = True
         details = {}
         # we just want the basic information of the blocks and handlers and not the full information
         # right now it's just sending the code as a dict, but in case we want to send more information
@@ -195,8 +210,10 @@ class mainframe(commandProcessor):
         details[BLOCK] = dict(zip(self.getBlocks().keys(), self.getBlocks().keys()))
         details[HANDLER] = dict(zip(self.getHandlers().keys(), self.getHandlers().keys()))
         m = msg.message(msg.MessageType.UI_UPDATE, msg.UiUpdateType.STARTUP, details=details)
-        if self.uiQueue is not None:
-            self.uiQueue.put(m)
+
+        # We want the startup message to be processed first so we add it to the start
+        self.pendingUiMessages.insert(0, m)
+        self.sendPendingUiMessages()
 
     def startRouter(self):
         self.routerProcess = dillMp.Process(target=mpLogging.loggedProcess,
