@@ -195,7 +195,7 @@ class mainframe(commandProcessor):
             # So we got a status message back after we thought the ui was disconnected, so start it back up again
             self.sendStartupData()
 
-    def checkStatus(self, _, details=None):
+    def checkStatus(self):
         # Check the status of the current running blocks
         for code, block in self.blockManager.blocks.items():
             if code not in self.statusDict:
