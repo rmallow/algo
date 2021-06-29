@@ -44,7 +44,7 @@ class mainframe(commandProcessor):
     def __init__(self):
         super().__init__()
         # have to set the level for logging
-        logging.getLogger().setLevel(logging.info)
+        logging.getLogger().setLevel(logging.INFO)
 
         # Set up item managers, unrelated to multiprocessing managers
         self.handlerManager = None
