@@ -127,6 +127,7 @@ class mainframe(commandProcessor):
         # sys.path.append(os.path.dirname(os.path.abspath(sys.modules[__name__].__file__)))
         dirPath = os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))
         os.chdir(dirPath)
+        mpLogging.info("Finished initializing mainframe")
 
     def sendToUi(self, message):
         if self.uiQueue is not None:
@@ -140,6 +141,7 @@ class mainframe(commandProcessor):
             mpLogging.error("Major error, ui queue is none, this should never happen")
 
     def sendPendingUiMessages(self):
+        mpLogging.info("Sending pending messages to the UI")
         m = msg.message(msg.MessageType.MESSAGE_LIST, self.pendingUiMessages)
         self.uiQueue.put(m)
         self.pendingUiMessages = []
@@ -189,6 +191,7 @@ class mainframe(commandProcessor):
             else:
                 # This function was called by the timer and not the mainframe processing a response message
                 # Therefore the ui should be disconnected
+                mpLogging.info("UI was connected but is now disconnected")
                 self.uiConnected = False
                 self.uiStatusTimer = None
         else:
@@ -224,8 +227,8 @@ class mainframe(commandProcessor):
             block.blockQueue.put(msg.message(msg.MessageType.COMMAND, command, details=details))
 
     def sendStartupData(self, _):
+        mpLogging.info("Sending startup data to the UI that was connected")
         self.uiConnected = True
-        self.uiStatus = True
         details = {}
         # we just want the basic information of the blocks and handlers and not the full information
         # right now it's just sending the code as a dict, but in case we want to send more information
