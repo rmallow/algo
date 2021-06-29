@@ -27,6 +27,7 @@ import aioprocessing
 import threading
 
 # python lib includes
+import logging
 import os
 import sys
 import configparser
@@ -42,6 +43,9 @@ class mainframe(commandProcessor):
 
     def __init__(self):
         super().__init__()
+        # have to set the level for logging
+        logging.getLogger().setLevel(logging.info)
+
         # Set up item managers, unrelated to multiprocessing managers
         self.handlerManager = None
         self.blockManager = None
