@@ -74,7 +74,7 @@ class mainModel(commandProcessor, QtCore.QObject):
                 self.processCommand(m.content, details=m)
             else:
                 for msgIter in m.content:
-                    if msgIter.isUIUpdate() and msgIter.content is not None:
+                    if msgIter.content is not None:
                         self.processCommand(msgIter.content, details=msgIter)
 
     def checkStatus(self, _, details=None):

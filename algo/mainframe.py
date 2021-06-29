@@ -177,8 +177,8 @@ class mainframe(commandProcessor):
         # schedule it again after the timer
         threading.Timer(LOGGING_QUEUE_CHECK_TIMER, self.checkLoggingQueue).start()
 
-    def checkUiStatus(self, content):
-        # Blank arg is so this function can be used with command processor
+    def checkUiStatus(self, content, details=None):
+        # if content is None then it was called by timer
         if self.uiConnected:
             if content is not None:
                 self.sendToUI(msg.message(msg.MessageType.COMMAND, content=msg.CommandType.CHECK_UI_STATUS))
@@ -195,7 +195,7 @@ class mainframe(commandProcessor):
             # So we got a status message back after we thought the ui was disconnected, so start it back up again
             self.sendStartupData()
 
-    def checkStatus(self):
+    def checkItemStatus(self):
         # Check the status of the current running blocks
         for code, block in self.blockManager.blocks.items():
             if code not in self.statusDict:
@@ -212,7 +212,7 @@ class mainframe(commandProcessor):
                     self.sendToUi(m)
                     del self.statusDict[code]
         # schedule it again after the timer
-        threading.Timer(STATUS_CHECK_TIMER, self.checkStatus).start()
+        threading.Timer(STATUS_CHECK_TIMER, self.checkItemStatus).start()
 
     def start(self):
         threading.Timer(MAINFRAME_QUEUE_CHECK_TIMER, self.checkMainframeQueue).start()
@@ -259,7 +259,7 @@ class mainframe(commandProcessor):
             else:
                 print("Error Running Block: " + code)
 
-        threading.Timer(STATUS_CHECK_TIMER, self.checkStatus).start()
+        threading.Timer(STATUS_CHECK_TIMER, self.checkItemStatus).start()
 
     def runBlock(self, code):
         if self.routerProcess is None:
