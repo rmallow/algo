@@ -177,12 +177,14 @@ class mainframe(commandProcessor):
         # schedule it again after the timer
         threading.Timer(LOGGING_QUEUE_CHECK_TIMER, self.checkLoggingQueue).start()
 
-    def checkUiStatus(self):
+    def checkUiStatus(self, content):
+        # Blank arg is so this function can be used with command processor
         if self.uiConnected:
-            if self.uiStatusTimer is None:
+            if content is not None:
                 self.sendToUI(msg.message(msg.MessageType.COMMAND, content=msg.CommandType.CHECK_UI_STATUS))
-                self.uiStatusTimer.cancel()
-                self.uiStatusTimer = threading.Timer(UI_STATUS_CHECK_TIMER, self.checkUiStatus)
+                if self.uiStatusTimer is not None:
+                    self.uiStatusTimer.cancel()
+                self.uiStatusTimer = threading.Timer(UI_STATUS_CHECK_TIMER, self.checkUiStatus, [None])
                 self.uiStatusTimer.start()
             else:
                 # This function was called by the timer and not the mainframe processing a response message
@@ -190,9 +192,10 @@ class mainframe(commandProcessor):
                 self.uiConnected = False
                 self.uiStatusTimer = None
         else:
+            # So we got a status message back after we thought the ui was disconnected, so start it back up again
             self.sendStartupData()
 
-    def checkStatus(self):
+    def checkStatus(self, _, details=None):
         # Check the status of the current running blocks
         for code, block in self.blockManager.blocks.items():
             if code not in self.statusDict:
@@ -236,7 +239,8 @@ class mainframe(commandProcessor):
         self.sendPendingUiMessages()
 
         # Want to start periodically checking UI status to make sure it is still there
-        threading.Timer(UI_STATUS_CHECK_TIMER, self.checkUiStatus).start()
+        # Passing in None as the command arg
+        threading.Timer(UI_STATUS_CHECK_TIMER, self.checkUiStatus, [None]).start()
 
     def startRouter(self):
         self.routerProcess = dillMp.Process(target=mpLogging.loggedProcess,
