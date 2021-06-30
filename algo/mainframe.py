@@ -190,8 +190,8 @@ class mainframe(commandProcessor):
                 self.sendToUI(msg.message(msg.MessageType.COMMAND, content=msg.CommandType.CHECK_UI_STATUS))
                 if self.uiStatusTimer is not None:
                     self.uiStatusTimer.cancel()
-                self.uiStatusTimer = threading.Timer(UI_STATUS_CHECK_TIMER, self.checkUiStatus, [None])
-                self.uiStatusTimer.start()
+                #self.uiStatusTimer = threading.Timer(UI_STATUS_CHECK_TIMER, self.checkUiStatus, [None])
+                #self.uiStatusTimer.start()
             else:
                 # This function was called by the timer and not the mainframe processing a response message
                 # Therefore the ui should be disconnected
