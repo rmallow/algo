@@ -36,7 +36,8 @@ import time
 MAINFRAME_QUEUE_CHECK_TIMER = .3
 LOGGING_QUEUE_CHECK_TIMER = .5
 STATUS_CHECK_TIMER = 1
-UI_STATUS_CHECK_TIMER = 10
+UI_STATUS_CHECK_TIMER = 5
+UI_SEND_STATUS_CHECK = 1
 
 
 class mainframe(commandProcessor):
@@ -97,7 +98,7 @@ class mainframe(commandProcessor):
         # add commands for processor
         self.addCmdFunc(msg.CommandType.ADD_OUTPUT_VIEW, mainframe.addOutputView)
         self.addCmdFunc(msg.CommandType.UI_STARTUP, mainframe.sendStartupData)
-        self.addCmdFunc(msg.CommandType.CHECK_UI_STATUS, mainframe.checkUiStatus)
+        self.addCmdFunc(msg.CommandType.CHECK_UI_STATUS, mainframe.sendStatusCheck)
 
         # Get other config files to load
         config = configparser.ConfigParser()
@@ -183,24 +184,14 @@ class mainframe(commandProcessor):
         # schedule it again after the timer
         threading.Timer(LOGGING_QUEUE_CHECK_TIMER, self.checkLoggingQueue).start()
 
-    def checkUiStatus(self, content, details=None):
-        # if content is None then it was called by timer
-        if self.uiConnected:
-            if content is not None:
-                self.sendToUI(msg.message(msg.MessageType.COMMAND, content=msg.CommandType.CHECK_UI_STATUS))
-                if self.uiStatusTimer is not None:
-                    self.uiStatusTimer.cancel()
-                #self.uiStatusTimer = threading.Timer(UI_STATUS_CHECK_TIMER, self.checkUiStatus, [None])
-                #self.uiStatusTimer.start()
-            else:
-                # This function was called by the timer and not the mainframe processing a response message
-                # Therefore the ui should be disconnected
-                mpLogging.info("UI was connected but is now disconnected")
-                self.uiConnected = False
-                self.uiStatusTimer = None
-        else:
+    def sendStatusCheck(self, content, details=None):
+        self.uiLastTime = time.time()
+        if not self.uiConnected:
             # So we got a status message back after we thought the ui was disconnected, so start it back up again
             self.sendStartupData()
+        # we'll just reply by sending the message back in 10 seconds
+        threading.Timer(UI_SEND_STATUS_CHECK, self.sendToUi,
+                        [msg.message(msg.MessageType.COMMAND, content=msg.CommandType.CHECK_UI_STATUS)])
 
     def checkItemStatus(self):
         # Check the status of the current running blocks
@@ -247,7 +238,13 @@ class mainframe(commandProcessor):
 
         # Want to start periodically checking UI status to make sure it is still there
         # Passing in None as the command arg
-        threading.Timer(UI_STATUS_CHECK_TIMER, self.checkUiStatus, [None]).start()
+        threading.Timer(UI_STATUS_CHECK_TIMER, self.isUiConnected).start()
+
+    def isUiConnected(self):
+        if time.time() - self.uiLastTime > UI_STATUS_CHECK_TIMER * 3:
+            self.uiConnected = False
+        else:
+            threading.Timer(UI_STATUS_CHECK_TIMER, self.isUiConnected).start()
 
     def startRouter(self):
         self.routerProcess = dillMp.Process(target=mpLogging.loggedProcess,
