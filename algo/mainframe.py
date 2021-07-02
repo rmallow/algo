@@ -28,8 +28,6 @@ import threading
 
 # python lib includes
 import logging
-import os
-import sys
 import configparser
 import time
 
@@ -65,10 +63,21 @@ class mainframe(commandProcessor):
         # This manager is for providing dill queues for the block processes
         self.dillBlockManager = dillMp.Manager()
 
+        port = None
+        authkey = None
+        if "server.port" in self.loader.valueDict:
+            port = int(self.loader.valueDict["server.port"])
+        else:
+            port = 50000
         # address is empty as the client will be acessing it
+        address = ('', port)
+
+        if "server.authkey" in self.loader.valueDict:
+            authkey = str.encode(self.loader.valueDict["server.authkey"])
+        else:
+            authkey = b"abc"
+
         # This manager is for cleint sessions to acess these queues
-        address = ('', int(self.loader.valueDict["server.port"]))
-        authkey = str.encode(self.loader.valueDict["server.authkey"])
         self.clientSeverManager = qm.QueueManager(address=address, authkey=authkey)
 
         print(f"Starting up server manager Address ip: {address[0]} port: {address[1]} and authkey: {authkey}")
@@ -130,8 +139,9 @@ class mainframe(commandProcessor):
 
         # this will set the current working directory from wherever to the directory this file is in
         # sys.path.append(os.path.dirname(os.path.abspath(sys.modules[__name__].__file__)))
-        dirPath = os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))
-        os.chdir(dirPath)
+        # removed this on 7/1/2021, if it doesn't have any issues after a month, permanently take out
+        # dirPath = os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))
+        # os.chdir(dirPath)
         mpLogging.info("Finished initializing mainframe")
 
     def sendToUi(self, message):
@@ -212,7 +222,7 @@ class mainframe(commandProcessor):
         # schedule it again after the timer
         threading.Timer(STATUS_CHECK_TIMER, self.checkItemStatus).start()
 
-    def start(self):
+    def init(self):
         threading.Timer(MAINFRAME_QUEUE_CHECK_TIMER, self.checkMainframeQueue).start()
         threading.Timer(LOGGING_QUEUE_CHECK_TIMER, self.checkLoggingQueue).start()
 
@@ -257,7 +267,8 @@ class mainframe(commandProcessor):
         # self.routerProcess = Process(target=self.messageRouter.initAndStartLoop, name="Router")
         self.routerProcess.start()
 
-    def runAll(self):
+    def cmdStart(self, _, details=None):
+        # Called by command processor on receiving the start command message
         if self.routerProcess is None:
             self.startRouter()
 
@@ -290,7 +301,8 @@ class mainframe(commandProcessor):
         self.processDict[code] = blockProcess
         blockProcess.start()
 
-    def endAll(self):
+    def cmdEnd(self, _, details=None):
+        # Called by command processor on receiving the end command message
         while self.processDict:
             for key, p in self.processDict.items():
                 p.join(.5)

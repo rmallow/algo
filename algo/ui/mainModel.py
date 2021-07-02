@@ -9,8 +9,6 @@ from ..backEnd.util.commandProcessor import commandProcessor
 
 from PySide6 import QtCore
 
-_requiredServerKeys = ['ip', 'port', 'authkey']
-
 
 class mainModel(commandProcessor, QtCore.QObject):
     updateOutputSignal = QtCore.Signal(msg.message)
@@ -30,12 +28,28 @@ class mainModel(commandProcessor, QtCore.QObject):
         if "server" in settingsDict:
             serverDict = configLoader.getKeyValueIni(settingsDict["server"])
 
-        if serverDict is None or not all(key in serverDict for key in _requiredServerKeys):
-            serverDict = {"ip": "127.0.0.1", "port": 50000, "authkey": b"abc"}
+        port = None
+        authkey = None
+        ip = None
+        if 'port' in serverDict:
+            port = int(serverDict['port'])
+        else:
+            port = 50000
+        # address is empty as the client will be acessing it
+        address = ('', port)
+
+        if 'authkey' in serverDict:
+            authkey = str.encode(serverDict['authkey'])
+        else:
+            authkey = b'abc'
+
+        if 'ip' in serverDict:
+            ip = serverDict['ip']
+        else:
+            ip = "127.0.0.1"
 
         # Connect to clientServerManager
-        address = (serverDict['ip'], int(serverDict['port']))
-        authkey = str.encode(serverDict['authkey'])
+        address = (ip, port)
         self.clientSeverManager = qm.QueueManager(address=address, authkey=authkey)
         self.clientSeverManager.connect()
 
@@ -76,6 +90,14 @@ class mainModel(commandProcessor, QtCore.QObject):
                 for msgIter in m.content:
                     if msgIter.content is not None:
                         self.processCommand(msgIter.content, details=msgIter)
+
+    @QtCore.Slot()
+    def sendCmdStart(self):
+        self.messageMainframe(msg.message(msg.MessageType.COMMAND, msg.CommandType.START))
+
+    @QtCore.Slot()
+    def sendCmdEnd(self):
+        self.messageMainframe(msg.message(msg.MessageType.COMMAND, msg.CommandType.END))
 
     def checkStatus(self, _, details=None):
         self.messageMainframe(details)

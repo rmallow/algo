@@ -64,6 +64,8 @@ class mainWindow(QtWidgets.QMainWindow):
         # Spooky, noted to fix in later development
 
         self.ui.startAllButton.clicked.connect(self.OnStartAllButtonClicked)
+        self.runAllSignal.connect(self.mainModel.sendCmdStart)
+        self.endAllSignal.connect(self.mainModel.sendCmdEnd)
         self.configWindow.ui.loadConfigsButton.clicked.connect(self.slotLoadConfigs)
 
         self.ui.show()

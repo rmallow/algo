@@ -30,7 +30,7 @@ def start():
     # init server
     if args.server or args.both:
         main = mainframe()
-        mainframeThread = threading.Thread(target=main.start)
+        mainframeThread = threading.Thread(target=main.init)
         mainframeThread.start()
 
     # If ui arg passed in then start, otherwise do not import
