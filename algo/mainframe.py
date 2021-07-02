@@ -93,7 +93,7 @@ class mainframe(commandProcessor):
         # set up flag variables
         self.uiConnected = False
         self.pendingUiMessages = []
-        self.uiStatusTimer = None
+        self.uiLastTime = None
 
         # add commands for processor
         self.addCmdFunc(msg.CommandType.ADD_OUTPUT_VIEW, mainframe.addOutputView)
@@ -241,7 +241,11 @@ class mainframe(commandProcessor):
         threading.Timer(UI_STATUS_CHECK_TIMER, self.isUiConnected).start()
 
     def isUiConnected(self):
-        if time.time() - self.uiLastTime > UI_STATUS_CHECK_TIMER * 3:
+        # If the ui has responded at one point and then not for a while we're going to say it's disconnected
+        # This will cause message to be sent to ui to be stored in pending messages
+        # once the ui is reconnected we'll send the pending messages on one message
+        # so as to not clog the queue
+        if self.uiLastTime and time.time() - self.uiLastTime > UI_STATUS_CHECK_TIMER * 3:
             self.uiConnected = False
         else:
             threading.Timer(UI_STATUS_CHECK_TIMER, self.isUiConnected).start()
