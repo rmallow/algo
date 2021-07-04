@@ -113,5 +113,6 @@ class outputSelect(QtWidgets.QWidget):
     @QtCore.Slot()
     def settingsSelected(self):
         self.selectionSettings[PERIOD] = self.selectSettingsUI.periodSpinBox.value()
-        self.selectionSettings[BACKTRACK] = self.selectSettingsUI.backtrackSpinBox.value()
+        self.selectionSettings[BACKTRACK] = min(self.selectionSettings[PERIOD],
+                                                self.selectSettingsUI.backtrackSpinBox.value())
         self.selectionFinished.emit(self.selectionSettings)

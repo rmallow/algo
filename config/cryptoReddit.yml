@@ -8,7 +8,7 @@ BTC:
         columnFilter:
             - price
             - volume
-        period: 15
+        period: 60
         dayFirst: False
     feed:
         period: 60
