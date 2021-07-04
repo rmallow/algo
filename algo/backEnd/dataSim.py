@@ -34,7 +34,7 @@ class dataSim(dataBase):
 
         self.data = self.dataFrameModifications(self.data)
 
-    def getData(self, period):
+    def getData(self):
         afterData = None
         if self.lastIndex is None:
             self.lastIndex = self.data.index[0]
@@ -60,7 +60,7 @@ class dataSim(dataBase):
         index = -1
         for idx, time in enumerate(timesAfter):
             index = idx
-            if (time - self.lastIndex).total_seconds() >= period:
+            if (time - self.lastIndex).total_seconds() >= self.period:
                 break
 
         if index == -1:

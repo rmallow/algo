@@ -166,7 +166,7 @@ class mainframe(commandProcessor):
             message = self.mainframeQueue.get()
             if isinstance(message, msg.message):
                 if message.isCommand():
-                    self.processCommand(message.content, message.details)
+                    self.processCommand(message.content, details=message.details)
                 elif message.isUIUpdate():
                     if message.content == msg.UiUpdateType.STATUS:
                         # Extra handling for status, adding back time and removing from status dict

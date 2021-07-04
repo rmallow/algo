@@ -7,7 +7,7 @@ from .util.commandProcessor import commandProcessor
 
 from ..commonUtil import mpLogging
 from ..commonUtil.helpers import getStrTime
-from ..commonGlobals import BLOCK_GROUP, SEND_TIME, RECEIVE_TIME, NOT_AVAIL_STR
+from ..commonGlobals import BLOCK_GROUP, SEND_TIME, RECEIVE_TIME, NOT_AVAIL_STR, BACKTRACK
 
 import pandas as pd
 import threading
@@ -77,12 +77,7 @@ class block(commandProcessor):
                     self.keepUpdating = False
 
             if self.track:
-                calcTail = self.feed.calcData.tail(len(self.feed.newData))
-                dataTail = self.feed.data.tail(len(self.feed.newData))
-                combinedDf = pd.concat([dataTail, calcTail], axis=1)
-                m = msg.message(msg.MessageType.UI_UPDATE, content=msg.UiUpdateType.BLOCK, details=combinedDf,
-                                key=msgKey.messageKey(self.code, combinedDf.index[0]))
-                self.mainframeQueue.put(m)
+                self.sendCombinedDf(len(self.feed.newData.index))
 
         # Return some data at the end
         return(self.feed.data, self.feed.calcData)
@@ -94,8 +89,30 @@ class block(commandProcessor):
                               key=msgKey.messageKey(self.code, None))
         self.messageRouter.receive(message)
 
-    def addOutputView(self, _, _2):
+    def addOutputView(self, _, details=None):
+        if details and BACKTRACK in details and details[BACKTRACK] != 0:
+            # if backtrack is present and is not 0 then send back to mainframed
+            # the desired amount of data
+            backtrackLength = details[BACKTRACK]
+            if backtrackLength == -1:
+                # if back track is -1 then send all of the data available
+                backtrackLength = len(self.feed.data.index)
+            self.sendCombinedDf(backtrackLength)
+
         self.track = True
+
+    def sendCombinedDf(self, length):
+        # need to check lengths on both, we want length to the be the shorter of the two
+        if length > len(self.feed.calcData.index):
+            length = len(self.feed.calcData.index)
+        if length > len(self.feed.data.index):
+            length = len(self.feed.data.index)
+        calcTail = self.feed.calcData.tail(length)
+        dataTail = self.feed.data.tail(length)
+        combinedDf = pd.concat([dataTail, calcTail], axis=1)
+        m = msg.message(msg.MessageType.UI_UPDATE, content=msg.UiUpdateType.BLOCK, details=combinedDf,
+                        key=msgKey.messageKey(self.code, combinedDf.index[0]))
+        self.mainframeQueue.put(m)
 
     def checkStatus(self, _, details):
         returnMessage = msg.message(msg.MessageType.UI_UPDATE, msg.UiUpdateType.STATUS,

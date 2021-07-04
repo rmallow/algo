@@ -2,7 +2,7 @@ from .uiSettings import OUTPUT_SELECT_ITEM_UI_FILE, OUTPUT_SELECT_TYPE_UI_FILE, 
 
 from .util import loadingUtil, animations
 
-from ..commonGlobals import TYPE, ITEM, PERIOD
+from ..commonGlobals import TYPE, ITEM, PERIOD, BACKTRACK
 from ..commonUtil import pathUtil
 
 from PySide6 import QtWidgets, QtCore
@@ -113,4 +113,5 @@ class outputSelect(QtWidgets.QWidget):
     @QtCore.Slot()
     def settingsSelected(self):
         self.selectionSettings[PERIOD] = self.selectSettingsUI.periodSpinBox.value()
+        self.selectionSettings[BACKTRACK] = self.selectSettingsUI.backtrackSpinBox.value()
         self.selectionFinished.emit(self.selectionSettings)

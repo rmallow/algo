@@ -35,8 +35,6 @@ class mainModel(commandProcessor, QtCore.QObject):
             port = int(serverDict['port'])
         else:
             port = 50000
-        # address is empty as the client will be acessing it
-        address = ('', port)
 
         if 'authkey' in serverDict:
             authkey = str.encode(serverDict['authkey'])

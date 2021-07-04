@@ -1,6 +1,8 @@
 from . import action as act
 from . import constants as con
 
+from ..commonUtil import mpLogging
+
 
 class event(act.action):
     def __init__(self, *args, **kwargs):
@@ -52,6 +54,9 @@ class event(act.action):
             if col not in feed.data.columns:
                 # find the column and get just the parts we care about
                 inputColDf = act.findCol(feed, col)
+                if inputColDf is None:
+                    mpLogging.error("Adding inf but findCol found none",
+                                    description=f"findCol called with col {col}")
                 rangeIndexEnd = len(inputColDf.index)
                 inputColDf = inputColDf.iloc[rangeIndexStart:rangeIndexEnd]
                 # kinda hacky but used isin and list instead of == to supress annoying numpy warning

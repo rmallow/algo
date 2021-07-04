@@ -88,7 +88,7 @@ class feed():
         return None
 
     def update(self):
-        rawData = self.getDataFunc(self.period)
+        rawData = self.getDataFunc()
         if rawData is None:
             mpLogging.warning("Data source returned none", group=FEED_GROUP,
                               description="Don't return none, use END_DATA to end.")

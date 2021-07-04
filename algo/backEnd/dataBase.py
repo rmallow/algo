@@ -96,7 +96,7 @@ class dataBase(keywordUnpacker, abc.ABC):
     @param: period      -   period of time to which get data
     """
     @abc.abstractmethod
-    def getData(self, period):
+    def getData(self):
         return
 
     """

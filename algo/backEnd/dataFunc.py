@@ -18,7 +18,7 @@ class dataFunc(dataBase):
 
         self.loadData()
 
-    def getData(self, period):
+    def getData(self):
         mpLogging.info("Data func getting data", group=DATA_GROUP)
         if self.time:
             diff = time.time() - self.time
