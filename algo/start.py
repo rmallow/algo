@@ -43,4 +43,4 @@ def start():
             # if ui is present we will allow the ui to run it
             uiStart.start()
     elif args.server:
-        main.cmdStart()
+        main.cmdStart(None)
