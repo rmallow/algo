@@ -37,8 +37,9 @@ def start():
     if args.ui or args.both:
         try:
             from .ui import uiStart
-        except ModuleNotFoundError:
-            logging.critical("UI command arg passes (-u) but ui modules not installed")
+        except ModuleNotFoundError as e:
+            logging.critical("UI arg passed (-u) but ui modules not installed")
+            logging.critical(e)
         else:
             # if ui is present we will allow the ui to run it
             uiStart.start()

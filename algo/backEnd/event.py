@@ -20,7 +20,8 @@ class event(act.action):
         index = feed.newCalcData[self.name].last_valid_index()
         if index:
             start = feed.newCalcData.index.get_loc(index) + 1
-        if start < len(feed.newCalcData.index):
+        newCalcDataIndexLength = len(feed.newCalcData.index)
+        if start < newCalcDataIndexLength:
             # checking whats the first calculated data needs to be fixed
             # first parameter can be used by functions to only do some computations on first attempt
             if feed.newCalcData[self.name].iloc[-1] == con.INSUF_DATA:
@@ -30,7 +31,10 @@ class event(act.action):
                 feed.addToPartialCols({self.name: calcFuncVal})
 
             self.parameters['first'] = False
-            for _ in range(start, len(feed.newCalcData.index)):
+            for _ in range(start, newCalcDataIndexLength):
+                # Debugging line:
+                colValues = feed.newCalcData[self.name]
+
                 calcFuncVal = super().update(feed)
                 feed.addToPartialCols({self.name: calcFuncVal})
 

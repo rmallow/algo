@@ -11,6 +11,7 @@ RECEIVE_TIME = "receive time"
 BACK_TIME = "back time"
 
 NOT_AVAIL_STR = "N/A"
+MAINFRAME = "Mainframe"
 
 # Logging groups
 ACTION_GROUP = "Action"
